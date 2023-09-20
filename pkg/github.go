@@ -43,12 +43,12 @@ func NewGithub() *Github {
 	}
 }
 
-func (g *Github) DownloadGist(gistId string) error {
+func (g *Github) DownloadGist(gistId string) (string, error) {
 	apiUrl := "https://api.github.com/gists/" + gistId
 	req, err := http.NewRequest("GET", apiUrl, nil)
 	if err != nil {
 		log.Errorf("do http error: %v", err)
-		return err
+		return "", err
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
 	req.Header.Set("Authorization", "Bearer "+g.token)
@@ -56,12 +56,12 @@ func (g *Github) DownloadGist(gistId string) error {
 
 	resp, err := g.httpClient.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	data := gjson.ParseBytes(bytes)
 	files := data.Get("files").Map()
@@ -71,8 +71,9 @@ func (g *Github) DownloadGist(gistId string) error {
 		rawUrl := result.Get("raw_url").String()
 		err = downloadSave(g.httpClient, rawUrl, filename)
 		if err != nil {
-			return err
+			return "", err
 		}
+		return filename, nil
 	}
-	return nil
+	return "", nil
 }

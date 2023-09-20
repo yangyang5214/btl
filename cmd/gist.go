@@ -26,9 +26,14 @@ var gistCmd = &cobra.Command{
 		}
 
 		github := pkg.NewGithub()
-		err := github.DownloadGist(gistUrl)
+		filepath, err := github.DownloadGist(gistUrl)
 		if err != nil {
 			log.Fatalf("download gist error %+v", err)
+		}
+		md := pkg.NewMarkdown(filepath)
+		err = md.ParseImages()
+		if err != nil {
+			log.Fatal(err)
 		}
 	},
 }

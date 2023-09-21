@@ -1,4 +1,4 @@
-module btl
+module github.com/yangyang5214/btl
 
 go 1.20
 

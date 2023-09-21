@@ -4,8 +4,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package main
 
 import (
-	"btl/cmd"
 	log "github.com/sirupsen/logrus"
+	"github.com/yangyang5214/btl/cmd"
 	"os"
 )
 

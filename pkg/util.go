@@ -3,8 +3,8 @@ package pkg
 import (
 	"bufio"
 	"crypto/md5"
-	"encoding/json"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"

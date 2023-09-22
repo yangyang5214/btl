@@ -3,6 +3,7 @@ package pkg
 import (
 	"errors"
 	"fmt"
+	"github.com/yangyang5214/btl/pkg/model"
 	"os"
 	"sort"
 	"strings"
@@ -10,46 +11,25 @@ import (
 
 var specialDelimiter = "~"
 
-type JsonGroup struct {
+type Json2Mind struct {
 	inputJson string
 	fields    []string
-	filename  string
 }
 
-type Mind struct {
-	key   string
-	name  string
-	count int
-	level int
-}
-
-func (m *Mind) String() string {
-	s := strings.Builder{}
-	for i := 0; i < m.level+1; i++ {
-		s.WriteString("#")
-	}
-	s.WriteString(" ")
-
-	s.WriteString(fmt.Sprintf("%s (%d)", m.name, m.count))
-
-	s.WriteString("\n")
-	s.WriteString("\n")
-	return s.String()
-}
-
-func NewJsonGroup(inputJson string, fields []string) *JsonGroup {
-	return &JsonGroup{
+func NewJsonGroup(inputJson string, fields []string) *Json2Mind {
+	return &Json2Mind{
 		inputJson: inputJson,
 		fields:    fields,
 	}
 }
 
-func (j *JsonGroup) ToMarkdown(titleMap map[string][]string, mindMap map[string]*Mind, name string) error {
+func (j *Json2Mind) ToMarkdown(titleMap map[string][]string, mindMap map[string]*model.Mind, name string) error {
 	f, err := os.Create(name)
 	if err != nil {
 		return err
 	}
-	_, err = f.WriteString(fmt.Sprintf("# %s", name))
+	_, err = f.WriteString("# " + getFilePrefix(j.inputJson))
+	_, err = f.WriteString("\n")
 	_, err = f.WriteString("\n")
 
 	for _, subTitles := range titleMap {
@@ -67,7 +47,7 @@ func (j *JsonGroup) ToMarkdown(titleMap map[string][]string, mindMap map[string]
 	return nil
 }
 
-func (j *JsonGroup) Run() error {
+func (j *Json2Mind) Run() error {
 	datas, err := readJsonLineFile(j.inputJson)
 	if err != nil {
 		return err
@@ -89,36 +69,25 @@ func (j *JsonGroup) Run() error {
 		}
 	}
 
-	minds := make(map[string]*Mind)
+	minds := make(map[string]*model.Mind)
 	titleMap := make(map[string][]string)
 
 	for k, v := range m {
 		arrs := strings.Split(k, specialDelimiter)
-		mind := &Mind{
-			key:   k,
-			name:  arrs[len(arrs)-1],
-			count: v,
-			level: len(arrs),
+		mind := &model.Mind{
+			Key:   k,
+			Name:  arrs[len(arrs)-1],
+			Count: v,
+			Level: len(arrs),
 		}
 		titleMap[arrs[0]] = append(titleMap[arrs[0]], k)
 		minds[k] = mind
 	}
 
-	err = j.ToMarkdown(titleMap, minds, j.getMarkdownName())
+	err = j.ToMarkdown(titleMap, minds, getFilePrefix(j.inputJson)+".md")
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (j *JsonGroup) getMarkdownName() string {
-	paths := strings.Split(j.inputJson, "/")
-	jsonFileName := paths[len(paths)-1]
-	arrs := strings.Split(jsonFileName, ".")
-	if len(arrs) == 1 {
-		return jsonFileName + "." + ".md"
-	}
-	arrs[len(arrs)-1] = "md"
-	return strings.Join(arrs, ".")
 }

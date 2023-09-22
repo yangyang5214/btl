@@ -15,13 +15,12 @@ var json2mindCmd = &cobra.Command{
 	Short: "json lines file transform to md file, then convert to mind map",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info("json2mind called")
-
 		j := pkg.NewJsonGroup(jsonFile, fields)
 		err := j.Run()
 		if err != nil {
 			log.Fatalf("errors in json2mind: %v", err)
 		}
+		log.Info("json2mind successfully converted")
 	},
 }
 

@@ -13,6 +13,7 @@ var specialDelimiter = "~"
 type JsonGroup struct {
 	inputJson string
 	fields    []string
+	filename  string
 }
 
 type Mind struct {
@@ -48,9 +49,10 @@ func (j *JsonGroup) ToMarkdown(titleMap map[string][]string, mindMap map[string]
 	if err != nil {
 		return err
 	}
+	_, err = f.WriteString(fmt.Sprintf("# %s", name))
+	_, err = f.WriteString("\n")
 
 	for _, subTitles := range titleMap {
-		fmt.Println(subTitles)
 		sort.Slice(subTitles, func(i, j int) bool {
 			return len(subTitles[i]) < len(subTitles[j])
 		})

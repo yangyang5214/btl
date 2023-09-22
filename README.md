@@ -22,3 +22,34 @@ json lines covert to CSV format
 ```shell
 btl json2csv  -f xxx.json
 ```
+
+## json2mind
+
+Group statistics json by inputs fields, then output mind map
+
+### help
+
+```
+➜ btl json2mind -h
+json lines file transform to md file, then convert to mind map
+
+Usage:
+  btl json2mind [flags]
+
+Flags:
+  -g, --fields strings     Fields that require group by
+  -h, --help               help for json2mind
+  -f, --json_file string   jsonlines file path
+```
+
+### usage
+
+```shell
+btl json2mind -f xxx.json -g field1,field2
+```
+
+### online markdown to mind map
+
+https://markmap.js.org/repl
+
+https://wanglin2.github.io/mind-map/#/

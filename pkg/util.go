@@ -1,8 +1,10 @@
 package pkg
 
 import (
+	"bufio"
 	"crypto/md5"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -46,6 +48,26 @@ func downloadSave(client *http.Client, urlStr string, filepath string) error {
 func md5Sum(text string) string {
 	data := []byte(text)
 	return fmt.Sprintf("%x", md5.Sum(data))
+}
+
+func readJsonLineFile(p string) ([]map[string]interface{}, error) {
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var result []map[string]interface{}
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		var data map[string]interface{}
+		err = json.Unmarshal([]byte(line), &data)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, data)
+	}
+	return result, nil
 }
 
 func getFilePrefix(p string) string {

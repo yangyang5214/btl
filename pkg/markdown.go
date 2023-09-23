@@ -25,6 +25,39 @@ func NewMarkdown(filepath string) *Markdown {
 	}
 }
 
+func (m *Markdown) downloadImag(line string) (string, error) {
+	var err error
+
+	var imgUrl string
+	if strings.HasPrefix(line, "![") {
+		imgUrl = m.parserMarkdownImgUrl(line)
+	} else if strings.HasPrefix(line, "<img") {
+		imgUrl = parserSrcImgUrl(line)
+	} else {
+		return line, nil
+	}
+
+	pwd, err := getPwd()
+	if err != nil {
+		return "", err
+	}
+
+	if strings.HasPrefix(imgUrl, "http") {
+		imgType := m.parserImageType(imgUrl)
+		if imgType == "" {
+			return "", errors.New(fmt.Sprintf("imgUrl %s not expected", imgUrl))
+		}
+		filename := md5Sum(line) + "." + imgType
+
+		err = downloadSave(m.httpClient, imgUrl, path.Join(pwd, "images", filename))
+		if err != nil {
+			return "", err
+		}
+		line = fmt.Sprintf("![](./images/%s)", filename)
+	}
+	return line, err
+}
+
 // ParseImages is 解析图片链接，转换为本地文件依赖
 func (m *Markdown) ParseImages() error {
 	bytes, err := os.ReadFile(m.filepath)
@@ -36,26 +69,9 @@ func (m *Markdown) ParseImages() error {
 
 	var result []string
 	for _, line := range lines {
-		if strings.HasPrefix(line, "![") {
-			imgUrl := m.parserImageUrl(line)
-			if strings.HasPrefix(imgUrl, "http") {
-				imgType := m.parserImageType(imgUrl)
-				if imgType == "" {
-					return errors.New(fmt.Sprintf("imgUrl %s not expected", imgUrl))
-				}
-				filename := md5Sum(line) + "." + imgType
-
-				var pwd string
-				pwd, err = os.Getwd()
-				if err != nil {
-					return err
-				}
-				err = downloadSave(m.httpClient, imgUrl, path.Join(pwd, "images", filename))
-				if err != nil {
-					return err
-				}
-				line = fmt.Sprintf("![](./images/%s)", filename)
-			}
+		line, err = m.downloadImag(line)
+		if err != nil {
+			return err
 		}
 		result = append(result, line)
 	}
@@ -83,7 +99,19 @@ func (m *Markdown) parserImageType(urlStr string) string {
 	return ""
 }
 
-func (m *Markdown) parserImageUrl(content string) string {
+func parserSrcImgUrl(content string) string {
+	//skip ">
+	end := len(content) - 3
+	start := 0
+	for i := end; i > 0; i-- {
+		if string(content[i]) == `"` {
+			start = i
+			break
+		}
+	}
+	return strings.Trim(content[start:end+1], "\"")
+}
+func (m *Markdown) parserMarkdownImgUrl(content string) string {
 	var start, end int
 	for index, item := range content {
 		if string(item) == "(" {

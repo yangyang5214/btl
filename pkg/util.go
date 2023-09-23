@@ -50,6 +50,36 @@ func md5Sum(text string) string {
 	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
+func readCsv(p string) ([]map[string]interface{}, error) {
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var result []map[string]interface{}
+
+	reader := csv.NewReader(f)
+	rawData, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	var headers []string
+	for lineNum, record := range rawData {
+		if lineNum == 0 {
+			for i := 0; i < len(record); i++ {
+				headers = append(headers, strings.TrimSpace(record[i]))
+			}
+		} else {
+			line := map[string]interface{}{}
+			for i := 0; i < len(record); i++ {
+				line[headers[i]] = record[i]
+			}
+			result = append(result, line)
+		}
+	}
+	return result, nil
+}
+
 func readJsonLineFile(p string) ([]map[string]interface{}, error) {
 	f, err := os.Open(p)
 	if err != nil {

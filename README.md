@@ -23,7 +23,7 @@ json lines covert to CSV format
 btl json2csv  -f xxx.json
 ```
 
-## json2mind
+## json2mind/csv2mind
 
 Group statistics json by inputs fields, then output mind map
 

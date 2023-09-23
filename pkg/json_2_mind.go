@@ -12,13 +12,13 @@ import (
 var specialDelimiter = "~"
 
 type Json2Mind struct {
-	inputJson string
+	inputFile string
 	fields    []string
 }
 
 func NewJsonGroup(inputJson string, fields []string) *Json2Mind {
 	return &Json2Mind{
-		inputJson: inputJson,
+		inputFile: inputJson,
 		fields:    fields,
 	}
 }
@@ -28,7 +28,7 @@ func (j *Json2Mind) ToMarkdown(titleMap map[string][]string, mindMap map[string]
 	if err != nil {
 		return err
 	}
-	_, err = f.WriteString("# " + getFilePrefix(j.inputJson))
+	_, err = f.WriteString("# " + getFilePrefix(j.inputFile))
 	_, err = f.WriteString("\n")
 	_, err = f.WriteString("\n")
 
@@ -47,8 +47,16 @@ func (j *Json2Mind) ToMarkdown(titleMap map[string][]string, mindMap map[string]
 	return nil
 }
 
-func (j *Json2Mind) Run() error {
-	datas, err := readJsonLineFile(j.inputJson)
+func (j *Json2Mind) Run() (err error) {
+	var datas []map[string]interface{}
+	if strings.Contains(j.inputFile, "json") {
+		datas, err = readJsonLineFile(j.inputFile)
+	} else if strings.HasSuffix(j.inputFile, ".csv") {
+		datas, err = readCsv(j.inputFile)
+	} else {
+		return errors.New("file type not supported")
+	}
+
 	if err != nil {
 		return err
 	}
@@ -84,7 +92,7 @@ func (j *Json2Mind) Run() error {
 		minds[k] = mind
 	}
 
-	err = j.ToMarkdown(titleMap, minds, getFilePrefix(j.inputJson)+".md")
+	err = j.ToMarkdown(titleMap, minds, getFilePrefix(j.inputFile)+".md")
 	if err != nil {
 		return err
 	}

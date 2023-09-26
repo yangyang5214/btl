@@ -3,10 +3,11 @@ package pkg
 import (
 	"errors"
 	"fmt"
-	"github.com/yangyang5214/btl/pkg/model"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/yangyang5214/btl/pkg/model"
 )
 
 var specialDelimiter = "~"

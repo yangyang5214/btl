@@ -3,12 +3,13 @@ package pkg
 import (
 	"errors"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Markdown struct {

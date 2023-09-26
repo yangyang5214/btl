@@ -6,12 +6,13 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func downloadSave(client *http.Client, urlStr string, filepath string) error {

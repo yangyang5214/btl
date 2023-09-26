@@ -1,10 +1,11 @@
 package pkg
 
 import (
-	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 	"io"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 
 	"net/http"
 	"os"

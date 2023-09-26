@@ -1,0 +1,12 @@
+version: '3'
+
+tasks:
+  format:
+    desc: Format *go code
+    vars:
+      GO_FILES: "find . ! -path './vendor/*' -type f -name '*.go'"
+    cmds:
+      - ({{.GO_FILES}} | xargs gofmt -s -w)
+      - ({{.GO_FILES}} | xargs golines -w --max-len=180 --reformat-tags --shorten-comments --ignore-generated)
+      - go mod edit -fmt
+

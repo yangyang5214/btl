@@ -3,9 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Json2Csv struct {

@@ -36,7 +36,7 @@ var dateCmd = &cobra.Command{
 
 func defaultFunc() {
 	now := time.Now()
-	log.Infof("Now date: %s", now.Format(time.DateTime))
+	log.Infof("Now date: %s", now.Format(DateTime))
 	log.Infof("Now timestamp: %d", now.UnixMilli())
 }
 

@@ -38,7 +38,7 @@ func (m *Markdown) downloadImag(line string) (string, error) {
 		return line, nil
 	}
 
-	pwd, err := getPwd()
+	pwd, err := GetPwd()
 	if err != nil {
 		return "", err
 	}

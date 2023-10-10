@@ -146,7 +146,7 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 	return nil
 }
 
-func getPwd() (string, error) {
+func GetPwd() (string, error) {
 	var pwd string
 	pwd, err := os.Getwd()
 	if err != nil {

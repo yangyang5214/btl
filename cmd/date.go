@@ -11,10 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	DateTime = "2006-01-02 15:04:05"
-)
-
 // dateCmd represents the date command
 var dateCmd = &cobra.Command{
 	Use:   "date",
@@ -36,7 +32,7 @@ var dateCmd = &cobra.Command{
 
 func defaultFunc() {
 	now := time.Now()
-	log.Infof("Now date: %s", now.Format(DateTime))
+	log.Infof("Now date: %s", now.Format(time.DateTime))
 	log.Infof("Now timestamp: %d", now.UnixMilli())
 }
 
@@ -49,7 +45,7 @@ func formatTimestamp(timestamp string) {
 	if len(timestamp) == 13 {
 		t = t / 1000
 	}
-	dateStr := time.Unix(t, 0).Format(DateTime)
+	dateStr := time.Unix(t, 0).Format(time.DateTime)
 	log.Infof(dateStr)
 }
 

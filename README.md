@@ -23,6 +23,33 @@ json lines covert to CSV format
 btl json2csv  -f xxx.json
 ```
 
+## gpx_map
+
+```
+Usage:
+  btl gpxMap [flags]
+
+Flags:
+  -a, --attribution string   
+  -d, --dir string            (default ".")
+  -f, --files strings        xx.gpx
+  -h, --help                 help for gpxMap
+  -n, --name string           (default "osm")
+```
+
+```
+btl gpxMap ~/beer/rides
+```
+
+- 上海区域
+
+![](./images/gpx_map_1.png)
+
+- 全国区域
+
+![](./images/gpx_map_2.png)
+
+
 ## json2mind/csv2mind
 
 https://gist.github.com/yangyang5214/9b238a3d4a714bb8930404ddce3c5935

@@ -41,14 +41,11 @@ Flags:
 btl gpx_map ~/beer/rides
 ```
 
-- 上海区域
-
 ![](./images/gpx_map_1.png)
-
-- 全国区域
 
 ![](./images/gpx_map_2.png)
 
+![](./images/gpx_map_3.png)
 
 ## json2mind/csv2mind
 

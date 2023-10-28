@@ -52,12 +52,13 @@ func getFiles(dirPath string) []string {
 	}
 	var r []string
 	for _, item := range d {
-		if item.IsDir() {
-			continue
-		}
 		name := item.Name()
+		p := path.Join(absPath, name)
+		if item.IsDir() {
+			r = append(r, getFiles(p)...)
+		}
 		if strings.HasSuffix(name, ".gpx") {
-			r = append(r, path.Join(absPath, name))
+			r = append(r, p)
 		}
 	}
 	return r

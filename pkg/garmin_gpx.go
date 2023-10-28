@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bufio"
+	"github.com/pkg/errors"
 	"os"
 	"path"
 	"sort"
@@ -24,7 +25,7 @@ type GpxFile struct {
 func (g *GarminGpx) Run() error {
 	dirs, err := os.ReadDir(g.CurrentDir)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	var gpxFiles []string
@@ -43,12 +44,12 @@ func (g *GarminGpx) Run() error {
 	}
 	gpxFiles, err = g.sortByDate(gpxFiles)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	resultFile, err := os.Create(path.Join(g.CurrentDir, "result.gpx"))
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	for index, gFile := range gpxFiles {
 		r := g.parseTrkseg(gFile)
@@ -57,7 +58,7 @@ func (g *GarminGpx) Run() error {
 		if index == 0 {
 			_, err = resultFile.WriteString(strings.Join(r.start, "\n"))
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			_, _ = resultFile.WriteString("\n")
 		}
@@ -65,7 +66,7 @@ func (g *GarminGpx) Run() error {
 		//content
 		_, err = resultFile.WriteString(strings.Join(r.content, "\n"))
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		_, _ = resultFile.WriteString("\n")
 
@@ -73,7 +74,7 @@ func (g *GarminGpx) Run() error {
 		if index == len(gpxFiles)-1 {
 			_, err = resultFile.WriteString(strings.Join(r.end, "\n"))
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 		}
 	}
@@ -86,7 +87,7 @@ func (g *GarminGpx) sortByDate(files []string) ([]string, error) {
 	for _, f := range files {
 		date, err := g.getDate(f)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		dateMap[date] = f
 	}

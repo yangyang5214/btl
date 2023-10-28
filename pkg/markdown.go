@@ -1,8 +1,8 @@
 package pkg
 
 import (
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"net/http"
 	"os"
 	"path"
@@ -64,7 +64,7 @@ func (m *Markdown) ParseImages() error {
 	bytes, err := os.ReadFile(m.filepath)
 	if err != nil {
 		log.Errorf("open file %s error: %s", m.filepath, err)
-		return err
+		return errors.WithStack(err)
 	}
 	lines := strings.Split(string(bytes), "\n")
 
@@ -72,19 +72,19 @@ func (m *Markdown) ParseImages() error {
 	for _, line := range lines {
 		line, err = m.downloadImag(line)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		result = append(result, line)
 	}
 
 	err = os.Remove(m.filepath)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	err = os.WriteFile(m.filepath, []byte(strings.Join(result, "\n")), 0755)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil

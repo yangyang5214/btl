@@ -5,6 +5,7 @@ import (
 	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
 	"path/filepath"
@@ -12,27 +13,33 @@ import (
 )
 
 type GpxMap struct {
-	files       []string
-	smCtx       *sm.Context
-	attribution string
+	files         []string
+	smCtx         *sm.Context
+	attribution   string
+	titleName     string
+	tileProviders map[string]*sm.TileProvider
 }
 
-func NewGpxMap(files []string, attribution string) *GpxMap {
+func NewGpxMap(files []string, attribution, titleName string) *GpxMap {
 	return &GpxMap{
-		files:       files,
-		smCtx:       sm.NewContext(),
-		attribution: attribution,
+		files:         files,
+		smCtx:         sm.NewContext(),
+		attribution:   attribution,
+		titleName:     titleName,
+		tileProviders: sm.GetTileProviders(),
 	}
 }
 
-func (g *GpxMap) getWidthHeight(positions []s2.LatLng) (int, int) {
-	southPoint, northPoint := positions[0], positions[0]
-	for _, position := range positions {
-		if position.Lat < southPoint.Lat {
-			southPoint = position
-		}
-		if position.Lat > northPoint.Lat {
-			northPoint = position
+func (g *GpxMap) getWidthHeight(positions [][]s2.LatLng) (int, int) {
+	southPoint, northPoint := positions[0][0], positions[0][0]
+	for _, points := range positions {
+		for _, point := range points {
+			if point.Lat < southPoint.Lat {
+				southPoint = point
+			}
+			if point.Lat > northPoint.Lat {
+				northPoint = point
+			}
 		}
 	}
 
@@ -48,49 +55,71 @@ func (g *GpxMap) getWidthHeight(positions []s2.LatLng) (int, int) {
 	return int(height * 1.5), int(height)
 }
 
-func (g *GpxMap) parsePositions() ([]s2.LatLng, error) {
-	var positions []s2.LatLng
+func (g *GpxMap) parsePositions() ([][]s2.LatLng, error) {
+	var positions [][]s2.LatLng
 	for _, f := range g.files {
 		p, err := filepath.Abs(f)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		gpxData, err := gpx.ParseFile(p)
 		if err != nil {
-			return nil, err
+			log.Errorf("gpx parse file <%s> error: %v", p, err)
+			return nil, errors.WithStack(err)
 		}
+		var local []s2.LatLng
 		for _, trk := range gpxData.Tracks {
 			for _, seg := range trk.Segments {
 				for _, pt := range seg.Points {
-					positions = append(positions, s2.LatLngFromDegrees(pt.GetLatitude(), pt.GetLongitude()))
+					local = append(local, s2.LatLngFromDegrees(pt.GetLatitude(), pt.GetLongitude()))
 				}
 			}
 		}
+		positions = append(positions, local)
 	}
 	return positions, nil
+}
+
+func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
+	var weight float64
+	defer func() {
+		log.Infof("points size is %d, line weight %v", len(post), weight)
+	}()
+	size := len(post)
+	weight = float64(size/10_000) + 2.0
+	return weight
 }
 
 func (g *GpxMap) Run(imgPath string) error {
 	color, _ := sm.ParseColorString("red")
 	positions, err := g.parsePositions()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	width, height := g.getWidthHeight(positions)
 	log.Infof("use height=%d, width=%d", height, width)
 	g.smCtx.SetSize(width, height)
-	g.smCtx.AddObject(sm.NewPath(positions, color, 3))
 
-	titleProvider := sm.NewTileProviderOpenStreetMaps()
+	for _, post := range positions {
+		weight := g.getWeight(post)
+		g.smCtx.AddObject(sm.NewPath(post, color, weight))
+	}
+
+	titleProvider, ok := g.tileProviders[g.titleName]
+	if !ok {
+		titleProvider = sm.NewTileProviderOpenStreetMaps()
+	}
+
 	titleProvider.Attribution = g.attribution
+
 	g.smCtx.SetTileProvider(titleProvider)
 	img, err := g.smCtx.Render()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	if err = gg.SavePNG(imgPath, img); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }

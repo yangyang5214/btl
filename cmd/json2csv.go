@@ -15,7 +15,7 @@ var json2csvCmd = &cobra.Command{
 	Short: "json to csv",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		j2c := pkg.NewJson2Csv(filepath)
+		j2c := pkg.NewJson2Csv(fPath)
 		err := j2c.Run()
 		if err != nil {
 			log.Errorf("json to csv error: %+v", err)
@@ -23,11 +23,11 @@ var json2csvCmd = &cobra.Command{
 	},
 }
 
-var filepath string
+var fPath string
 
 func init() {
 	rootCmd.AddCommand(json2csvCmd)
 
-	json2csvCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "csv file path")
+	json2csvCmd.Flags().StringVarP(&fPath, "filepath", "f", "", "csv file path")
 	_ = json2csvCmd.MarkFlagRequired("filepath")
 }

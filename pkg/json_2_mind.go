@@ -1,8 +1,8 @@
 package pkg
 
 import (
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"os"
 	"sort"
 	"strings"
@@ -27,7 +27,7 @@ func NewJsonGroup(inputJson string, fields []string) *Json2Mind {
 func (j *Json2Mind) ToMarkdown(titleMap map[string][]string, mindMap map[string]*model.Mind, name string) error {
 	f, err := os.Create(name)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	_, err = f.WriteString("# " + getFilePrefix(j.inputFile))
 	_, err = f.WriteString("\n")
@@ -41,7 +41,7 @@ func (j *Json2Mind) ToMarkdown(titleMap map[string][]string, mindMap map[string]
 			mind := mindMap[subTitle]
 			_, err = f.WriteString(mind.String())
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 		}
 	}
@@ -59,7 +59,7 @@ func (j *Json2Mind) Run() (err error) {
 	}
 
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	m := make(map[string]int)
@@ -95,7 +95,7 @@ func (j *Json2Mind) Run() (err error) {
 
 	err = j.ToMarkdown(titleMap, minds, getFilePrefix(j.inputFile)+".md")
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil

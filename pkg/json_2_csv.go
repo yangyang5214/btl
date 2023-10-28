@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 	"os"
 	"strings"
 
@@ -21,13 +21,13 @@ func (s *Json2Csv) Run() error {
 	bytes, err := os.ReadFile(s.jsonFile)
 	if err != nil {
 		log.Errorf("read file error %v", err)
-		return err
+		return errors.WithStack(err)
 	}
 	content := string(bytes)
 	var datas []map[string]interface{}
 	if strings.HasPrefix(content, "[") {
 		if err = json.NewDecoder(strings.NewReader(content)).Decode(&datas); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	} else {
 		lines := strings.Split(content, "\n")
@@ -40,7 +40,7 @@ func (s *Json2Csv) Run() error {
 				err = json.Unmarshal([]byte(line), &data)
 				if err != nil {
 					log.Errorf("unmarshal json %s error %v", line, err)
-					return err
+					return errors.WithStack(err)
 				}
 				datas = append(datas, data)
 			}

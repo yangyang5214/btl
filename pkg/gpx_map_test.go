@@ -9,16 +9,17 @@ import (
 
 func Test(t *testing.T) {
 	files := []string{
-		//"/Users/beer/Downloads/1.gpx",
-		//"/Users/beer/Downloads/activity_273093158.gpx",
-		//"/Users/beer/Downloads/activity_190230645.gpx",
-		//"/Users/beer/Downloads/activity_198260918.gpx",
-		"/Users/beer/Downloads/HaiNan.gpx",
+		"/Users/beer/beer/rides/6779742686.gpx",
+		"/Users/beer/beer/rides/9986398127.gpx",
+		"/Users/beer/beer/rides/6789896328.gpx",
+		"/Users/beer/beer/rides/6830932310.gpx",
 	}
-	gpx := NewGpxMap(files, "beer")
-	err := gpx.Run("result.png")
-	if err != nil {
-		t.Fatal(err)
+	for k, _ := range sm.GetTileProviders() {
+		gpx := NewGpxMap(files, "beer", k)
+		err := gpx.Run(k + "_" + "result.png")
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"os"
@@ -24,24 +25,24 @@ func downloadSave(client *http.Client, urlStr string, filepath string) error {
 	resp, err := client.Get(urlStr)
 	if err != nil {
 		log.Errorf("http request failed %+v. %s", err, urlStr)
-		return err
+		return errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 	bytes, err := io.ReadAll(resp.Body)
 
 	err = os.MkdirAll(path.Dir(filepath), 0755)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	f, err := os.Create(filepath)
 	if err != nil {
 		log.Errorf("create file %v error", filepath)
-		return err
+		return errors.WithStack(err)
 	}
 	_, err = f.Write(bytes)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -54,7 +55,7 @@ func md5Sum(text string) string {
 func readCsv(p string) ([]map[string]interface{}, error) {
 	f, err := os.Open(p)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	defer f.Close()
 	var result []map[string]interface{}
@@ -62,7 +63,7 @@ func readCsv(p string) ([]map[string]interface{}, error) {
 	reader := csv.NewReader(f)
 	rawData, err := reader.ReadAll()
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	var headers []string
 	for lineNum, record := range rawData {
@@ -84,7 +85,7 @@ func readCsv(p string) ([]map[string]interface{}, error) {
 func readJsonLineFile(p string) ([]map[string]interface{}, error) {
 	f, err := os.Open(p)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	defer f.Close()
 	var result []map[string]interface{}
@@ -94,7 +95,7 @@ func readJsonLineFile(p string) ([]map[string]interface{}, error) {
 		var data map[string]interface{}
 		err = json.Unmarshal([]byte(line), &data)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		result = append(result, data)
 	}
@@ -120,7 +121,7 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 	outputFile, err := os.Create(filename)
 	if err != nil {
 		log.Errorf("create file error: %+v", err)
-		return err
+		return errors.WithStack(err)
 	}
 	defer outputFile.Close()
 	writer := csv.NewWriter(outputFile)
@@ -128,7 +129,7 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 	headers := mapKeys(datas[0])
 	if err = writer.Write(headers); err != nil {
 		log.Errorf("write headers error: %+v", err)
-		return err
+		return errors.WithStack(err)
 	}
 	for _, r := range datas {
 		var csvRow []string
@@ -140,7 +141,7 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 
 		if err = writer.Write(csvRow); err != nil {
 			log.Errorf("write csv row data error: %+v", err)
-			return err
+			return errors.WithStack(err)
 		}
 	}
 	return nil

@@ -31,6 +31,7 @@ func NewGpxMap(files []string, attribution, titleName string) *GpxMap {
 }
 
 func (g *GpxMap) getWidthHeight(positions [][]s2.LatLng) (int, int) {
+	var maxPointSize int
 	southPoint, northPoint := positions[0][0], positions[0][0]
 	for _, points := range positions {
 		for _, point := range points {
@@ -41,6 +42,9 @@ func (g *GpxMap) getWidthHeight(positions [][]s2.LatLng) (int, int) {
 				northPoint = point
 			}
 		}
+		if len(points) > maxPointSize {
+			maxPointSize = len(points)
+		}
 	}
 
 	log.Infof("northPoint: %s", fmt.Sprintf("%s,%s", northPoint.Lng, northPoint.Lat))
@@ -50,7 +54,11 @@ func (g *GpxMap) getWidthHeight(positions [][]s2.LatLng) (int, int) {
 	north, _ := strconv.ParseFloat(northPoint.Lat.String(), 10)
 	height := (north - south) * 1000 / 4
 	if height < 600 {
-		return 800, 600
+		if maxPointSize > 2000 {
+			return 1028, 1000
+		} else {
+			return 800, 600
+		}
 	}
 	return int(height * 1.5), int(height)
 }
@@ -102,6 +110,9 @@ func (g *GpxMap) Run(imgPath string) error {
 
 	for _, post := range positions {
 		weight := g.getWeight(post)
+		if height <= 1000 {
+			weight = 2
+		}
 		g.smCtx.AddObject(sm.NewPath(post, color, weight))
 	}
 

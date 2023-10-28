@@ -63,10 +63,19 @@ func getFiles(dirPath string) []string {
 	return r
 }
 
+func gpxMapUsage() string {
+	r := []string{
+		"carto-dark(暗黑)",
+		"carto-light(白色)",
+		"wikimedia(纯线路)",
+	}
+	return strings.Join(r, "\n")
+}
+
 func init() {
 	rootCmd.AddCommand(gpxMapCmd)
 	gpxMapCmd.Flags().StringSliceVarP(&files, "files", "f", []string{}, "xx.gpx")
 	gpxMapCmd.Flags().StringVarP(&dirPath, "dir", "d", ".", "")
 	gpxMapCmd.Flags().StringVarP(&attribution, "attribution", "a", "", "")
-	gpxMapCmd.Flags().StringVarP(&titleName, "name", "n", "osm", "")
+	gpxMapCmd.Flags().StringVarP(&titleName, "name", "n", "carto-light", gpxMapUsage())
 }

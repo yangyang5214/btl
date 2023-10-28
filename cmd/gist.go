@@ -9,24 +9,19 @@ import (
 	"github.com/yangyang5214/btl/pkg"
 )
 
-var gistUrl string
-
 // gistCmd represents the gist command
 var gistCmd = &cobra.Command{
 	Use:   "gist",
 	Short: "download a gist to local md file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.WithFields(log.Fields{
-			"gist_url": gistUrl,
-		}).Info("start download gist")
-
-		if gistUrl == "" {
-			log.Fatalf("gist url is empty, exit")
+		if len(args) == 0 {
+			log.Error("need gist_id param. eg: btl gist xxxxx")
+			return
 		}
-
+		gistId := args[0]
 		github := pkg.NewGithub()
-		filepath, err := github.DownloadGist(gistUrl)
+		filepath, err := github.DownloadGist(gistId)
 		if err != nil {
 			log.Fatalf("download gist error %+v", err)
 		}
@@ -40,7 +35,4 @@ var gistCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gistCmd)
-
-	gistCmd.Flags().StringVarP(&gistUrl, "gist_id", "u", "", "gist url")
-	_ = gistCmd.MarkFlagRequired("gist_id")
 }

@@ -12,8 +12,8 @@ import (
 
 // garminGpxCmd represents the garminGpx command
 var garminGpxCmd = &cobra.Command{
-	Use:   "garminGpx",
-	Short: "merge garmin gpx files",
+	Use:   "gpx_merge",
+	Short: "merge gpx files",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info("garminGpx cmd called")
@@ -22,7 +22,7 @@ var garminGpxCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("error getting pwd: %v", err)
 		}
-		gpx := pkg.GarminGpx{
+		gpx := pkg.GpxMerge{
 			CurrentDir: pwd,
 		}
 		err = gpx.Run()

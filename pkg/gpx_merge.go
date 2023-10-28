@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type GarminGpx struct {
+type GpxMerge struct {
 	CurrentDir string
 }
 
@@ -22,7 +22,7 @@ type GpxFile struct {
 	content []string
 }
 
-func (g *GarminGpx) Run() error {
+func (g *GpxMerge) Run() error {
 	dirs, err := os.ReadDir(g.CurrentDir)
 	if err != nil {
 		return errors.WithStack(err)
@@ -82,7 +82,7 @@ func (g *GarminGpx) Run() error {
 }
 
 // sortByDate is sort gpx files by date
-func (g *GarminGpx) sortByDate(files []string) ([]string, error) {
+func (g *GpxMerge) sortByDate(files []string) ([]string, error) {
 	dateMap := make(map[int64]string)
 	for _, f := range files {
 		date, err := g.getDate(f)
@@ -108,7 +108,7 @@ func (g *GarminGpx) sortByDate(files []string) ([]string, error) {
 	return result, nil
 }
 
-func (g *GarminGpx) getDate(f string) (int64, error) {
+func (g *GpxMerge) getDate(f string) (int64, error) {
 	file, err := os.Open(f)
 	if err != nil {
 		return 0, err
@@ -134,7 +134,7 @@ func (g *GarminGpx) getDate(f string) (int64, error) {
 }
 
 // parseTrkseg parse <trkseg>xxx</trkseg> xxx 内容
-func (g *GarminGpx) parseTrkseg(f string) *GpxFile {
+func (g *GpxMerge) parseTrkseg(f string) *GpxFile {
 	bytes, _ := os.ReadFile(f)
 	content := string(bytes)
 	lines := strings.Split(content, "\n")

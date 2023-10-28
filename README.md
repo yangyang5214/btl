@@ -27,18 +27,18 @@ btl json2csv  -f xxx.json
 
 ```
 Usage:
-  btl gpxMap [flags]
+  btl gpx_map [flags]
 
 Flags:
   -a, --attribution string   
   -d, --dir string            (default ".")
   -f, --files strings        xx.gpx
-  -h, --help                 help for gpxMap
+  -h, --help                 help for gpx_map
   -n, --name string           (default "osm")
 ```
 
 ```
-btl gpxMap ~/beer/rides
+btl gpx_map ~/beer/rides
 ```
 
 - 上海区域

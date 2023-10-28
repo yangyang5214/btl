@@ -19,11 +19,13 @@ var (
 
 // gpxMapCmd represents the gpxMap command
 var gpxMapCmd = &cobra.Command{
-	Use:   "gpxMap",
+	Use:   "gpx_map",
 	Short: "show gpx in map",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		files := getFiles(dirPath)
+		if len(files) == 0 {
+			files = getFiles(dirPath)
+		}
 		if len(files) == 0 {
 			log.Info("inout gpx files is empty")
 			return

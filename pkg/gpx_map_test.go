@@ -39,7 +39,7 @@ func Test(t *testing.T) {
 		//"stamen-terrain",      //森林？
 	}
 	for _, name := range names {
-		gpx := NewGpxMap(files, "", name)
+		gpx := NewGpxMap(files, "", name, nil)
 		err := gpx.Run("result.png")
 		if err != nil {
 			t.Fatal(err)

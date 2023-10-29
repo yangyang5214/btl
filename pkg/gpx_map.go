@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
+	ic "image/color"
 	"path/filepath"
 	"strconv"
 )
@@ -18,15 +19,17 @@ type GpxMap struct {
 	attribution   string
 	titleName     string
 	tileProviders map[string]*sm.TileProvider
+	color         ic.Color
 }
 
-func NewGpxMap(files []string, attribution, titleName string) *GpxMap {
+func NewGpxMap(files []string, attribution, titleName string, color ic.Color) *GpxMap {
 	return &GpxMap{
 		files:         files,
 		smCtx:         sm.NewContext(),
 		attribution:   attribution,
 		titleName:     titleName,
 		tileProviders: sm.GetTileProviders(),
+		color:         color,
 	}
 }
 
@@ -99,7 +102,6 @@ func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
 }
 
 func (g *GpxMap) Run(imgPath string) error {
-	color, _ := sm.ParseColorString("red")
 	positions, err := g.parsePositions()
 	if err != nil {
 		return errors.WithStack(err)
@@ -113,7 +115,7 @@ func (g *GpxMap) Run(imgPath string) error {
 		if height <= 1000 {
 			weight = 2
 		}
-		g.smCtx.AddObject(sm.NewPath(post, color, weight))
+		g.smCtx.AddObject(sm.NewPath(post, g.color, weight))
 	}
 
 	titleProvider, ok := g.tileProviders[g.titleName]

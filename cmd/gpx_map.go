@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	sm "github.com/flopp/go-staticmaps"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg"
+	"image/color"
 	"os"
 	"path"
 	"path/filepath"
@@ -15,6 +18,7 @@ var (
 	dirPath     string
 	attribution string
 	titleName   string
+	colorStr    string
 )
 
 // gpxMapCmd represents the gpxMap command
@@ -30,15 +34,28 @@ var gpxMapCmd = &cobra.Command{
 			log.Info("inout gpx files is empty")
 			return
 		}
-		gpxMap := pkg.NewGpxMap(files, attribution, titleName)
+		c, err := parserColor()
+		if err != nil {
+			log.Info("parse color <%s> error: %v", err)
+			return
+		}
+		gpxMap := pkg.NewGpxMap(files, attribution, titleName, c)
 		resultImg := "result.png"
-		err := gpxMap.Run(resultImg)
+		err = gpxMap.Run(resultImg)
 		if err != nil {
 			log.Errorf("run  gpxMap error: %+v", err)
 			return
 		}
 		log.Infof("result image is: %s", resultImg)
 	},
+}
+
+func parserColor() (color.Color, error) {
+	c, err := sm.ParseColorString(colorStr)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return c, nil
 }
 
 func getFiles(dirPath string) []string {
@@ -79,4 +96,5 @@ func init() {
 	gpxMapCmd.Flags().StringVarP(&dirPath, "dir", "d", ".", "")
 	gpxMapCmd.Flags().StringVarP(&attribution, "attribution", "a", "", "")
 	gpxMapCmd.Flags().StringVarP(&titleName, "name", "n", "carto-light", gpxMapUsage())
+	gpxMapCmd.Flags().StringVarP(&colorStr, "color", "c", "red", "set color")
 }

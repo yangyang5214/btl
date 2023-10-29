@@ -10,3 +10,7 @@ tasks:
       - ({{.GO_FILES}} | xargs golines -w --max-len=180 --reformat-tags --shorten-comments --ignore-generated)
       - go mod edit -fmt
 
+  build:
+    cmds:
+      - go build
+      - mv btl ~/go/bin

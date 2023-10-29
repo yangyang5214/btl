@@ -11,6 +11,7 @@ tasks:
       - go mod edit -fmt
 
   build:
+    desc: local build
     cmds:
       - go build
       - mv btl ~/go/bin

@@ -4,32 +4,50 @@ import (
 	"fmt"
 	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
+	"github.com/golang/freetype/truetype"
 	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
-	ic "image/color"
+	"golang.org/x/image/font/gofont/goregular"
+	"image"
+	"image/color"
 	"path/filepath"
 	"strconv"
 )
 
+type Stat struct {
+	distance     float64
+	timeOfSecond float64
+	count        int
+}
+
+func (s *Stat) String() string {
+	return fmt.Sprintf("distance %vkm, time %vh, count %d", int(s.distance)/1000, int(s.timeOfSecond)/3600, s.count)
+}
+
 type GpxMap struct {
 	files         []string
+	gpxData       []*gpx.GPX
 	smCtx         *sm.Context
 	attribution   string
 	titleName     string
 	tileProviders map[string]*sm.TileProvider
-	color         ic.Color
+	colorObj      color.Color
+	stat          *Stat
 }
 
-func NewGpxMap(files []string, attribution, titleName string, color ic.Color) *GpxMap {
+func NewGpxMap(files []string, attribution, titleName string, color color.Color) *GpxMap {
+	if color == nil {
+		color, _ = sm.ParseColorString("green")
+	}
 	return &GpxMap{
 		files:         files,
 		smCtx:         sm.NewContext(),
 		attribution:   attribution,
 		titleName:     titleName,
 		tileProviders: sm.GetTileProviders(),
-		color:         color,
+		colorObj:      color,
 	}
 }
 
@@ -78,6 +96,7 @@ func (g *GpxMap) parsePositions() ([][]s2.LatLng, error) {
 			log.Errorf("gpx parse file <%s> error: %v", p, err)
 			return nil, errors.WithStack(err)
 		}
+		g.gpxData = append(g.gpxData, gpxData)
 		var local []s2.LatLng
 		for _, trk := range gpxData.Tracks {
 			for _, seg := range trk.Segments {
@@ -101,11 +120,30 @@ func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
 	return weight
 }
 
+func (g *GpxMap) genStat() error {
+	stat := &Stat{}
+	for _, gd := range g.gpxData {
+		md := gd.MovingData()
+		stat.distance = stat.distance + md.MovingDistance + md.StoppedDistance
+		stat.timeOfSecond = stat.timeOfSecond + md.MovingTime + md.StoppedTime
+		gpx.GetGpxElementInfo("", gd)
+	}
+	stat.count = len(g.gpxData)
+	g.stat = stat
+	return nil
+}
+
 func (g *GpxMap) Run(imgPath string) error {
 	positions, err := g.parsePositions()
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	//gen stat
+	err = g.genStat()
+	if err != nil {
+		return err
+	}
+
 	width, height := g.getWidthHeight(positions)
 	log.Infof("use height=%d, width=%d", height, width)
 	g.smCtx.SetSize(width, height)
@@ -115,7 +153,7 @@ func (g *GpxMap) Run(imgPath string) error {
 		if height <= 1000 {
 			weight = 2
 		}
-		g.smCtx.AddObject(sm.NewPath(post, g.color, weight))
+		g.smCtx.AddObject(sm.NewPath(post, g.colorObj, weight))
 	}
 
 	titleProvider, ok := g.tileProviders[g.titleName]
@@ -131,8 +169,30 @@ func (g *GpxMap) Run(imgPath string) error {
 		return errors.WithStack(err)
 	}
 
+	//img = g.addStat(img)
 	if err = gg.SavePNG(imgPath, img); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
+}
+
+func (g *GpxMap) addStat(img image.Image) image.Image {
+	log.Infof(g.stat.String())
+	img = addLabel(img, 50, 100, g.stat.String())
+	return img
+}
+
+func addLabel(img image.Image, x, y int, label string) image.Image {
+	dc := gg.NewContextForImage(img)
+	dc.SetColor(&color.RGBA{
+		R: 255,
+		G: 0,
+		B: 0,
+		A: 255,
+	})
+	font, _ := truetype.Parse(goregular.TTF)
+	face := truetype.NewFace(font, &truetype.Options{Size: 50})
+	dc.SetFontFace(face)
+	dc.DrawStringAnchored(label, float64(x), float64(y), 0, 0)
+	return dc.Image()
 }

@@ -9,11 +9,10 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
+	"github.com/yangyang5214/btl/pkg/utils"
 	"golang.org/x/image/font/gofont/goregular"
 	"image"
 	"image/color"
-	"path/filepath"
-	"strconv"
 )
 
 type Stat struct {
@@ -51,65 +50,6 @@ func NewGpxMap(files []string, attribution, titleName string, color color.Color)
 	}
 }
 
-func (g *GpxMap) getWidthHeight(positions [][]s2.LatLng) (int, int) {
-	var maxPointSize int
-	southPoint, northPoint := positions[0][0], positions[0][0]
-	for _, points := range positions {
-		for _, point := range points {
-			if point.Lat < southPoint.Lat {
-				southPoint = point
-			}
-			if point.Lat > northPoint.Lat {
-				northPoint = point
-			}
-		}
-		if len(points) > maxPointSize {
-			maxPointSize = len(points)
-		}
-	}
-
-	log.Infof("northPoint: %s", fmt.Sprintf("%s,%s", northPoint.Lng, northPoint.Lat))
-	log.Infof("southPoint: %s", fmt.Sprintf("%s,%s", southPoint.Lng, southPoint.Lat))
-
-	south, _ := strconv.ParseFloat(southPoint.Lat.String(), 10)
-	north, _ := strconv.ParseFloat(northPoint.Lat.String(), 10)
-	height := (north - south) * 1000 / 4
-	if height < 600 {
-		if maxPointSize > 2000 {
-			return 1028, 1000
-		} else {
-			return 800, 600
-		}
-	}
-	return int(height * 1.5), int(height)
-}
-
-func (g *GpxMap) parsePositions() ([][]s2.LatLng, error) {
-	var positions [][]s2.LatLng
-	for _, f := range g.files {
-		p, err := filepath.Abs(f)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		gpxData, err := gpx.ParseFile(p)
-		if err != nil {
-			log.Errorf("gpx parse file <%s> error: %v", p, err)
-			return nil, errors.WithStack(err)
-		}
-		g.gpxData = append(g.gpxData, gpxData)
-		var local []s2.LatLng
-		for _, trk := range gpxData.Tracks {
-			for _, seg := range trk.Segments {
-				for _, pt := range seg.Points {
-					local = append(local, s2.LatLngFromDegrees(pt.GetLatitude(), pt.GetLongitude()))
-				}
-			}
-		}
-		positions = append(positions, local)
-	}
-	return positions, nil
-}
-
 func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
 	var weight float64
 	defer func() {
@@ -134,7 +74,11 @@ func (g *GpxMap) genStat() error {
 }
 
 func (g *GpxMap) Run(imgPath string) error {
-	positions, err := g.parsePositions()
+	gpxDatas, err := utils.ParseGpxData(g.files)
+	if err != nil {
+		return err
+	}
+	positions, err := utils.ParsePositions(gpxDatas)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -144,7 +88,7 @@ func (g *GpxMap) Run(imgPath string) error {
 		return err
 	}
 
-	width, height := g.getWidthHeight(positions)
+	width, height := utils.GenWidthHeight(positions)
 	log.Infof("use height=%d, width=%d", height, width)
 	g.smCtx.SetSize(width, height)
 

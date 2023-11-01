@@ -9,8 +9,8 @@ import (
 
 func Test(t *testing.T) {
 	files := []string{
-		"/Users/beer/beer/rides/hai_nan.gpx",
-		//"/Users/beer/beer/rides/shang_hai/activity_188416039.gpx",
+		//"/Users/beer/beer/rides/hai_nan.gpx",
+		"/Users/beer/beer/rides/shang_hai/activity_188416039.gpx",
 		//"/Users/beer/beer/rides/shang_hai/activity_190230645.gpx",
 		//"/Users/beer/beer/rides/shang_hai/activity_192638282.gpx",
 		//"/Users/beer/beer/rides/shang_hai/activity_195179761.gpx",
@@ -33,9 +33,9 @@ func Test(t *testing.T) {
 		//"/Users/beer/beer/rides/shang_hai/6833367971.gpx",
 	}
 	names := []string{
-		//"carto-dark",          //黑暗系
+		"carto-dark", //黑暗系
 		//"arcgis-worldimagery", //地理影像
-		"carto-light", //白色系
+		//"carto-light", //白色系
 		//"wikimedia", //纯线路
 		//"stamen-terrain",      //森林？
 	}

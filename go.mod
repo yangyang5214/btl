@@ -36,3 +36,5 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/flopp/go-staticmaps v0.0.0-20220221183018-c226716bec53 => github.com/yangyang5214/go-staticmaps v0.0.0-20231103114642-ba9901cc21ee

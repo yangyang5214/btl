@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/yangyang5214/gou"
 
@@ -29,7 +30,8 @@ type GpxVideo struct {
 
 	pointCount int
 
-	pwd string
+	pwd    string
+	weight float64
 }
 
 var (
@@ -57,6 +59,7 @@ func NewGpxVideo(files []string) (*GpxVideo, error) {
 		col:           col,
 		titleProvider: titleProvider,
 		pwd:           pwd,
+		weight:        2,
 	}, nil
 }
 
@@ -110,31 +113,44 @@ func (g *GpxVideo) Run() error {
 	step := g.genStep()
 
 	log.Infof("points count: %d, set step %d", g.pointCount, step)
+
+	var wg sync.WaitGroup
 	for _, position := range positions {
 		for i := step; i < len(position); i += step {
-			_ = bar.Add(step)
 			index = index + 1
-			smCtx := sm.NewContext()
-			smCtx.SetSize(width, height)
-			smCtx.SetTileProvider(g.titleProvider)
-			smCtx.SetZoom(zoom)
-			smCtx.SetCenter(center)
-
-			smCtx.AddObject(sm.NewPath(position[0:i], g.col, 2))
-
-			img, err = smCtx.Render()
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
+			wg.Add(1)
 			imgPath := path.Join(tempDir, fmt.Sprintf("%d.png", index))
-			if err = gg.SavePNG(imgPath, img); err != nil {
-				return errors.WithStack(err)
-			}
 			resultImg = imgPath
+			go func(imgPath string, i int, step int) {
+				defer func() {
+					_ = bar.Add(step)
+					wg.Done()
+				}()
+				smCtx := sm.NewContext()
+				smCtx.SetSize(width, height)
+				smCtx.SetTileProvider(g.titleProvider)
+				smCtx.SetZoom(zoom)
+				smCtx.SetCenter(center)
+
+				smCtx.AddObject(sm.NewPath(position[0:i], g.col, g.weight))
+
+				img, err = smCtx.Render()
+				if err != nil {
+					log.Errorf("call sm.Render failed %+v", err)
+				}
+				err = gg.SavePNG(imgPath, img)
+				if err != nil {
+					log.Errorf("save png failed %+v", err)
+				}
+			}(imgPath, i, step)
 		}
 	}
+	wg.Wait()
 
+	_ = bar.Finish() //set finished
+
+	log.Info("\n")
+	log.Infof("Satrt merge to  video ..")
 	err = fileutil.CopyFile(resultImg, path.Join(g.pwd, "result.png"))
 	if err != nil {
 		return errors.WithStack(err)

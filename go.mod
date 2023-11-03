@@ -17,8 +17,6 @@ require (
 	golang.org/x/image v0.13.0
 )
 
-require github.com/yangyang5214/gou v0.0.6 // indirect
-
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/flopp/go-coordsparser v0.0.0-20201115094714-8baaeb7062d5 // indirect
@@ -31,7 +29,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
+	github.com/yangyang5214/gou v0.0.6 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect

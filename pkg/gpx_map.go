@@ -75,11 +75,6 @@ func (g *GpxMap) genStat() error {
 	return nil
 }
 
-func (g *GpxMap) getColor(index int) color.Color {
-	size := len(g.colors)
-	return g.colors[index%size]
-}
-
 func (g *GpxMap) Run(imgPath string) error {
 	gpxDatas, err := utils.ParseGpxData(g.files)
 	if err != nil {
@@ -104,7 +99,7 @@ func (g *GpxMap) Run(imgPath string) error {
 		if height <= 1000 {
 			weight = 3
 		}
-		g.smCtx.AddObject(sm.NewPath(post, g.getColor(index), weight))
+		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), weight))
 	}
 
 	titleProvider, ok := g.tileProviders[g.titleName]

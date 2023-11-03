@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg"
+	"github.com/yangyang5214/btl/pkg/utils"
 )
 
 var gpxFile string
@@ -18,10 +19,24 @@ var gpxVideoCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if gpxFile == "" {
+			files = utils.FindGpxFiles(dirPath)
+		} else {
+			files = []string{gpxFile}
+		}
+		if len(files) == 0 {
 			log.Infof("no gpx file set")
 			return
 		}
-		gpxv, err := pkg.NewGpxVideo([]string{gpxFile})
+
+		log.Infof("satrt gpxv, gpx file size is %d", len(files))
+
+		cs, err := parserColor()
+		if err != nil {
+			log.Info("parse color <%s> error: %v", err)
+			return
+		}
+
+		gpxv, err := pkg.NewGpxVideo(files, cs)
 		if err != nil {
 			log.Errorf("init error: %+v", err)
 		}
@@ -35,4 +50,5 @@ var gpxVideoCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(gpxVideoCmd)
 	gpxVideoCmd.Flags().StringVarP(&gpxFile, "file", "f", "", "xx.gpx")
+	gpxVideoCmd.Flags().StringVarP(&colorStr, "color", "c", "green", "red green or random")
 }

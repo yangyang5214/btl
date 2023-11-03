@@ -2,10 +2,9 @@ package cmd
 
 import (
 	. "image/color"
-	"os"
-	"path"
-	"path/filepath"
 	"strings"
+
+	"github.com/yangyang5214/btl/pkg/utils"
 
 	sm "github.com/flopp/go-staticmaps"
 	"github.com/pkg/errors"
@@ -29,7 +28,7 @@ var gpxMapCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(files) == 0 {
-			files = getFiles(dirPath)
+			files = utils.FindGpxFiles(dirPath)
 		}
 		if len(files) == 0 {
 			log.Info("inout gpx files is empty")
@@ -54,7 +53,7 @@ var gpxMapCmd = &cobra.Command{
 func parserColor() ([]Color, error) {
 	if colorStr == "random" {
 		return []Color{
-			//RGBA{A: 0xff},                   //black
+			//RGBA{A: 0xff},                  //black
 			RGBA{B: 0xff, A: 0xff},          //blue
 			RGBA{G: 0xff, A: 0xff},          //green
 			RGBA{R: 0xff, G: 0x7f, A: 0xff}, //orange
@@ -67,29 +66,6 @@ func parserColor() ([]Color, error) {
 		return nil, errors.WithStack(err)
 	}
 	return []Color{c}, nil
-}
-
-func getFiles(dirPath string) []string {
-	absPath, err := filepath.Abs(dirPath)
-	if err != nil {
-		return nil
-	}
-	d, err := os.ReadDir(absPath)
-	if err != nil {
-		return nil
-	}
-	var r []string
-	for _, item := range d {
-		name := item.Name()
-		p := path.Join(absPath, name)
-		if item.IsDir() {
-			r = append(r, getFiles(p)...)
-		}
-		if strings.HasSuffix(name, ".gpx") {
-			r = append(r, p)
-		}
-	}
-	return r
 }
 
 func gpxMapUsage() string {

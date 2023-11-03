@@ -2,8 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"image/color"
+	"os"
+	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"
@@ -83,4 +87,32 @@ func CountPoints(positions [][]s2.LatLng) int {
 		r = r + len(sub)
 	}
 	return r
+}
+
+func FindGpxFiles(dirPath string) []string {
+	absPath, err := filepath.Abs(dirPath)
+	if err != nil {
+		return nil
+	}
+	d, err := os.ReadDir(absPath)
+	if err != nil {
+		return nil
+	}
+	var r []string
+	for _, item := range d {
+		name := item.Name()
+		p := path.Join(absPath, name)
+		if item.IsDir() {
+			r = append(r, FindGpxFiles(p)...)
+		}
+		if strings.HasSuffix(name, ".gpx") {
+			r = append(r, p)
+		}
+	}
+	return r
+}
+
+func GetColor(index int, colors []color.Color) color.Color {
+	size := len(colors)
+	return colors[index+1%size]
 }

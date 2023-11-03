@@ -25,10 +25,8 @@ import (
 
 type GpxVideo struct {
 	files         []string
-	col           color.Color
+	cols          []color.Color
 	titleProvider *sm.TileProvider
-
-	pointCount int
 
 	pwd    string
 	weight float64
@@ -38,7 +36,7 @@ var (
 	outMp4 = "out.mp4"
 )
 
-func NewGpxVideo(files []string) (*GpxVideo, error) {
+func NewGpxVideo(files []string, cols []color.Color) (*GpxVideo, error) {
 	if !gou.CmdExists("ffmpeg") {
 		return nil, errors.New("ffmpeg not found")
 	}
@@ -46,7 +44,6 @@ func NewGpxVideo(files []string) (*GpxVideo, error) {
 	if len(files) == 0 {
 		return nil, errors.New("no files provided")
 	}
-	col, _ := sm.ParseColorString("green")
 	titleProvider := sm.NewTileProviderCartoDark()
 	titleProvider.Attribution = ""
 
@@ -56,7 +53,7 @@ func NewGpxVideo(files []string) (*GpxVideo, error) {
 	}
 	return &GpxVideo{
 		files:         files,
-		col:           col,
+		cols:          cols,
 		titleProvider: titleProvider,
 		pwd:           pwd,
 		weight:        2,
@@ -66,13 +63,22 @@ func NewGpxVideo(files []string) (*GpxVideo, error) {
 func (g *GpxVideo) genCenter(positions [][]s2.LatLng) (int, s2.LatLng, error) {
 	smCtx := sm.NewContext()
 	for _, position := range positions {
-		smCtx.AddObject(sm.NewPath(position, g.col, 2))
+		smCtx.AddObject(sm.NewPath(position, color.Transparent, 3))
 	}
 	return smCtx.DetermineZoomCenter()
 }
 
-func (g *GpxVideo) genStep() int {
-	step := g.pointCount / (30 * 10) // ffmpeg -framerate 30 * 15 seconds
+func (g *GpxVideo) genStep(positions [][]s2.LatLng) int {
+	var lines []int
+	for _, position := range positions {
+		lines = append(lines, len(position))
+	}
+	log.Infof("all lines points is %v", lines)
+	// 取一个线路为 基准
+	index := len(lines) / 5 * 3
+
+	log.Infof("use lines index for step %d", index)
+	step := lines[index] / (30 * 12) // ffmpeg -framerate 30 * 15 seconds
 	if step < 1 {
 		step = 1
 	}
@@ -85,7 +91,6 @@ func (g *GpxVideo) Run() error {
 		return err
 	}
 	positions, err := utils.ParsePositions(gpxDatas)
-	g.pointCount = utils.CountPoints(positions)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -109,41 +114,49 @@ func (g *GpxVideo) Run() error {
 	var index int64
 	var resultImg string //last image
 
-	bar := progressbar.New(g.pointCount)
-	step := g.genStep()
+	maxPoints := g.maxPoints(positions)
+	bar := progressbar.New(maxPoints)
+	step := g.genStep(positions)
 
-	log.Infof("points count: %d, set step %d", g.pointCount, step)
+	log.Infof("max points count: %d, set step %d", maxPoints, step)
 
 	var wg sync.WaitGroup
-	for _, position := range positions {
-		for i := step; i < len(position); i += step {
-			index = index + 1
-			wg.Add(1)
-			imgPath := path.Join(tempDir, fmt.Sprintf("%d.png", index))
-			resultImg = imgPath
-			go func(imgPath string, i int, step int) {
-				defer func() {
-					_ = bar.Add(step)
-					wg.Done()
-				}()
-				smCtx := sm.NewContext()
-				smCtx.SetSize(width, height)
-				smCtx.SetTileProvider(g.titleProvider)
-				smCtx.SetZoom(zoom)
-				smCtx.SetCenter(center)
+	for i := step; i < maxPoints; i += step {
+		index = index + 1
+		wg.Add(1)
+		imgPath := path.Join(tempDir, fmt.Sprintf("%d.png", index))
+		resultImg = imgPath
 
-				smCtx.AddObject(sm.NewPath(position[0:i], g.col, g.weight))
+		go func(imgPath string, i int, step int, lines [][]s2.LatLng) {
+			defer func() {
+				_ = bar.Add(step)
+				wg.Done()
+			}()
+			smCtx := sm.NewContext()
+			smCtx.SetSize(width, height)
+			smCtx.SetTileProvider(g.titleProvider)
+			smCtx.SetZoom(zoom)
+			smCtx.SetCenter(center)
 
-				img, err = smCtx.Render()
-				if err != nil {
-					log.Errorf("call sm.Render failed %+v", err)
+			for lineIndex, line := range lines {
+				end := i
+				if end > len(line) {
+					end = len(line)
 				}
-				err = gg.SavePNG(imgPath, img)
-				if err != nil {
-					log.Errorf("save png failed %+v", err)
-				}
-			}(imgPath, i, step)
-		}
+				ps := line[0:end]
+				curColor := utils.GetColor(lineIndex, g.cols)
+				smCtx.AddObject(sm.NewPath(ps, curColor, g.weight))
+			}
+
+			img, err = smCtx.Render()
+			if err != nil {
+				log.Errorf("call sm.Render failed %+v", err)
+			}
+			err = gg.SavePNG(imgPath, img)
+			if err != nil {
+				log.Errorf("save png failed %+v", err)
+			}
+		}(imgPath, i, step, positions)
 	}
 	wg.Wait()
 
@@ -158,6 +171,16 @@ func (g *GpxVideo) Run() error {
 		return errors.WithStack(err)
 	}
 	return nil
+}
+
+func (g *GpxVideo) maxPoints(points [][]s2.LatLng) int {
+	var r int
+	for _, point := range points {
+		if len(point) > r {
+			r = len(point)
+		}
+	}
+	return r
 }
 
 func (g *GpxVideo) mergeVideo(workDir string) (err error) {

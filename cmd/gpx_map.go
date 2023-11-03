@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"image/color"
+	. "image/color"
 	"os"
 	"path"
 	"path/filepath"
@@ -51,12 +51,22 @@ var gpxMapCmd = &cobra.Command{
 	},
 }
 
-func parserColor() (color.Color, error) {
+func parserColor() ([]Color, error) {
+	if colorStr == "random" {
+		return []Color{
+			//RGBA{A: 0xff},                   //black
+			RGBA{B: 0xff, A: 0xff},          //blue
+			RGBA{G: 0xff, A: 0xff},          //green
+			RGBA{R: 0xff, G: 0x7f, A: 0xff}, //orange
+			RGBA{R: 0xff, A: 0xff},          //red
+			RGBA{R: 0xff, G: 0xff, A: 0xff}, //yellow
+		}, nil
+	}
 	c, err := sm.ParseColorString(colorStr)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return c, nil
+	return []Color{c}, nil
 }
 
 func getFiles(dirPath string) []string {
@@ -87,6 +97,7 @@ func gpxMapUsage() string {
 		"carto-dark(暗黑)",
 		"carto-light(白色)",
 		"wikimedia(纯线路)",
+		"osm",
 	}
 	return strings.Join(r, "\n")
 }
@@ -96,6 +107,6 @@ func init() {
 	gpxMapCmd.Flags().StringSliceVarP(&files, "files", "f", []string{}, "xx.gpx")
 	gpxMapCmd.Flags().StringVarP(&dirPath, "dir", "d", ".", "")
 	gpxMapCmd.Flags().StringVarP(&attribution, "attribution", "a", "", "")
-	gpxMapCmd.Flags().StringVarP(&titleName, "name", "n", "carto-light", gpxMapUsage())
-	gpxMapCmd.Flags().StringVarP(&colorStr, "color", "c", "red", "set color")
+	gpxMapCmd.Flags().StringVarP(&titleName, "name", "n", "carto-dark", gpxMapUsage())
+	gpxMapCmd.Flags().StringVarP(&colorStr, "color", "c", "red", "red or green or random")
 }

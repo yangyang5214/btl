@@ -33,13 +33,14 @@ type GpxMap struct {
 	attribution   string
 	titleName     string
 	tileProviders map[string]*sm.TileProvider
-	colorObj      color.Color
+	colors        []color.Color
 	stat          *Stat
 }
 
-func NewGpxMap(files []string, attribution, titleName string, color color.Color) *GpxMap {
-	if color == nil {
-		color, _ = sm.ParseColorString("green")
+func NewGpxMap(files []string, attribution, titleName string, colors []color.Color) *GpxMap {
+	if len(colors) == 0 {
+		defaultColor, _ := sm.ParseColorString("green")
+		colors = []color.Color{defaultColor}
 	}
 	return &GpxMap{
 		files:         files,
@@ -47,7 +48,7 @@ func NewGpxMap(files []string, attribution, titleName string, color color.Color)
 		attribution:   attribution,
 		titleName:     titleName,
 		tileProviders: sm.GetTileProviders(),
-		colorObj:      color,
+		colors:        colors,
 	}
 }
 
@@ -74,6 +75,11 @@ func (g *GpxMap) genStat() error {
 	return nil
 }
 
+func (g *GpxMap) getColor(index int) color.Color {
+	size := len(g.colors)
+	return g.colors[index%size]
+}
+
 func (g *GpxMap) Run(imgPath string) error {
 	gpxDatas, err := utils.ParseGpxData(g.files)
 	if err != nil {
@@ -93,12 +99,12 @@ func (g *GpxMap) Run(imgPath string) error {
 	log.Infof("use height=%d, width=%d", height, width)
 	g.smCtx.SetSize(width, height)
 
-	for _, post := range positions {
+	for index, post := range positions {
 		weight := g.getWeight(post)
 		if height <= 1000 {
-			weight = 2
+			weight = 3
 		}
-		g.smCtx.AddObject(sm.NewPath(post, g.colorObj, weight))
+		g.smCtx.AddObject(sm.NewPath(post, g.getColor(index), weight))
 	}
 
 	titleProvider, ok := g.tileProviders[g.titleName]

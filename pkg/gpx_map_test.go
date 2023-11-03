@@ -55,7 +55,7 @@ func TestName(t *testing.T) {
 	w := float64(h) * 1.5
 
 	ctx.SetSize(int(w), h)
-	r, err := sm.ParsePathString("colorObj:red|weight:5|gpx:/Users/beer/Downloads/1.gpx")
+	r, err := sm.ParsePathString("colors:red|weight:5|gpx:/Users/beer/Downloads/1.gpx")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,5 +83,12 @@ func TestName(t *testing.T) {
 
 	if err = gg.SavePNG("1.png", img); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestColors(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	for i := 0; i < 20; i++ {
+		t.Log(s[i%len(s)])
 	}
 }

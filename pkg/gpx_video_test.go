@@ -11,7 +11,7 @@ func TestVideo(t *testing.T) {
 	files := []string{
 		"/Users/beer/beer/rides/shang_hai/activity_188416039.gpx",
 	}
-	v, err := NewGpxVideo(files)
+	v, err := NewGpxVideo(files, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

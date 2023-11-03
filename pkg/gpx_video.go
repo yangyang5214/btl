@@ -64,7 +64,7 @@ func NewGpxVideo(files []string, cols []color.Color) (*GpxVideo, error) {
 func (g *GpxVideo) genCenter(positions [][]s2.LatLng) (int, s2.LatLng, error) {
 	smCtx := sm.NewContext()
 	for _, position := range positions {
-		smCtx.AddObject(sm.NewPath(position, color.Transparent, 3))
+		smCtx.AddObject(sm.NewPath(position, color.Transparent, 1))
 	}
 	return smCtx.DetermineZoomCenter()
 }

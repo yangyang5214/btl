@@ -2,10 +2,11 @@ package pkg
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/yangyang5214/btl/pkg/model"
 )

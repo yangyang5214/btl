@@ -4,6 +4,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
 
@@ -18,14 +20,11 @@ var garminGpxCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info("garminGpx cmd called")
 
-		pwd, err := pkg.GetPwd()
-		if err != nil {
-			log.Fatalf("error getting pwd: %v", err)
-		}
+		pwd, _ := os.Getwd()
 		gpx := pkg.GpxMerge{
 			CurrentDir: pwd,
 		}
-		err = gpx.Run()
+		err := gpx.Run()
 		if err != nil {
 			log.Fatalf("error running garmin gpx: %v", err)
 		}

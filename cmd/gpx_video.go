@@ -13,11 +13,19 @@ var gpxFile string
 
 // gpxVideoCmd represents the gpxVideo command
 var gpxVideoCmd = &cobra.Command{
-	Use:   "gpxVideo",
-	Short: "",
+	Use:   "gpxv",
+	Short: "gpx to video",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := pkg.NewGpxVideo([]string{gpxFile})
+		if gpxFile == "" {
+			log.Infof("no gpx file set")
+			return
+		}
+		gpxv, err := pkg.NewGpxVideo([]string{gpxFile})
+		if err != nil {
+			log.Errorf("init error: %+v", err)
+		}
+		err = gpxv.Run()
 		if err != nil {
 			log.Errorf("gpx video error: %+v", err)
 		}

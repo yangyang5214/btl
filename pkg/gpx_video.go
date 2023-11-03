@@ -2,31 +2,62 @@ package pkg
 
 import (
 	"fmt"
+	"image"
+	"image/color"
+	"os"
+	"path"
+
+	"github.com/yangyang5214/gou"
+
+	"github.com/schollz/progressbar/v3"
+
+	fileutil "github.com/yangyang5214/gou/file"
+
 	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg/utils"
-	"image"
-	"image/color"
 )
 
 type GpxVideo struct {
 	files         []string
 	col           color.Color
 	titleProvider *sm.TileProvider
+
+	pointCount int
+
+	pwd string
 }
 
-func NewGpxVideo(files []string) *GpxVideo {
+var (
+	outMp4 = "out.mp4"
+)
+
+func NewGpxVideo(files []string) (*GpxVideo, error) {
+	if !gou.CmdExists("ffmpeg") {
+		return nil, errors.New("ffmpeg not found")
+	}
+
+	if len(files) == 0 {
+		return nil, errors.New("no files provided")
+	}
 	col, _ := sm.ParseColorString("green")
 	titleProvider := sm.NewTileProviderCartoDark()
 	titleProvider.Attribution = ""
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
 	return &GpxVideo{
 		files:         files,
 		col:           col,
 		titleProvider: titleProvider,
-	}
+		pwd:           pwd,
+	}, nil
 }
 
 func (g *GpxVideo) genCenter(positions [][]s2.LatLng) (int, s2.LatLng, error) {
@@ -37,12 +68,21 @@ func (g *GpxVideo) genCenter(positions [][]s2.LatLng) (int, s2.LatLng, error) {
 	return smCtx.DetermineZoomCenter()
 }
 
+func (g *GpxVideo) genStep() int {
+	step := g.pointCount / (30 * 10) // ffmpeg -framerate 30 * 15 seconds
+	if step < 1 {
+		step = 1
+	}
+	return step
+}
+
 func (g *GpxVideo) Run() error {
 	gpxDatas, err := utils.ParseGpxData(g.files)
 	if err != nil {
 		return err
 	}
 	positions, err := utils.ParsePositions(gpxDatas)
+	g.pointCount = utils.CountPoints(positions)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -54,10 +94,25 @@ func (g *GpxVideo) Run() error {
 	width, height := utils.GenWidthHeight(positions)
 	log.Infof("use height=%d, width=%d", height, width)
 
+	tempDir, err := os.MkdirTemp("", uuid.New().String())
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tempDir)
+	}()
+
 	var img image.Image
 	var index int64
+	var resultImg string //last image
+
+	bar := progressbar.New(g.pointCount)
+	step := g.genStep()
+
+	log.Infof("points count: %d, set step %d", g.pointCount, step)
 	for _, position := range positions {
-		for i := 1; i < len(position); i += 5 {
+		for i := step; i < len(position); i += step {
+			_ = bar.Add(step)
 			index = index + 1
 			smCtx := sm.NewContext()
 			smCtx.SetSize(width, height)
@@ -72,13 +127,28 @@ func (g *GpxVideo) Run() error {
 				return errors.WithStack(err)
 			}
 
-			//img = g.addStat(img)
-			if err = gg.SavePNG(fmt.Sprintf("/tmp/2/%d.png", index), img); err != nil {
+			imgPath := path.Join(tempDir, fmt.Sprintf("%d.png", index))
+			if err = gg.SavePNG(imgPath, img); err != nil {
 				return errors.WithStack(err)
 			}
+			resultImg = imgPath
 		}
 	}
 
-	//ffmpeg -framerate 30 -i %d.png -c:v libx264  out.mp4 -y
+	err = fileutil.CopyFile(resultImg, path.Join(g.pwd, "result.png"))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	cmd := "ffmpeg -framerate 30 -i %d.png -c:v libx264  -y " + outMp4
+	err, _ = gou.RunCmd(fmt.Sprintf("cd %s", tempDir) + " && " + cmd)
+	if err != nil {
+		log.Errorf("run ffmpeg error %v", err)
+		return errors.WithStack(err)
+	}
+
+	err = fileutil.CopyFile(path.Join(tempDir, outMp4), g.pwd)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	return nil
 }

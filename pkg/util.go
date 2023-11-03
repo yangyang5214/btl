@@ -6,12 +6,13 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -145,14 +146,4 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 		}
 	}
 	return nil
-}
-
-func GetPwd() (string, error) {
-	var pwd string
-	pwd, err := os.Getwd()
-	if err != nil {
-		log.Errorf("os getwd error: %+v", err)
-		return "", err
-	}
-	return pwd, nil
 }

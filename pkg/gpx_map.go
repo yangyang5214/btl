@@ -2,6 +2,9 @@ package pkg
 
 import (
 	"fmt"
+	"image"
+	"image/color"
+
 	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
@@ -11,8 +14,6 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"golang.org/x/image/font/gofont/goregular"
-	"image"
-	"image/color"
 )
 
 type Stat struct {
@@ -53,7 +54,7 @@ func NewGpxMap(files []string, attribution, titleName string, color color.Color)
 func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
 	var weight float64
 	defer func() {
-		log.Infof("points size is %d, line weight %v", len(post), weight)
+		log.Infof("pointCount size is %d, line weight %v", len(post), weight)
 	}()
 	size := len(post)
 	weight = float64(size/10_000) + 2.0

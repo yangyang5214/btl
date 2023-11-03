@@ -2,12 +2,13 @@ package pkg
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -38,11 +39,6 @@ func (m *Markdown) downloadImag(line string) (string, error) {
 		return line, nil
 	}
 
-	pwd, err := GetPwd()
-	if err != nil {
-		return "", err
-	}
-
 	if strings.HasPrefix(imgUrl, "http") {
 		imgType := m.parserImageType(imgUrl)
 		if imgType == "" {
@@ -50,6 +46,7 @@ func (m *Markdown) downloadImag(line string) (string, error) {
 		}
 		filename := md5Sum(line) + "." + imgType
 
+		pwd, _ := os.Getwd()
 		err = downloadSave(m.httpClient, imgUrl, path.Join(pwd, "images", filename))
 		if err != nil {
 			return "", err

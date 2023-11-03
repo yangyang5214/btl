@@ -4,4 +4,5 @@ use .
 
 replace (
 	github.com/flopp/go-staticmaps => ./../go-staticmaps
+	github.com/yangyang5214/gou => ./../gou
 )

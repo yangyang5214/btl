@@ -13,5 +13,6 @@ tasks:
   build:
     desc: local build
     cmds:
+      - task format
       - go build
       - mv btl ~/go/bin

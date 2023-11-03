@@ -1,16 +1,17 @@
 package cmd
 
 import (
-	sm "github.com/flopp/go-staticmaps"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
-	"github.com/yangyang5214/btl/pkg"
 	"image/color"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	sm "github.com/flopp/go-staticmaps"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/yangyang5214/btl/pkg"
 )
 
 var files []string
@@ -23,7 +24,7 @@ var (
 
 // gpxMapCmd represents the gpxMap command
 var gpxMapCmd = &cobra.Command{
-	Use:   "gpx_map",
+	Use:   "gpxm",
 	Short: "show gpx in map",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {

@@ -1,10 +1,11 @@
 package pkg
 
 import (
-	sm "github.com/flopp/go-staticmaps"
-	"github.com/fogleman/gg"
 	"strconv"
 	"testing"
+
+	sm "github.com/flopp/go-staticmaps"
+	"github.com/fogleman/gg"
 )
 
 func Test(t *testing.T) {

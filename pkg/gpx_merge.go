@@ -2,12 +2,13 @@ package pkg
 
 import (
 	"bufio"
-	"github.com/pkg/errors"
 	"os"
 	"path"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )

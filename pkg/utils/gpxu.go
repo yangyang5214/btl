@@ -2,12 +2,13 @@ package utils
 
 import (
 	"fmt"
+	"path/filepath"
+	"strconv"
+
 	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
-	"path/filepath"
-	"strconv"
 )
 
 func ParseGpxData(files []string) ([]*gpx.GPX, error) {
@@ -74,4 +75,12 @@ func GenWidthHeight(positions [][]s2.LatLng) (int, int) {
 		}
 	}
 	return int(height * 1.5), int(height)
+}
+
+func CountPoints(positions [][]s2.LatLng) int {
+	var r int
+	for _, sub := range positions {
+		r = r + len(sub)
+	}
+	return r
 }

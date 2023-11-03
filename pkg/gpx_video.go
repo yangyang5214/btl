@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"os"
 	"path"
+	"sort"
 	"sync"
 
 	"github.com/yangyang5214/gou"
@@ -73,6 +74,7 @@ func (g *GpxVideo) genStep(positions [][]s2.LatLng) int {
 	for _, position := range positions {
 		lines = append(lines, len(position))
 	}
+	sort.Ints(lines)
 	log.Infof("all lines points is %v", lines)
 	// 取一个线路为 基准
 	index := len(lines) / 5 * 3

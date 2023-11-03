@@ -113,6 +113,9 @@ func FindGpxFiles(dirPath string) []string {
 }
 
 func GetColor(index int, colors []color.Color) color.Color {
+	if len(colors) == 1 {
+		return colors[0]
+	}
 	size := len(colors)
 	return colors[index+1%size]
 }

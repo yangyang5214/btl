@@ -148,21 +148,29 @@ func (g *GpxVideo) Run() error {
 	wg.Wait()
 
 	_ = bar.Finish() //set finished
-
 	log.Info("\n")
-	log.Infof("Satrt merge to  video ..")
 	err = fileutil.CopyFile(resultImg, path.Join(g.pwd, "result.png"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	err = g.mergeVideo(tempDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+func (g *GpxVideo) mergeVideo(workDir string) (err error) {
+	log.Infof("Satrt merge to  video ..")
+
 	cmd := "ffmpeg -framerate 30 -i %d.png -c:v libx264  -y " + outMp4
-	err, _ = gou.RunCmd(fmt.Sprintf("cd %s", tempDir) + " && " + cmd)
+	err, _ = gou.RunCmd(fmt.Sprintf("cd %s", workDir) + " && " + cmd)
 	if err != nil {
 		log.Errorf("run ffmpeg error %v", err)
 		return errors.WithStack(err)
 	}
 
-	err = fileutil.CopyFile(path.Join(tempDir, outMp4), g.pwd)
+	err = fileutil.CopyFile(path.Join(workDir, outMp4), g.pwd)
 	if err != nil {
 		return errors.WithStack(err)
 	}

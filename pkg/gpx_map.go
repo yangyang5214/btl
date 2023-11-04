@@ -75,19 +75,19 @@ func (g *GpxMap) genStat() error {
 	return nil
 }
 
-func (g *GpxMap) Run(imgPath string) error {
+func (g *GpxMap) Process() (image.Image, error) {
 	gpxDatas, err := utils.ParseGpxData(g.files)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	positions, err := utils.ParsePositions(gpxDatas)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	//gen stat
 	err = g.genStat()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	width, height := utils.GenWidthHeight(positions)
@@ -106,12 +106,14 @@ func (g *GpxMap) Run(imgPath string) error {
 	titleProvider.Attribution = g.attribution
 
 	g.smCtx.SetTileProvider(titleProvider)
-	img, err := g.smCtx.Render()
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	return g.smCtx.Render()
+}
 
-	//img = g.addStat(img)
+func (g *GpxMap) Run(imgPath string) error {
+	img, err := g.Process()
+	if err != nil {
+		return err
+	}
 	if err = gg.SavePNG(imgPath, img); err != nil {
 		return errors.WithStack(err)
 	}

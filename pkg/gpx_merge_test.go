@@ -5,9 +5,7 @@ import (
 )
 
 func TestGarminGpx_getDate(t *testing.T) {
-	g := &GpxMerge{
-		CurrentDir: "",
-	}
+	g := NewGpxMerge("")
 	got, err := g.getDate("/tmp/1.gpx")
 	if err != nil {
 		t.Fatal(err)
@@ -16,9 +14,7 @@ func TestGarminGpx_getDate(t *testing.T) {
 }
 
 func Test_ParseTrkseg(t *testing.T) {
-	g := &GpxMerge{
-		CurrentDir: "",
-	}
+	g := NewGpxMerge("")
 	r := g.parseTrkseg("/tmp/1.gpx")
 	t.Log(r)
 }

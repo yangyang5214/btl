@@ -21,9 +21,7 @@ var garminGpxCmd = &cobra.Command{
 		log.Info("garminGpx cmd called")
 
 		pwd, _ := os.Getwd()
-		gpx := pkg.GpxMerge{
-			CurrentDir: pwd,
-		}
+		gpx := pkg.NewGpxMerge(pwd)
 		err := gpx.Run()
 		if err != nil {
 			log.Fatalf("error running garmin gpx: %v", err)

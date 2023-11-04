@@ -14,7 +14,7 @@ import (
 )
 
 type GpxMerge struct {
-	CurrentDir string
+	currentDir string
 }
 
 type GpxFile struct {
@@ -23,8 +23,14 @@ type GpxFile struct {
 	content []string
 }
 
+func NewGpxMerge(workDir string) *GpxMerge {
+	return &GpxMerge{
+		currentDir: workDir,
+	}
+}
+
 func (g *GpxMerge) Run() error {
-	dirs, err := os.ReadDir(g.CurrentDir)
+	dirs, err := os.ReadDir(g.currentDir)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -35,7 +41,7 @@ func (g *GpxMerge) Run() error {
 			continue
 		}
 		if strings.HasSuffix(dir.Name(), ".gpx") {
-			gpxFiles = append(gpxFiles, path.Join(g.CurrentDir, dir.Name()))
+			gpxFiles = append(gpxFiles, path.Join(g.currentDir, dir.Name()))
 		}
 	}
 
@@ -48,7 +54,7 @@ func (g *GpxMerge) Run() error {
 		return errors.WithStack(err)
 	}
 
-	resultFile, err := os.Create(path.Join(g.CurrentDir, "result.gpx"))
+	resultFile, err := os.Create(path.Join(g.currentDir, "result.gpx"))
 	if err != nil {
 		return errors.WithStack(err)
 	}

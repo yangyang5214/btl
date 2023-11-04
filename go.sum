@@ -55,8 +55,8 @@ github.com/tidwall/pretty v1.2.1/go.mod h1:ITEVvHYasfjBbM0u2Pg8T2nJnzm8xPwvNhhso
 github.com/tkrajina/gpxgo v1.1.2/go.mod h1:795sjVRFo5wWyN6oOZp0RYienGGBJjpAlgOz2nCngA0=
 github.com/tkrajina/gpxgo v1.3.1 h1:b9x0OgF0YqEtLKQoWC6SeCKy4OWUWSt9uzCDPKTI2LY=
 github.com/tkrajina/gpxgo v1.3.1/go.mod h1:795sjVRFo5wWyN6oOZp0RYienGGBJjpAlgOz2nCngA0=
-github.com/yangyang5214/go-staticmaps v0.0.0-20231104064717-027d446dd953 h1:Oc8iKzfUVr1uDWDF24wyOBZlnA4d+8Wxun7KbVUpofE=
-github.com/yangyang5214/go-staticmaps v0.0.0-20231104064717-027d446dd953/go.mod h1:vGgI6wKa1TTiN9iumpzYZgNc/C7KxqsZbw9OH8O10iQ=
+github.com/yangyang5214/go-staticmaps v0.0.0-20231104065828-630dcc544a1a h1:AxYBPzXBvONchs5bvDNV/KOf/YMMIc6hDrt6hWBFwNg=
+github.com/yangyang5214/go-staticmaps v0.0.0-20231104065828-630dcc544a1a/go.mod h1:ZyAdskeMKi3ywp9J4YDB9qqb7l1HtEytxHxzDM83BSI=
 github.com/yangyang5214/gou v0.0.0-20231103015920-b1b5d1b849fc h1:qvDRfqX2hRq0gTDzn+MCnU3O7gOm1Z21scDEooJOzGQ=
 github.com/yangyang5214/gou v0.0.0-20231103015920-b1b5d1b849fc/go.mod h1:V6tHHIRMf+s1B5g3aFFUK20u7UEfO+0A9yXlwHjFTpU=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

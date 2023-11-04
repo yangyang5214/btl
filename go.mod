@@ -3,7 +3,6 @@ module github.com/yangyang5214/btl
 go 1.20
 
 require (
-	github.com/flopp/go-staticmaps v0.0.0-20220221183018-c226716bec53
 	github.com/fogleman/gg v1.3.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217
@@ -15,6 +14,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/tkrajina/gpxgo v1.3.1
+	github.com/yangyang5214/go-staticmaps v0.0.0-20231104065828-630dcc544a1a
 	github.com/yangyang5214/gou v0.0.0-20231103015920-b1b5d1b849fc
 	golang.org/x/image v0.13.0
 )
@@ -36,5 +36,3 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/flopp/go-staticmaps v0.0.0-20220221183018-c226716bec53 => github.com/yangyang5214/go-staticmaps v0.0.0-20231104064717-027d446dd953

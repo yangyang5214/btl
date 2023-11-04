@@ -12,13 +12,13 @@ import (
 
 	fileutil "github.com/yangyang5214/gou/file"
 
-	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg/utils"
+	sm "github.com/yangyang5214/go-staticmaps"
 )
 
 type GpxVideo struct {

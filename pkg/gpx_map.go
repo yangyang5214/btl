@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 
-	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
 	"github.com/golang/geo/s2"
@@ -13,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/utils"
+	sm "github.com/yangyang5214/go-staticmaps"
 	"golang.org/x/image/font/gofont/goregular"
 )
 

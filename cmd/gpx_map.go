@@ -6,11 +6,11 @@ import (
 
 	"github.com/yangyang5214/btl/pkg/utils"
 
-	sm "github.com/flopp/go-staticmaps"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg"
+	sm "github.com/yangyang5214/go-staticmaps"
 )
 
 var files []string

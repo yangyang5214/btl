@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"testing"
 
-	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
+	sm "github.com/yangyang5214/go-staticmaps"
 )
 
 func Test(t *testing.T) {

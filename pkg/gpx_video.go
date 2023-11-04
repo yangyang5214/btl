@@ -2,16 +2,12 @@ package pkg
 
 import (
 	"fmt"
-	"image"
+	"github.com/schollz/progressbar/v3"
+	"github.com/yangyang5214/gou"
 	"image/color"
 	"os"
 	"path"
-	"sort"
 	"sync"
-
-	"github.com/yangyang5214/gou"
-
-	"github.com/schollz/progressbar/v3"
 
 	fileutil "github.com/yangyang5214/gou/file"
 
@@ -69,22 +65,53 @@ func (g *GpxVideo) genCenter(positions [][]s2.LatLng) (int, s2.LatLng, error) {
 	return smCtx.DetermineZoomCenter()
 }
 
-func (g *GpxVideo) genStep(positions [][]s2.LatLng) int {
-	var lines []int
-	for _, position := range positions {
-		lines = append(lines, len(position))
+func (g *GpxVideo) genStep(positions [][]s2.LatLng) map[int]int {
+	r := make(map[int]int)
+	for index := range positions {
+		//step := len(position)/(30*15) + 1
+		//if step > 10 {
+		//	step = 10
+		//}
+		r[index] = 5
 	}
-	sort.Ints(lines)
-	log.Infof("all lines points is %v", lines)
-	// 取一个线路为 基准
-	index := len(lines) / 5 * 3
+	return r
+}
 
-	log.Infof("use lines index for step %d", index)
-	step := lines[index] / (30 * 12) // ffmpeg -framerate 30 * 15 seconds
-	if step < 1 {
-		step = 1
+func (g *GpxVideo) initSmCtx(width, height, zoom int, center s2.LatLng) *sm.Context {
+	smCtx := sm.NewContext()
+	smCtx.SetSize(width, height)
+	smCtx.SetTileProvider(g.titleProvider)
+	smCtx.SetZoom(zoom)
+	smCtx.SetCenter(center)
+	return smCtx
+}
+
+func (g *GpxVideo) stepImage(bar *progressbar.ProgressBar, wg *sync.WaitGroup, imgPath string, positions [][]s2.LatLng, smCtx *sm.Context, index int, lineStep map[int]int) {
+	defer func() {
+		wg.Done()
+		_ = bar.Add(1)
+	}()
+
+	for lineIndex, line := range positions {
+		end := index * lineStep[lineIndex]
+		if end > len(line) {
+			end = len(line)
+		}
+		//log.Infof("size is %d,index is %d, end is %d", len(line), index, end)
+		ps := line[0:end]
+		curColor := utils.GetColor(lineIndex, g.cols)
+		smCtx.AddObject(sm.NewPath(ps, curColor, g.weight))
 	}
-	return step
+
+	img, err := smCtx.Render()
+	if err != nil {
+		log.Errorf("call sm.Render failed %+v", err)
+	}
+	err = gg.SavePNG(imgPath, img)
+	if err != nil {
+		log.Errorf("save png failed %+v", err)
+	}
+
 }
 
 func (g *GpxVideo) Run() error {
@@ -112,53 +139,25 @@ func (g *GpxVideo) Run() error {
 		_ = os.RemoveAll(tempDir)
 	}()
 
-	var img image.Image
-	var index int64
+	var index int
 	var resultImg string //last image
 
-	maxPoints := g.maxPoints(positions)
-	bar := progressbar.New(maxPoints)
-	step := g.genStep(positions)
+	lineStep := g.genStep(positions)
+	loops := g.loopCount(lineStep, positions)
 
-	log.Infof("max points count: %d, set step %d", maxPoints, step)
+	log.Infof("lineStep is %+v", lineStep)
 
-	var wg sync.WaitGroup
-	for i := step; i < maxPoints; i += step {
+	bar := progressbar.New(loops)
+
+	wg := &sync.WaitGroup{}
+	for i := 0; i < loops; i++ {
 		index = index + 1
 		wg.Add(1)
 		imgPath := path.Join(tempDir, fmt.Sprintf("%d.png", index))
 		resultImg = imgPath
 
-		go func(imgPath string, i int, step int, lines [][]s2.LatLng) {
-			defer func() {
-				_ = bar.Add(step)
-				wg.Done()
-			}()
-			smCtx := sm.NewContext()
-			smCtx.SetSize(width, height)
-			smCtx.SetTileProvider(g.titleProvider)
-			smCtx.SetZoom(zoom)
-			smCtx.SetCenter(center)
-
-			for lineIndex, line := range lines {
-				end := i
-				if end > len(line) {
-					end = len(line)
-				}
-				ps := line[0:end]
-				curColor := utils.GetColor(lineIndex, g.cols)
-				smCtx.AddObject(sm.NewPath(ps, curColor, g.weight))
-			}
-
-			img, err = smCtx.Render()
-			if err != nil {
-				log.Errorf("call sm.Render failed %+v", err)
-			}
-			err = gg.SavePNG(imgPath, img)
-			if err != nil {
-				log.Errorf("save png failed %+v", err)
-			}
-		}(imgPath, i, step, positions)
+		smCtx := g.initSmCtx(width, height, zoom, center)
+		go g.stepImage(bar, wg, imgPath, positions, smCtx, index, lineStep)
 	}
 	wg.Wait()
 
@@ -180,6 +179,17 @@ func (g *GpxVideo) maxPoints(points [][]s2.LatLng) int {
 	for _, point := range points {
 		if len(point) > r {
 			r = len(point)
+		}
+	}
+	return r
+}
+
+func (g *GpxVideo) loopCount(points map[int]int, positions [][]s2.LatLng) int {
+	var r int
+	for index, step := range points {
+		c := len(positions[index]) / step
+		if c > r {
+			r = c
 		}
 	}
 	return r

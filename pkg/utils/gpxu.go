@@ -1,12 +1,10 @@
 package utils
 
 import (
-	"fmt"
 	. "image/color"
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/golang/geo/s2"
@@ -61,35 +59,15 @@ func ParsePositions(datas []*gpx.GPX) ([][]s2.LatLng, error) {
 
 func GenWidthHeight(positions [][]s2.LatLng) (int, int) {
 	var maxPointSize int
-	southPoint, northPoint := positions[0][0], positions[0][0]
 	for _, points := range positions {
-		for _, point := range points {
-			if point.Lat < southPoint.Lat {
-				southPoint = point
-			}
-			if point.Lat > northPoint.Lat {
-				northPoint = point
-			}
-		}
 		if len(points) > maxPointSize {
 			maxPointSize = len(points)
 		}
 	}
-
-	log.Infof("northPoint: %s", fmt.Sprintf("%s,%s", northPoint.Lng, northPoint.Lat))
-	log.Infof("southPoint: %s", fmt.Sprintf("%s,%s", southPoint.Lng, southPoint.Lat))
-
-	south, _ := strconv.ParseFloat(southPoint.Lat.String(), 10)
-	north, _ := strconv.ParseFloat(northPoint.Lat.String(), 10)
-	height := (north - south) * 1000 / 4
-	if height < 600 {
-		if maxPointSize > 2000 {
-			return 1028, 1000
-		} else {
-			return 800, 600
-		}
+	if maxPointSize > 10000 {
+		return 1280, 1000
 	}
-	return int(height * 1.5), int(height)
+	return 800, 600
 }
 
 func CountPoints(positions [][]s2.LatLng) int {

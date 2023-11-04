@@ -95,11 +95,7 @@ func (g *GpxMap) Run(imgPath string) error {
 	g.smCtx.SetSize(width, height)
 
 	for index, post := range positions {
-		weight := g.getWeight(post)
-		if height <= 1000 {
-			weight = 3
-		}
-		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), weight))
+		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), 1))
 	}
 
 	titleProvider, ok := g.tileProviders[g.titleName]

@@ -7,6 +7,7 @@ import (
 	"image/color"
 	"os"
 	"path"
+	"sort"
 	"sync"
 
 	fileutil "github.com/yangyang5214/gou/file"
@@ -27,6 +28,11 @@ type GpxVideo struct {
 
 	pwd    string
 	weight float64
+
+	zoom   int
+	center s2.LatLng
+	width  int
+	height int
 }
 
 var (
@@ -53,44 +59,48 @@ func NewGpxVideo(files []string, cols []color.Color) (*GpxVideo, error) {
 		cols:          cols,
 		titleProvider: titleProvider,
 		pwd:           pwd,
-		weight:        2,
+		weight:        1,
 	}, nil
 }
 
 func (g *GpxVideo) genCenter(positions [][]s2.LatLng) (int, s2.LatLng, error) {
 	smCtx := sm.NewContext()
 	for _, position := range positions {
-		smCtx.AddObject(sm.NewPath(position, color.Transparent, 1))
+		smCtx.AddObject(sm.NewPath(position, color.Transparent, g.weight))
 	}
 	return smCtx.DetermineZoomCenter()
 }
 
 func (g *GpxVideo) genStep(positions [][]s2.LatLng) map[int]int {
-	r := make(map[int]int)
-	for index := range positions {
-		//step := len(position)/(30*15) + 1
-		//if step > 10 {
-		//	step = 10
-		//}
-		r[index] = 5
+	var lines []int
+	for _, position := range positions {
+		lines = append(lines, len(position))
 	}
-	return r
+	sort.Ints(lines)
+
+	step := make(map[int]int)
+	for index := range lines {
+		step[index] = 5 //todo
+	}
+	return step
 }
 
-func (g *GpxVideo) initSmCtx(width, height, zoom int, center s2.LatLng) *sm.Context {
+func (g *GpxVideo) initSmCtx() *sm.Context {
 	smCtx := sm.NewContext()
-	smCtx.SetSize(width, height)
+	smCtx.SetSize(g.width, g.height)
 	smCtx.SetTileProvider(g.titleProvider)
-	smCtx.SetZoom(zoom)
-	smCtx.SetCenter(center)
+	smCtx.SetZoom(g.zoom)
+	smCtx.SetCenter(g.center)
 	return smCtx
 }
 
-func (g *GpxVideo) stepImage(bar *progressbar.ProgressBar, wg *sync.WaitGroup, imgPath string, positions [][]s2.LatLng, smCtx *sm.Context, index int, lineStep map[int]int) {
+func (g *GpxVideo) stepImage(bar *progressbar.ProgressBar, wg *sync.WaitGroup, imgPath string, positions [][]s2.LatLng, index int, lineStep map[int]int) {
 	defer func() {
-		wg.Done()
 		_ = bar.Add(1)
+		wg.Done()
 	}()
+
+	smCtx := g.initSmCtx()
 
 	for lineIndex, line := range positions {
 		end := index * lineStep[lineIndex]
@@ -127,9 +137,14 @@ func (g *GpxVideo) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	g.zoom = zoom
+	g.center = center
+	log.Infof("use zoom %d", zoom)
 
 	width, height := utils.GenWidthHeight(positions)
 	log.Infof("use height=%d, width=%d", height, width)
+	g.width = width
+	g.height = height
 
 	tempDir, err := os.MkdirTemp("", uuid.New().String())
 	if err != nil {
@@ -139,34 +154,26 @@ func (g *GpxVideo) Run() error {
 		_ = os.RemoveAll(tempDir)
 	}()
 
-	var index int
-	var resultImg string //last image
-
 	lineStep := g.genStep(positions)
-	loops := g.loopCount(lineStep, positions)
+	loops := g.loopCount(lineStep, positions) //最大 loops
 
-	log.Infof("lineStep is %+v", lineStep)
+	log.Infof("lineStep is %+v, loops is %d", lineStep, loops)
 
 	bar := progressbar.New(loops)
 
+	var index int
 	wg := &sync.WaitGroup{}
 	for i := 0; i < loops; i++ {
 		index = index + 1
 		wg.Add(1)
 		imgPath := path.Join(tempDir, fmt.Sprintf("%d.png", index))
-		resultImg = imgPath
-
-		smCtx := g.initSmCtx(width, height, zoom, center)
-		go g.stepImage(bar, wg, imgPath, positions, smCtx, index, lineStep)
+		go g.stepImage(bar, wg, imgPath, positions, index, lineStep)
 	}
 	wg.Wait()
 
 	_ = bar.Finish() //set finished
 	log.Info("\n")
-	err = fileutil.CopyFile(resultImg, path.Join(g.pwd, "result.png"))
-	if err != nil {
-		return errors.WithStack(err)
-	}
+
 	err = g.mergeVideo(tempDir)
 	if err != nil {
 		return errors.WithStack(err)

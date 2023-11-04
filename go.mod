@@ -9,15 +9,15 @@ require (
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217
 	github.com/google/uuid v1.4.0
 	github.com/pkg/errors v0.9.1
+	github.com/schollz/progressbar/v3 v3.13.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.16.0
 	github.com/tkrajina/gpxgo v1.3.1
+	github.com/yangyang5214/gou v0.0.0-20231103015920-b1b5d1b849fc
 	golang.org/x/image v0.13.0
 )
-
-require github.com/yangyang5214/gou v0.0.6 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -27,14 +27,14 @@ require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/schollz/progressbar/v3 v3.13.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/flopp/go-staticmaps v0.0.0-20220221183018-c226716bec53 => github.com/yangyang5214/go-staticmaps v0.0.0-20231103114642-ba9901cc21ee

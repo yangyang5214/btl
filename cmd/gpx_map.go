@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"golang.org/x/image/colornames"
 	. "image/color"
 	"strings"
 
@@ -52,7 +53,13 @@ var gpxMapCmd = &cobra.Command{
 
 func parserColor() ([]Color, error) {
 	if colorStr == "random" {
-		return utils.DefaultColors, nil
+		return []Color{
+			colornames.Red,
+			colornames.Yellow,
+			colornames.Green,
+			colornames.Blue,
+			colornames.Orange,
+		}, nil
 	}
 	c, err := sm.ParseColorString(colorStr)
 	if err != nil {

@@ -35,6 +35,9 @@ type GpxMap struct {
 	tileProviders map[string]*sm.TileProvider
 	colors        []color.Color
 	stat          *Stat
+
+	weight  float64
+	bgColor color.Color
 }
 
 func NewGpxMap(files []string, attribution, titleName string, colors []color.Color) *GpxMap {
@@ -49,10 +52,22 @@ func NewGpxMap(files []string, attribution, titleName string, colors []color.Col
 		titleName:     titleName,
 		tileProviders: sm.GetTileProviders(),
 		colors:        colors,
+		bgColor:       color.RGBA{R: 255, G: 255, B: 255, A: 255}, //white
 	}
 }
 
+func (g *GpxMap) SetWeight(weight float64) {
+	g.weight = weight
+}
+
+func (g *GpxMap) SetBgColor(cc color.Color) {
+	g.bgColor = cc
+}
+
 func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
+	if g.weight != 0 {
+		return g.weight
+	}
 	var weight float64
 	defer func() {
 		log.Infof("pointCount size is %d, line weight %v", len(post), weight)
@@ -95,7 +110,7 @@ func (g *GpxMap) Process() (image.Image, error) {
 	g.smCtx.SetSize(width, height)
 
 	for index, post := range positions {
-		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), 1))
+		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), g.weight))
 	}
 
 	titleProvider, ok := g.tileProviders[g.titleName]
@@ -104,6 +119,7 @@ func (g *GpxMap) Process() (image.Image, error) {
 	}
 
 	titleProvider.Attribution = g.attribution
+	titleProvider.BackGroundColor = g.bgColor
 
 	g.smCtx.SetTileProvider(titleProvider)
 	return g.smCtx.Render()

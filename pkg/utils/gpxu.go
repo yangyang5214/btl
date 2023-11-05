@@ -13,17 +13,6 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 )
 
-var (
-	DefaultColors = []Color{
-		//RGBA{A: 0xff},                 //black
-		RGBA{B: 0xff, A: 0xff},          //blue
-		RGBA{G: 0xff, A: 0xff},          //green
-		RGBA{R: 0xff, G: 0x7f, A: 0xff}, //orange
-		RGBA{R: 0xff, A: 0xff},          //red
-		RGBA{R: 0xff, G: 0xff, A: 0xff}, //yellow
-	}
-)
-
 func ParseGpxData(files []string) ([]*gpx.GPX, error) {
 	var results []*gpx.GPX
 	for _, f := range files {

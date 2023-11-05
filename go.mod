@@ -14,7 +14,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/tkrajina/gpxgo v1.3.1
-	github.com/yangyang5214/go-staticmaps v0.0.0-20231105033351-f6b868048d70
+	github.com/yangyang5214/go-staticmaps v0.0.0-20231105115241-b191a93d8d37
 	github.com/yangyang5214/gou v0.0.0-20231103015920-b1b5d1b849fc
 	golang.org/x/image v0.13.0
 )

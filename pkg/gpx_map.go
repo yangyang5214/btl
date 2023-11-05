@@ -7,7 +7,6 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
-	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
@@ -36,10 +35,8 @@ type GpxMap struct {
 	colors        []color.Color
 	stat          *Stat
 
-	weight  float64
 	bgColor color.Color
-
-	width, height int
+	weight  float64
 }
 
 func NewGpxMap(files []string, attribution, titleName string, colors []color.Color) *GpxMap {
@@ -55,6 +52,7 @@ func NewGpxMap(files []string, attribution, titleName string, colors []color.Col
 		tileProviders: sm.GetTileProviders(),
 		colors:        colors,
 		bgColor:       color.RGBA{R: 255, G: 255, B: 255, A: 255}, //white
+		weight:        3,
 	}
 }
 
@@ -64,24 +62,6 @@ func (g *GpxMap) SetWeight(weight float64) {
 
 func (g *GpxMap) SetBgColor(cc color.Color) {
 	g.bgColor = cc
-}
-
-func (g *GpxMap) SetSize(width, height int) {
-	g.width = width
-	g.height = height
-}
-
-func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
-	if g.weight != 0 {
-		return g.weight
-	}
-	var weight float64
-	defer func() {
-		log.Infof("pointCount size is %d, line weight %v", len(post), weight)
-	}()
-	size := len(post)
-	weight = float64(size/10_000) + 2.0
-	return weight
 }
 
 func (g *GpxMap) genStat() error {
@@ -106,19 +86,15 @@ func (g *GpxMap) Process() (image.Image, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	//gen stat
 	err = g.genStat()
 	if err != nil {
 		return nil, err
 	}
 
-	if g.width == 0 {
-		width, height := utils.GenWidthHeight(positions)
-		log.Infof("use height=%d, width=%d", height, width)
-		g.width = width
-		g.height = height
-	}
-	g.smCtx.SetSize(g.width, g.height)
+	w, h := utils.GenWidthHeight(positions)
+	g.smCtx.SetSize(w, h)
 
 	for index, post := range positions {
 		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), g.weight))

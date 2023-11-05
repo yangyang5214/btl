@@ -1,6 +1,8 @@
 package utils
 
 import (
+	sm "github.com/yangyang5214/go-staticmaps"
+	"golang.org/x/image/colornames"
 	. "image/color"
 	"os"
 	"path"
@@ -47,19 +49,24 @@ func ParsePositions(datas []*gpx.GPX) ([][]s2.LatLng, error) {
 }
 
 func GenWidthHeight(positions [][]s2.LatLng) (int, int) {
-	var maxPointSize int
-	for _, points := range positions {
-		if len(points) > maxPointSize {
-			maxPointSize = len(points)
-		}
+	smCtx := sm.NewContext()
+	for _, position := range positions {
+		smCtx.AddObject(sm.NewPath(position, colornames.Yellow, 1))
 	}
-	log.Infof("point count: %d", maxPointSize)
-	if maxPointSize > 20000 {
-		return 1200, 1000
-	} else if maxPointSize > 10000 {
-		return 1000, 800
+	bounds := smCtx.DetermineBounds()
+	maxLength := bounds.Lat.Length()
+	if bounds.Lng.Length() > maxLength {
+		maxLength = bounds.Lng.Length()
 	}
-	return 800, 600
+
+	width := 0
+	dis := int(maxLength * 1_0000)
+	gap := dis / 50
+	width = (gap)*200 + 800
+
+	log.Printf("dis %v, width %v,", dis, width)
+
+	return width, int(float64(width) * 0.8)
 }
 
 func CountPoints(positions [][]s2.LatLng) int {

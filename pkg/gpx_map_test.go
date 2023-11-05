@@ -13,7 +13,8 @@ import (
 func Test(t *testing.T) {
 	files := []string{
 		//"/Users/beer/beer/rides/hai_nan.gpx",
-		"/Users/beer/beer/rides/shang_hai/6833367971.gpx",
+		//"/Users/beer/beer/rides/shang_hai/6833367971.gpx",
+		//"/Users/beer/beer/rides/shang_hai/6884490616.gpx",
 	}
 	names := []string{
 		"none",
@@ -27,6 +28,7 @@ func Test(t *testing.T) {
 		gpx := NewGpxMap(files, "", name, []color.Color{colornames.White})
 		gpx.SetBgColor(colornames.Yellow)
 		gpx.SetWeight(10)
+		gpx.SetSize(800, 600)
 		err := gpx.Run("result.png")
 		if err != nil {
 			t.Fatal(err)

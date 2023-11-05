@@ -38,6 +38,8 @@ type GpxMap struct {
 
 	weight  float64
 	bgColor color.Color
+
+	width, height int
 }
 
 func NewGpxMap(files []string, attribution, titleName string, colors []color.Color) *GpxMap {
@@ -62,6 +64,11 @@ func (g *GpxMap) SetWeight(weight float64) {
 
 func (g *GpxMap) SetBgColor(cc color.Color) {
 	g.bgColor = cc
+}
+
+func (g *GpxMap) SetSize(width, height int) {
+	g.width = width
+	g.height = height
 }
 
 func (g *GpxMap) getWeight(post []s2.LatLng) float64 {
@@ -105,9 +112,13 @@ func (g *GpxMap) Process() (image.Image, error) {
 		return nil, err
 	}
 
-	width, height := utils.GenWidthHeight(positions)
-	log.Infof("use height=%d, width=%d", height, width)
-	g.smCtx.SetSize(width, height)
+	if g.width == 0 {
+		width, height := utils.GenWidthHeight(positions)
+		log.Infof("use height=%d, width=%d", height, width)
+		g.width = width
+		g.height = height
+	}
+	g.smCtx.SetSize(g.width, g.height)
 
 	for index, post := range positions {
 		g.smCtx.AddObject(sm.NewPath(post, utils.GetColor(index, g.colors), g.weight))

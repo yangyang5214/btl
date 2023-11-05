@@ -53,8 +53,11 @@ func GenWidthHeight(positions [][]s2.LatLng) (int, int) {
 			maxPointSize = len(points)
 		}
 	}
-	if maxPointSize > 10000 {
-		return 1280, 1000
+	log.Infof("point count: %d", maxPointSize)
+	if maxPointSize > 20000 {
+		return 1200, 1000
+	} else if maxPointSize > 10000 {
+		return 1000, 800
 	}
 	return 800, 600
 }

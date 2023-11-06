@@ -1,13 +1,17 @@
 package utils
 
 import (
-	sm "github.com/yangyang5214/go-staticmaps"
-	"golang.org/x/image/colornames"
+	"github.com/yangyang5214/btl/pkg/model"
 	. "image/color"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
+
+	sm "github.com/yangyang5214/go-staticmaps"
+	"golang.org/x/image/colornames"
 
 	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"
@@ -102,4 +106,35 @@ func FindGpxFiles(dirPath string) []string {
 
 func GetColor(index int, colors []Color) Color {
 	return colors[index%len(colors)]
+}
+
+func LonLatToTileCoordinates(lng, lat float64, zoom int) (x, y int) {
+	x = int(math.Floor((lng + 180.0) / 360.0 * math.Pow(2.0, float64(zoom))))
+	y = int(math.Floor((1.0 - math.Log(math.Tan(lat*math.Pi/180.0)+1.0/math.Cos(lat*math.Pi/180.0))/math.Pi) / 2.0 * math.Pow(2.0, float64(zoom))))
+	return x, y
+}
+
+func ParserLatLng(location string) (s2.LatLng, error) {
+	point := strings.Split(location, ",")
+	if len(point) != 2 {
+		return s2.LatLng{}, errors.New("Invalid carto location")
+	}
+	lat, err := strconv.ParseFloat(point[1], 64)
+	if err != nil {
+		return s2.LatLng{}, err
+	}
+	lng, err := strconv.ParseFloat(point[0], 64)
+	if err != nil {
+		return s2.LatLng{}, err
+	}
+	return s2.LatLngFromDegrees(lat, lng), nil
+}
+
+func GenBounds(start s2.LatLng, end s2.LatLng, zoom int) (*model.Bounds, error) {
+	startX, startY := LonLatToTileCoordinates(start.Lng.Degrees(), start.Lat.Degrees(), zoom)
+	endX, endY := LonLatToTileCoordinates(end.Lng.Degrees(), end.Lat.Degrees(), zoom)
+	return &model.Bounds{
+		X: []int{startX, endX},
+		Y: []int{startY, endY},
+	}, nil
 }

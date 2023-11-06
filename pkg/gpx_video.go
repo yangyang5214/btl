@@ -2,13 +2,14 @@ package pkg
 
 import (
 	"fmt"
-	"github.com/schollz/progressbar/v3"
-	"github.com/yangyang5214/gou"
 	"image/color"
 	"os"
 	"path"
 	"sort"
 	"sync"
+
+	"github.com/schollz/progressbar/v3"
+	"github.com/yangyang5214/gou"
 
 	fileutil "github.com/yangyang5214/gou/file"
 

@@ -25,3 +25,8 @@ func (m *Mind) String() string {
 	s.WriteString("\n")
 	return s.String()
 }
+
+type Bounds struct {
+	X []int
+	Y []int
+}

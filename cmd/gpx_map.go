@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"golang.org/x/image/colornames"
 	. "image/color"
 	"strings"
+
+	"golang.org/x/image/colornames"
 
 	"github.com/yangyang5214/btl/pkg/utils"
 

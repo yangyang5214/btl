@@ -1,10 +1,11 @@
 package pkg
 
 import (
-	"golang.org/x/image/colornames"
 	"image/color"
 	"strconv"
 	"testing"
+
+	"golang.org/x/image/colornames"
 
 	"github.com/fogleman/gg"
 	sm "github.com/yangyang5214/go-staticmaps"

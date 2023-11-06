@@ -72,32 +72,43 @@ func (c *Carto) Run() (err error) {
 	start := s2.LatLngFromDegrees(c.center.Lat.Degrees()+deltaLat, c.center.Lng.Degrees()-deltaLng)
 	end := s2.LatLngFromDegrees(c.center.Lat.Degrees()-deltaLat, c.center.Lng.Degrees()+deltaLng)
 
-	log.Infof("start: %v,%v, end: %v,%v", start.Lng.Degrees(), start.Lat.Degrees(), end.Lng.Degrees(), end.Lat.Degrees())
+	log.Infof("zoom %d, start: %v,%v, end: %v,%v", c.zoom, start.Lng.Degrees(), start.Lat.Degrees(), end.Lng.Degrees(), end.Lat.Degrees())
 	bounds, err := utils.GenBounds(start, end, c.zoom)
 	if err != nil {
 		return err
 	}
 
+	log.Infof("bounds is %v", bounds)
+
 	var wg sync.WaitGroup
+	var finalUrl string
 	workerCh := make(chan struct{}, 100)
 	for i := bounds.X[0]; i < bounds.X[1]; i++ {
 		for j := bounds.Y[0]; j < bounds.Y[1]; j++ {
-			s := rand.NewSource(time.Now().Unix())
-			r := rand.New(s)
-			finalUrl := urls[r.Intn(len(urls))]
+			finalUrl = urls[0]
+			if len(urls) != 1 {
+				s := rand.NewSource(time.Now().Unix())
+				r := rand.New(s)
+				finalUrl = urls[r.Intn(len(urls))]
+			}
 
 			wg.Add(1)
 			workerCh <- struct{}{}
-			go func(x, y int) {
+			go func(x, y int, urlStr string) {
 				defer func() {
 					wg.Done()
 					<-workerCh
 				}()
-				err = c.download(x, y, finalUrl)
-				if err != nil {
-					log.Errorf("error download %v", err)
+
+				for k := 0; k < 3; k++ { //重试三次
+					err = c.download(x, y, urlStr)
+					if err != nil {
+						log.Errorf("error download %v", err)
+					} else {
+						break
+					}
 				}
-			}(i, j)
+			}(i, j, finalUrl)
 		}
 	}
 	wg.Wait()

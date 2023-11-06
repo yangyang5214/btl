@@ -23,7 +23,7 @@ var (
 var cartoCmd = &cobra.Command{
 	Use:   "carto",
 	Short: "download carto map",
-	Long:  ``,
+	Long:  `default zoom range [8,15]`,
 	Run: func(cmd *cobra.Command, args []string) {
 		point := strings.Split(location, ",")
 		if len(point) != 2 {
@@ -39,7 +39,7 @@ var cartoCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		center := s2.LatLngFromDegrees(lat, lng)
-		for i := 8; i <= 13; i++ {
+		for i := 8; i <= 15; i++ {
 			carto := pkg.NewCarto(cartoName, i, center, float64(km))
 			err = carto.Run()
 			if err != nil {
@@ -53,7 +53,7 @@ func init() {
 	rootCmd.AddCommand(cartoCmd)
 
 	//https://github.com/CartoDB/basemap-styles
-	cartoCmd.Flags().StringVarP(&cartoName, "carto_name", "n", "dark", gpxMapUsage())
-	cartoCmd.Flags().StringVarP(&location, "location", "", "121.455708,31.249574", "lat,lng. \n  https://lbs.amap.com/tools/picker)")
+	cartoCmd.Flags().StringVarP(&cartoName, "carto_name", "n", "carto-dark", gpxMapUsage())
+	cartoCmd.Flags().StringVarP(&location, "location", "l", "121.455708,31.249574", "lat,lng. \n  https://lbs.amap.com/tools/picker)")
 	cartoCmd.Flags().IntVarP(&km, "km", "k", 300, "")
 }

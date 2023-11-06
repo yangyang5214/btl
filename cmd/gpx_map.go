@@ -73,7 +73,6 @@ func gpxMapUsage() string {
 	r := []string{
 		"carto-dark(暗黑)",
 		"carto-light(白色)",
-		"wikimedia(纯线路)",
 		"osm",
 	}
 	return strings.Join(r, "\n")

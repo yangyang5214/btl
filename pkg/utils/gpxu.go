@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/yangyang5214/btl/pkg/model"
 	. "image/color"
 	"math"
 	"os"
@@ -9,6 +8,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/yangyang5214/btl/pkg/model"
 
 	sm "github.com/yangyang5214/go-staticmaps"
 	"golang.org/x/image/colornames"

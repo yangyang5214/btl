@@ -3,11 +3,6 @@ package pkg
 import (
 	"bytes"
 	"fmt"
-	"github.com/golang/geo/s2"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"github.com/yangyang5214/btl/pkg/utils"
-	sm "github.com/yangyang5214/go-staticmaps"
 	"io"
 	"math"
 	"math/rand"
@@ -18,6 +13,12 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/golang/geo/s2"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"github.com/yangyang5214/btl/pkg/utils"
+	sm "github.com/yangyang5214/go-staticmaps"
 )
 
 var (

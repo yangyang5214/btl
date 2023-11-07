@@ -39,7 +39,7 @@ var cartoCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		center := s2.LatLngFromDegrees(lat, lng)
-		for i := 8; i <= 15; i++ {
+		for i := 8; i <= 13; i++ {
 			carto := pkg.NewCarto(cartoName, i, center, float64(km))
 			err = carto.Run()
 			if err != nil {

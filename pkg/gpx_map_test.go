@@ -14,20 +14,20 @@ import (
 func Test(t *testing.T) {
 	files := []string{
 		//"/Users/beer/beer/rides/hai_nan.gpx",
-		"/Users/beer/beer/rides/shang_hai/activity_190230645.gpx",
-		"/Users/beer/beer/rides/shang_hai/7198278844.gpx",
+		//"/Users/beer/beer/rides/shang_hai/activity_190230645.gpx",
+		//"/Users/beer/beer/rides/shang_hai/7198278844.gpx",
 		"/Users/beer/beer/rides/shang_hai/6884490616.gpx",
 	}
 	names := []string{
-		"none",
-		//"carto-dark", //黑暗系
+		//"none",
+		"carto-dark", //黑暗系
 		//"arcgis-worldimagery", //地理影像
 		//"carto-light", //白色系
 		//"wikimedia", //纯线路
 		//"stamen-terrain",      //森林？
 	}
 	for _, name := range names {
-		gpx := NewGpxMap(files, "", name, []color.Color{colornames.White})
+		gpx := NewGpxMap(files, "", name, []color.Color{colornames.Red})
 		gpx.SetBgColor(colornames.Yellow)
 		gpx.SetWeight(5)
 		err := gpx.Run("result.png")

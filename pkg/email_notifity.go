@@ -10,10 +10,11 @@ import (
 )
 
 type EmailConfig struct {
-	From     string `json:"from,omitempty"`
-	Password string `json:"password,omitempty"`
-	SmtpHost string `json:"smtp_host,omitempty"`
-	SmtpPort int    `json:"smtp_port,omitempty"`
+	To       []string `json:"to,omitempty"`
+	From     string   `json:"from,omitempty"`
+	Password string   `json:"password,omitempty"`
+	SmtpHost string   `json:"smtp_host,omitempty"`
+	SmtpPort int      `json:"smtp_port,omitempty"`
 }
 
 type EmailContent struct {

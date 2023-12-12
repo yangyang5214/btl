@@ -15,7 +15,7 @@ func TestSendEmail(t *testing.T) {
 			"/Users/beer/Downloads/IMG_0018.png",
 		},
 	}
-	err = email.Send([]string{"beer5214@126.com"}, content)
+	err = email.Send(config.To, content)
 	if err != nil {
 		t.Fatal(err)
 	}

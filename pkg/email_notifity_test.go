@@ -11,7 +11,7 @@ func TestSendEmail(t *testing.T) {
 	content := &EmailContent{
 		Subject: "测试",
 		Content: "嘿嘿",
-		images: []string{
+		Images: []string{
 			"/Users/beer/Downloads/IMG_0018.png",
 		},
 	}

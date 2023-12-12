@@ -3,9 +3,8 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"github.com/go-gomail/gomail"
 	log "github.com/sirupsen/logrus"
-	"net/smtp"
 	"os"
 	"path"
 )
@@ -20,7 +19,7 @@ type EmailConfig struct {
 type EmailContent struct {
 	Subject string
 	Content string
-	images  []string //todo
+	Images  []string
 }
 
 func (e *EmailContent) String() []byte {
@@ -36,11 +35,13 @@ func (e *EmailContent) String() []byte {
 
 type EmailNotify struct {
 	config *EmailConfig
+	gm     *gomail.Message
 }
 
 func NewEmailNotify(config *EmailConfig) *EmailNotify {
 	return &EmailNotify{
 		config: config,
+		gm:     gomail.NewMessage(),
 	}
 }
 
@@ -62,15 +63,18 @@ func LoadConfigFromEnv() (*EmailConfig, error) {
 	return &config, nil
 }
 
-func (e *EmailNotify) addr() string {
-	return fmt.Sprintf("%s:%d", e.config.SmtpHost, e.config.SmtpPort)
-}
-
 func (e *EmailNotify) Send(to []string, content *EmailContent) error {
-	auth := smtp.PlainAuth("", e.config.From, e.config.Password, e.config.SmtpHost)
-	err := smtp.SendMail(e.addr(), auth, e.config.From, to, content.String())
-	if err != nil {
-		log.Errorf("send email failed: %+v", err)
+	e.gm.SetHeader("From", e.config.From)
+	e.gm.SetHeader("To", to...)
+	e.gm.SetHeader("Subject", content.Subject)
+	e.gm.SetBody("text/plain", content.Content)
+
+	for _, image := range content.Images {
+		e.gm.Attach(image)
+	}
+
+	d := gomail.NewDialer(e.config.SmtpHost, e.config.SmtpPort, e.config.From, e.config.Password)
+	if err := d.DialAndSend(e.gm); err != nil {
 		return err
 	}
 	return nil

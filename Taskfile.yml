@@ -16,3 +16,10 @@ tasks:
       - task format
       - go build
       - mv btl ~/go/bin
+
+  deploy:
+    desc: deploy
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build
+      - scp btl beer:/tmp/btl
+      - ssh beer '\mv /tmp/btl /root/go/bin/'

@@ -41,6 +41,7 @@ func (g *GpxMerge) Run() error {
 			continue
 		}
 		if strings.HasSuffix(dir.Name(), ".gpx") {
+			log.Infof("find gpx file %s", dir.Name())
 			gpxFiles = append(gpxFiles, path.Join(g.currentDir, dir.Name()))
 		}
 	}
@@ -55,11 +56,20 @@ func (g *GpxMerge) Run() error {
 	}
 
 	resultFile, err := os.Create(path.Join(g.currentDir, "result.gpx"))
+	defer resultFile.Close()
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	log.Infof("merge gpx files count: %d", len(gpxFiles))
+
 	for index, gFile := range gpxFiles {
-		r := g.parseTrkseg(gFile)
+		log.Infof("Satrt merge gpx file: %s", gFile)
+
+		r, err := g.parseTrkseg(gFile)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 
 		//start
 		if index == 0 {
@@ -141,22 +151,27 @@ func (g *GpxMerge) getDate(f string) (int64, error) {
 }
 
 // parseTrkseg parse <trkseg>xxx</trkseg> xxx 内容
-func (g *GpxMerge) parseTrkseg(f string) *GpxFile {
-	bytes, _ := os.ReadFile(f)
+func (g *GpxMerge) parseTrkseg(f string) (*GpxFile, error) {
+	bytes, err := os.ReadFile(f)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 	content := string(bytes)
 	lines := strings.Split(content, "\n")
 	var start, end int
 	for index, line := range lines {
+		line = strings.TrimLeft(line, "\t")
 		line = strings.TrimLeft(line, " ")
-		if strings.HasSuffix(line, "<trkseg>") {
+		if strings.HasPrefix(line, "<trkseg>") {
 			start = index + 1
-		} else if strings.HasSuffix(line, "</trkseg>") {
+		} else if strings.HasPrefix(line, "</trkseg>") {
 			end = index
+			break //快速结束
 		}
 	}
 	return &GpxFile{
 		start:   lines[:start],
 		content: lines[start:end],
 		end:     lines[end:],
-	}
+	}, nil
 }

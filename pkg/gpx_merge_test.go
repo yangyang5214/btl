@@ -4,17 +4,19 @@ import (
 	"testing"
 )
 
-func TestGarminGpx_getDate(t *testing.T) {
+func Test_ParseTrkseg(t *testing.T) {
 	g := NewGpxMerge("")
-	got, err := g.getDate("/tmp/1.gpx")
+	r, err := g.parseTrkseg("/tmp/1.gpx")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(got)
+	t.Log(r)
 }
 
-func Test_ParseTrkseg(t *testing.T) {
-	g := NewGpxMerge("")
-	r := g.parseTrkseg("/tmp/1.gpx")
-	t.Log(r)
+func TestMerge(t *testing.T) {
+	g := NewGpxMerge("/tmp/1")
+	err := g.Run()
+	if err != nil {
+		t.Fatal(err)
+	}
 }

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	. "image/color"
 	"math"
 	"os"
@@ -138,4 +139,37 @@ func GenBounds(start s2.LatLng, end s2.LatLng, zoom int) (*model.Bounds, error) 
 		X: []int{startX, endX},
 		Y: []int{startY, endY},
 	}, nil
+}
+
+type LatLng struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+func (l LatLng) String() string {
+	return fmt.Sprintf("%f,%f", l.Lng, l.Lat)
+}
+
+func GetPoints(gpxFiles []string) ([][]*LatLng, error) {
+	var result [][]*LatLng
+	for _, gf := range gpxFiles {
+		gpxData, err := gpx.ParseFile(gf)
+		if err != nil {
+			return nil, err
+		}
+
+		var points []*LatLng
+		for _, track := range gpxData.Tracks {
+			for _, seg := range track.Segments {
+				for _, pt := range seg.Points {
+					points = append(points, &LatLng{
+						Lat: pt.GetLatitude(),
+						Lng: pt.GetLongitude(),
+					})
+				}
+			}
+		}
+		result = append(result, points)
+	}
+	return result, nil
 }

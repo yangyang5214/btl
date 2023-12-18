@@ -2,11 +2,13 @@ package gpx_amap
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"golang.org/x/image/colornames"
 	"image/color"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -34,6 +36,7 @@ type GpxAmap struct {
 	defaultColors []color.Color
 	allColorNames []string // color_names
 	mapStyle      string
+	amapKey       string
 }
 
 type TemplateAmap struct {
@@ -57,7 +60,28 @@ func (g *GpxAmap) SetMapStyle(style string) {
 	g.mapStyle = style
 }
 
+func (g *GpxAmap) loadAmapKey() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	data, err := os.ReadFile(path.Join(homeDir, ".amap_key"))
+	if err != nil {
+		return err
+	}
+	g.amapKey = strings.Trim(string(data), "\n")
+	return nil
+}
+
 func (g *GpxAmap) Run() error {
+	err := g.loadAmapKey()
+	if err != nil {
+		return err
+	}
+
+	if g.amapKey == "" {
+		return errors.New("amap key is required")
+	}
 	points, err := utils.GetPoints(g.files)
 	if err != nil {
 		return err
@@ -142,7 +166,8 @@ func (g *GpxAmap) drawLines() string {
 }
 
 func (g *GpxAmap) start() string {
-	return `<!doctype html>
+	var sb strings.Builder
+	sb.WriteString(`<!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -157,13 +182,20 @@ func (g *GpxAmap) start() string {
         }
     </style>
     <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
-    <script src="https://webapi.amap.com/maps?v=1.4.15&key=04625a30c4c1d00ab371618a37bcc59f"></script>
+`)
+	sb.WriteString("\n")
+
+	sb.WriteString(fmt.Sprintf(`<script src="https://webapi.amap.com/maps?v=1.4.15&key=%s"></script>`, g.amapKey))
+	sb.WriteString("\n")
+
+	sb.WriteString(`
     <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
 </head>
 <body>
 <div id="container"></div>
 <script type="text/javascript">
-`
+`)
+	return sb.String()
 }
 
 func (g *GpxAmap) end() string {

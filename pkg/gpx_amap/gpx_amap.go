@@ -94,7 +94,14 @@ func (g *GpxAmap) Run() error {
 	sb.WriteString(g.drawLines())
 	sb.WriteString(g.end())
 
-	f, err := os.Create("index.html")
+	//gen index.html
+	file, err := os.CreateTemp("", "index.html")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(file.Name())
+
+	f, err := os.Create(file.Name())
 	if err != nil {
 		return err
 	}
@@ -103,6 +110,9 @@ func (g *GpxAmap) Run() error {
 	if err != nil {
 		return err
 	}
+
+	//screenshot
+
 	return nil
 }
 

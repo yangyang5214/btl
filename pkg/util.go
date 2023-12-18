@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"image/color"
 	"io"
 	"net/http"
 	"os"
@@ -146,4 +147,9 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 		}
 	}
 	return nil
+}
+
+func ColorToHex(c color.Color) string {
+	r, g, b, _ := c.RGBA()
+	return fmt.Sprintf("#%02X%02X%02X", r>>8, g>>8, b>>8)
 }

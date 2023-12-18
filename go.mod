@@ -3,6 +3,7 @@ module github.com/yangyang5214/btl
 go 1.20
 
 require (
+	github.com/chromedp/chromedp v0.9.3
 	github.com/fogleman/gg v1.3.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
@@ -21,9 +22,16 @@ require (
 )
 
 require (
+	github.com/chromedp/cdproto v0.0.0-20231011050154-1d073bb38998 // indirect
+	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/flopp/go-coordsparser v0.0.0-20201115094714-8baaeb7062d5 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

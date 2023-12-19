@@ -37,6 +37,7 @@ type GpxAmap struct {
 	allColorNames []string // color_names
 	mapStyle      string
 	amapKey       string
+	imgPath       string
 }
 
 type TemplateAmap struct {
@@ -44,11 +45,12 @@ type TemplateAmap struct {
 	Center utils.LatLng
 }
 
-func NewGpxAmap(files []string) *GpxAmap {
+func NewGpxAmap(files []string, imgPath string) *GpxAmap {
 	return &GpxAmap{
 		files:         files,
 		allColorNames: colornames.Names,
 		mapStyle:      Whitesmoke,
+		imgPath:       imgPath,
 	}
 }
 
@@ -112,8 +114,8 @@ func (g *GpxAmap) Run() error {
 	}
 
 	//screenshot
-
-	return nil
+	shot := pkg.NewScreenshot(g.imgPath, file.Name())
+	return shot.Run()
 }
 
 func (g *GpxAmap) randomColor(index int) string {

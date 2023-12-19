@@ -9,7 +9,7 @@ import (
 
 func Test1(t *testing.T) {
 	files := utils.FindGpxFiles("/Users/beer/beer/rides/shang_hai")
-	ga := NewGpxAmap(files)
+	ga := NewGpxAmap(files, "/tmp/1.png")
 	ga.SetColors([]color.Color{colornames.Red})
 	//ga.SetMapStyle(Dark)
 	//ga.SetMapStyle(Light)

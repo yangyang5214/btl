@@ -10,6 +10,10 @@ import (
 	"github.com/yangyang5214/btl/pkg/utils"
 )
 
+var (
+	files []string
+)
+
 // gpxAmapCmd represents the gpxAmap command
 var gpxAmapCmd = &cobra.Command{
 	Use:   "gpx_amap",

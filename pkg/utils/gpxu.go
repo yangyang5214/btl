@@ -11,9 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	sm "github.com/yangyang5214/go-staticmaps"
-	"golang.org/x/image/colornames"
-
 	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -55,27 +52,6 @@ func ParsePositions(datas []*gpx.GPX) ([][]s2.LatLng, error) {
 		positions = append(positions, local)
 	}
 	return positions, nil
-}
-
-func GenWidthHeight(positions [][]s2.LatLng) (int, int) {
-	smCtx := sm.NewContext()
-	for _, position := range positions {
-		smCtx.AddObject(sm.NewPath(position, colornames.Yellow, 1))
-	}
-	bounds := smCtx.DetermineBounds()
-	maxLength := bounds.Lat.Length()
-	if bounds.Lng.Length() > maxLength {
-		maxLength = bounds.Lng.Length()
-	}
-
-	width := 0
-	dis := int(maxLength * 1_0000)
-	gap := dis / 50
-	width = (gap)*200 + 800
-
-	log.Printf("dis %v, width %v,", dis, width)
-
-	return width, int(float64(width) * 0.8)
 }
 
 func CountPoints(positions [][]s2.LatLng) int {

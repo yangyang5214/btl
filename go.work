@@ -3,6 +3,4 @@ go 1.20
 use .
 
 replace (
-	github.com/yangyang5214/go-staticmaps => ./../go-staticmaps
-	//github.com/yangyang5214/gou => ./../gou
 )

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/yangyang5214/btl/pkg/model"
 	. "image/color"
 	"math"
 	"os"
@@ -9,8 +10,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/yangyang5214/btl/pkg/model"
 
 	sm "github.com/yangyang5214/go-staticmaps"
 	"golang.org/x/image/colornames"
@@ -20,6 +19,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tkrajina/gpxgo/gpx"
 )
+
+func GetStartTime(f *gpx.GPX) int64 {
+	return f.Tracks[0].Segments[0].Points[0].Timestamp.Unix()
+}
 
 func ParseGpxData(files []string) ([]*gpx.GPX, error) {
 	var results []*gpx.GPX

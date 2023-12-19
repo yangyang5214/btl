@@ -5,12 +5,9 @@ package cmd
 
 import (
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg/gpx_amap"
 	"github.com/yangyang5214/btl/pkg/utils"
-	"golang.org/x/image/colornames"
-	"image/color"
-
-	"github.com/spf13/cobra"
 )
 
 // gpxAmapCmd represents the gpxAmap command
@@ -18,11 +15,10 @@ var gpxAmapCmd = &cobra.Command{
 	Use:   "gpx_amap",
 	Short: `gen image by amap`,
 	Run: func(cmd *cobra.Command, args []string) {
-		files := utils.FindGpxFiles(".")
+		if len(files) == 0 {
+			files = utils.FindGpxFiles(".")
+		}
 		gamap := gpx_amap.NewGpxAmap(files, "result.png")
-		gamap.SetColors([]color.Color{
-			colornames.Red,
-		})
 		err := gamap.Run()
 		if err != nil {
 			log.Errorf("run gamap failed: %v", err)
@@ -33,4 +29,5 @@ var gpxAmapCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gpxAmapCmd)
+	gpxAmapCmd.Flags().StringSliceVarP(&files, "files", "f", []string{}, "xx.gpx")
 }

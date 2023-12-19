@@ -77,6 +77,10 @@ func (g *GpxAmap) loadAmapKey() error {
 }
 
 func (g *GpxAmap) Run() error {
+	for _, filename := range g.files {
+		log.Infof("gpx file is %s", filename)
+	}
+
 	err := g.loadAmapKey()
 	if err != nil {
 		return err

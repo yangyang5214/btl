@@ -3,6 +3,7 @@ package gpx_amap
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"golang.org/x/image/colornames"
@@ -91,6 +92,8 @@ func (g *GpxAmap) Run() error {
 	g.points = points
 	g.center = g.getCenter()
 
+	log.Info("start gen index.html")
+
 	var sb strings.Builder
 	sb.WriteString(g.start())
 	sb.WriteString(g.drawLines())
@@ -114,6 +117,7 @@ func (g *GpxAmap) Run() error {
 	}
 
 	//screenshot
+	log.Info("start screenshot")
 	shot := pkg.NewScreenshot(g.imgPath, file.Name())
 	return shot.Run()
 }

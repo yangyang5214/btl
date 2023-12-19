@@ -35,7 +35,6 @@ type GpxAmap struct {
 	center utils.LatLng
 
 	defaultColors []color.Color
-	allColorNames []string // color_names
 	mapStyle      string
 	amapKey       string
 	imgPath       string
@@ -48,10 +47,16 @@ type TemplateAmap struct {
 
 func NewGpxAmap(files []string, imgPath string) *GpxAmap {
 	return &GpxAmap{
-		files:         files,
-		allColorNames: colornames.Names,
-		mapStyle:      Whitesmoke,
-		imgPath:       imgPath,
+		files: files,
+		defaultColors: []color.Color{
+			colornames.Red,
+			colornames.Blue,
+			colornames.Green,
+			colornames.Black,
+			colornames.Orange,
+		},
+		mapStyle: Whitesmoke,
+		imgPath:  imgPath,
 	}
 }
 
@@ -127,11 +132,6 @@ func (g *GpxAmap) Run() error {
 }
 
 func (g *GpxAmap) randomColor(index int) string {
-	if len(g.defaultColors) == 0 {
-		for _, v := range colornames.Map {
-			g.defaultColors = append(g.defaultColors, v)
-		}
-	}
 	relIndex := index % len(g.defaultColors)
 	r := pkg.ColorToHex(g.defaultColors[relIndex])
 	//log.Infof("index %d, use color %s", index, r)

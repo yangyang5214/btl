@@ -39,6 +39,7 @@ type GpxAmap struct {
 	amapKey       string
 	imgPath       string
 	indexHtmlPath string
+	step          int
 }
 
 type TemplateAmap struct {
@@ -59,7 +60,12 @@ func NewGpxAmap(files []string) *GpxAmap {
 		mapStyle:      Whitesmoke,
 		imgPath:       "result.png",
 		indexHtmlPath: "index.html",
+		step:          1,
 	}
+}
+
+func (g *GpxAmap) SetStep(step int) {
+	g.step = step
 }
 
 func (g *GpxAmap) SetIndexHtmlPath(indexHtmlPath string) {
@@ -92,6 +98,9 @@ func (g *GpxAmap) loadAmapKey() error {
 }
 
 func (g *GpxAmap) Run() error {
+	if len(g.files) == 0 {
+		return errors.New("input gpx files is empty")
+	}
 	for _, filename := range g.files {
 		log.Infof("gpx file is %s", filename)
 	}
@@ -159,7 +168,8 @@ func (g *GpxAmap) drawLines() string {
 
 		sb.WriteString("\n")
 
-		for _, point := range points {
+		for j := 0; j < len(points); j += g.step {
+			point := points[j]
 			sb.WriteString(fmt.Sprintf("[%s],", point.String()))
 			sb.WriteString("\n")
 		}

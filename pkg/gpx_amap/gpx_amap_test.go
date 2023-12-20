@@ -10,6 +10,10 @@ import (
 func Test1(t *testing.T) {
 	files := utils.FindGpxFiles("/Users/beer/beer/rides")
 	ga := NewGpxAmap(files)
+	//ga := NewGpxAmap([]string{
+	//	"/Users/beer/beer/rides/hai_nan.gpx",
+	//})
+	ga.SetStep(20)
 	//ga.SetColors([]color.Color{colornames.Red})
 	//ga.SetMapStyle(Dark)
 	//ga.SetMapStyle(Light)

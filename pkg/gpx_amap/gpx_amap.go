@@ -38,6 +38,7 @@ type GpxAmap struct {
 	mapStyle      string
 	amapKey       string
 	imgPath       string
+	indexHtmlPath string
 }
 
 type TemplateAmap struct {
@@ -45,7 +46,7 @@ type TemplateAmap struct {
 	Center utils.LatLng
 }
 
-func NewGpxAmap(files []string, imgPath string) *GpxAmap {
+func NewGpxAmap(files []string) *GpxAmap {
 	return &GpxAmap{
 		files: files,
 		defaultColors: []color.Color{
@@ -55,9 +56,18 @@ func NewGpxAmap(files []string, imgPath string) *GpxAmap {
 			colornames.Black,
 			colornames.Orange,
 		},
-		mapStyle: Whitesmoke,
-		imgPath:  imgPath,
+		mapStyle:      Whitesmoke,
+		imgPath:       "result.png",
+		indexHtmlPath: "index.html",
 	}
+}
+
+func (g *GpxAmap) SetIndexHtmlPath(indexHtmlPath string) {
+	g.indexHtmlPath = indexHtmlPath
+}
+
+func (g *GpxAmap) SetImgPath(imgPath string) {
+	g.imgPath = imgPath
 }
 
 func (g *GpxAmap) SetColors(colors []color.Color) {
@@ -109,16 +119,7 @@ func (g *GpxAmap) Run() error {
 	sb.WriteString(g.end())
 
 	//gen index.html
-	file, err := os.CreateTemp("", "index.html")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(file.Name())
-
-	f, err := os.Create(file.Name())
-	if err != nil {
-		return err
-	}
+	f, err := os.Create(g.indexHtmlPath)
 	defer f.Close()
 	_, err = f.WriteString(sb.String())
 	if err != nil {
@@ -127,7 +128,7 @@ func (g *GpxAmap) Run() error {
 
 	//screenshot
 	log.Info("start screenshot")
-	shot := pkg.NewScreenshot(g.imgPath, file.Name())
+	shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath)
 	return shot.Run()
 }
 

@@ -10,11 +10,14 @@ type GpxExport struct {
 	exportDir string
 }
 
-func NewGpxExport(app string, exportDir string) *GpxExport {
+func NewGpxExport(app string) *GpxExport {
 	return &GpxExport{
-		app:       app,
-		exportDir: exportDir,
+		app: app,
 	}
+}
+
+func (e *GpxExport) setExportDir(exportDir string) {
+	e.exportDir = exportDir
 }
 
 func (e *GpxExport) Run() error {

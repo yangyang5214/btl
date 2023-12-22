@@ -10,7 +10,9 @@ import (
 )
 
 var (
-	app string
+	app      string
+	username string
+	password string
 )
 
 // gpxExportCmd represents the gpxExport command
@@ -19,7 +21,7 @@ var gpxExportCmd = &cobra.Command{
 	Short: "export gpx from apps",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ge := gpx_export.NewGpxExport(app)
+		ge := gpx_export.NewGpxExport(app, username, password)
 		err := ge.Run()
 		if err != nil {
 			log.Errorf("export gpx failed: %v", err)
@@ -31,4 +33,6 @@ var gpxExportCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(gpxExportCmd)
 	gpxExportCmd.Flags().StringVarP(&app, "app", "a", "", "App name from export")
+	gpxExportCmd.Flags().StringVarP(&username, "user", "u", "", "username")
+	gpxExportCmd.Flags().StringVarP(&password, "pwd", "p", "", "password")
 }

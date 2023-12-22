@@ -3,3 +3,5 @@ result.png
 pkg/result.png
 go.work
 pkg/gpx_amap/index.html
+py/garmin_export_out
+**/__pycache__

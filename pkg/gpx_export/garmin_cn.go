@@ -1,6 +1,5 @@
 package gpx_export
 
-import "C"
 import (
 	"fmt"
 	"github.com/pkg/errors"
@@ -60,13 +59,17 @@ func (g *GarminCn) cloneScripts() error {
 		return err
 	}
 	if _, err := os.Stat(g.runningDir); os.IsNotExist(err) {
-		cmd := exec.Command("git", "clone", g.repoURL, g.runningDir)
+		cmdStr := fmt.Sprintf("git clone %s %s", g.repoURL, g.runningDir)
+		cmd := exec.Command("/bin/bash", "-c", cmdStr)
 		if _, err := cmd.Output(); err != nil {
+			log.Errorf("run cmd: %s, err: %v", cmdStr, err)
 			return err
 		}
 	} else {
-		cmd := exec.Command("git", "-C", g.runningDir, "pull")
+		cmdStr := fmt.Sprintf("cd %s && git pull", g.runningDir)
+		cmd := exec.Command("/bin/bash", "-c", cmdStr)
 		if _, err := cmd.Output(); err != nil {
+			log.Errorf("run cmd: %s, err: %v", cmdStr, err)
 			return err
 		}
 	}

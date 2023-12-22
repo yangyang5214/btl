@@ -1,6 +1,8 @@
 package gpx_export
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRun(t *testing.T) {
 	username := ""

@@ -21,7 +21,7 @@ func NewGpxExport(app string, user, pwd string) *GpxExport {
 	}
 }
 
-func (e *GpxExport) setExportDir(exportDir string) {
+func (e *GpxExport) SetExportDir(exportDir string) {
 	e.exportDir = exportDir
 }
 
@@ -31,7 +31,7 @@ func (e *GpxExport) Run() error {
 	case Strava:
 	//
 	case GarminCN:
-		appExport = NewGarminCn()
+		appExport = NewGarminCn(e.exportDir)
 	//
 	default:
 		return errors.New(fmt.Sprintf("%s app not supported", e.app))

@@ -153,3 +153,17 @@ func ColorToHex(c color.Color) string {
 	r, g, b, _ := c.RGBA()
 	return fmt.Sprintf("#%02X%02X%02X", r>>8, g>>8, b>>8)
 }
+
+func FileExists(fp string) bool {
+	if fp == "" {
+		return false
+	}
+	_, err := os.Stat(fp)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}

@@ -2,15 +2,16 @@ package gpx_amap
 
 import (
 	"fmt"
+	"image/color"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"golang.org/x/image/colornames"
-	"image/color"
-	"os"
-	"path"
-	"strings"
 )
 
 var (

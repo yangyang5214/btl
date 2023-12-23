@@ -1,13 +1,14 @@
 package pkg
 
 import (
-	"github.com/pkg/errors"
-	"github.com/tkrajina/gpxgo/gpx"
-	"github.com/yangyang5214/btl/pkg/utils"
 	"os"
 	"path"
 	"sort"
 	"strings"
+
+	"github.com/pkg/errors"
+	"github.com/tkrajina/gpxgo/gpx"
+	"github.com/yangyang5214/btl/pkg/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -71,7 +72,9 @@ func (g *GpxMerge) Run() error {
 
 	firstGpx.Tracks[0].Segments[0].Points = points
 
-	date, err := firstGpx.ToXml(gpx.ToXmlParams{Indent: true})
+	date, err := firstGpx.ToXml(gpx.ToXmlParams{
+		Indent: true, //相差不大
+	})
 	if err != nil {
 		return err
 	}

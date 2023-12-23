@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/yangyang5214/btl/pkg/model"
 	. "image/color"
 	"math"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/yangyang5214/btl/pkg/model"
 
 	"github.com/golang/geo/s2"
 	"github.com/pkg/errors"

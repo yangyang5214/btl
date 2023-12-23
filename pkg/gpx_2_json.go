@@ -2,8 +2,9 @@ package pkg
 
 import (
 	"encoding/json"
-	"github.com/yangyang5214/btl/pkg/utils"
 	"os"
+
+	"github.com/yangyang5214/btl/pkg/utils"
 )
 
 type Gpx2Json struct {

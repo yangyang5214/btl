@@ -4,13 +4,14 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/gpx_export"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 var (

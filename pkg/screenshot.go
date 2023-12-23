@@ -2,10 +2,11 @@ package pkg
 
 import (
 	"context"
-	"github.com/chromedp/cdproto/page"
-	"github.com/chromedp/chromedp"
 	"os"
 	"time"
+
+	"github.com/chromedp/cdproto/page"
+	"github.com/chromedp/chromedp"
 )
 
 type Screenshot struct {

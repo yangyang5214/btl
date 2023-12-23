@@ -1,8 +1,9 @@
 package pkg
 
 import (
-	"golang.org/x/image/colornames"
 	"testing"
+
+	"golang.org/x/image/colornames"
 )
 
 func TestColorToHex(t *testing.T) {

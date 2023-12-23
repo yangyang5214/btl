@@ -2,13 +2,14 @@ package gpx_export
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"github.com/yangyang5214/btl/pkg"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"github.com/yangyang5214/btl/pkg"
 )
 
 type GarminCn struct {

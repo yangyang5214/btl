@@ -2,6 +2,7 @@ package gpx_export
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 )
 

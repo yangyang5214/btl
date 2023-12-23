@@ -3,10 +3,11 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/go-gomail/gomail"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
+
+	"github.com/go-gomail/gomail"
+	log "github.com/sirupsen/logrus"
 )
 
 type EmailConfig struct {

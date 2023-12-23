@@ -49,7 +49,7 @@ func downloadSave(client *http.Client, urlStr string, filepath string) error {
 	return nil
 }
 
-func md5Sum(text string) string {
+func Md5Sum(text string) string {
 	data := []byte(text)
 	return fmt.Sprintf("%x", md5.Sum(data))
 }

@@ -44,7 +44,7 @@ func (m *Markdown) downloadImag(line string) (string, error) {
 		if imgType == "" {
 			return "", errors.New(fmt.Sprintf("imgUrl %s not expected", imgUrl))
 		}
-		filename := md5Sum(line) + "." + imgType
+		filename := Md5Sum(line) + "." + imgType
 
 		pwd, _ := os.Getwd()
 		err = downloadSave(m.httpClient, imgUrl, path.Join(pwd, "images", filename))

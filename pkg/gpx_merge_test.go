@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"os"
 	"testing"
 )
 
@@ -10,4 +11,12 @@ func TestMerge(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestName(t *testing.T) {
+	bytes, err := os.ReadFile("/Users/beer/Downloads/gpx-1/result.gpx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(len(bytes) / 1024 / 1024)
 }

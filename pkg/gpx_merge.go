@@ -79,6 +79,12 @@ func (g *GpxMerge) Run() error {
 		return err
 	}
 
+	//截取文件
+	fileSize := len(date) / 1024 / 1024
+	if fileSize > 25 {
+		date = g.zipPoints(firstGpx, fileSize+1)
+	}
+
 	resultFile, err := os.Create(path.Join(g.currentDir, "result.gpx"))
 	defer resultFile.Close()
 	if err != nil {
@@ -89,6 +95,27 @@ func (g *GpxMerge) Run() error {
 		return errors.WithStack(err)
 	}
 	return nil
+}
+
+func (g *GpxMerge) zipPoints(gpxObj *gpx.GPX, fileSize int) []byte {
+	points := gpxObj.Tracks[0].Segments[0].Points
+
+	length := len(points)
+	finalPointLen := (length / fileSize) * 25
+	step := length / (length - finalPointLen)
+	log.Infof("original size %d, point size %d->%d,zip step is %d", fileSize, length, finalPointLen, step)
+
+	var result []gpx.GPXPoint
+	for i := 0; i < len(points); i++ {
+		if i%step != 0 {
+			result = append(result, points[i])
+		}
+	}
+	gpxObj.Tracks[0].Segments[0].Points = result
+	date, _ := gpxObj.ToXml(gpx.ToXmlParams{
+		Indent: true, //相差不大
+	})
+	return date
 }
 
 func (g *GpxMerge) sortByDate(files []*gpx.GPX) ([]*gpx.GPX, error) {

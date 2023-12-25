@@ -20,3 +20,20 @@ func TestName(t *testing.T) {
 	}
 	t.Log(len(bytes) / 1024 / 1024)
 }
+
+func TestSetGpxDatas(t *testing.T) {
+	bytes, err := os.ReadFile("/tmp/111/13175318687.gpx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	g := NewGpxMerge("")
+	err = g.SetGpxDatas([][]byte{bytes})
+	if err != nil {
+		t.Fatal(err)
+	}
+	g.SetResultPath("/tmp/result.gpx")
+	err = g.Run()
+	if err != nil {
+		t.Fatal(err)
+	}
+}

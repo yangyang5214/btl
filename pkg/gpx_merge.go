@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"sort"
@@ -15,21 +16,33 @@ import (
 
 type GpxMerge struct {
 	currentDir string
-}
-
-type GpxFile struct {
-	start   []string
-	end     []string
-	content []string
+	gpxDatas   []*gpx.GPX
+	resultPath string
 }
 
 func NewGpxMerge(workDir string) *GpxMerge {
 	return &GpxMerge{
 		currentDir: workDir,
+		resultPath: path.Join(workDir, "result.gpx"),
 	}
 }
 
-func (g *GpxMerge) Run() error {
+func (g *GpxMerge) SetResultPath(p string) {
+	g.resultPath = p
+}
+
+func (g *GpxMerge) SetGpxDatas(gpxDatas [][]byte) error {
+	for _, data := range gpxDatas {
+		gpxData, err := gpx.ParseBytes(data)
+		if err != nil {
+			return err
+		}
+		g.gpxDatas = append(g.gpxDatas, gpxData)
+	}
+	return nil
+}
+
+func (g *GpxMerge) loadGpxData() error {
 	dirs, err := os.ReadDir(g.currentDir)
 	if err != nil {
 		return errors.WithStack(err)
@@ -50,19 +63,31 @@ func (g *GpxMerge) Run() error {
 		log.Info("not find gpx files in current directory")
 		return nil
 	}
-
 	gpxDatas, err := utils.ParseGpxData(gpxFiles)
 	if err != nil {
 		return err
 	}
+	g.gpxDatas = gpxDatas
+	return nil
+}
 
-	gpxDatas, err = g.sortByDate(gpxDatas)
+func (g *GpxMerge) Run() error {
+	if len(g.gpxDatas) == 0 {
+		err := g.loadGpxData()
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(g.gpxDatas) == 0 {
+		return fmt.Errorf("no gpx files found")
+	}
+
+	log.Infof("merge gpx files count: %d", len(g.gpxDatas))
+	gpxDatas, err := g.sortByDate(g.gpxDatas)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	log.Infof("merge gpx files count: %d", len(gpxFiles))
-
 	firstGpx := gpxDatas[0]
 
 	points := firstGpx.Tracks[0].Segments[0].Points
@@ -79,7 +104,9 @@ func (g *GpxMerge) Run() error {
 		return err
 	}
 
-	resultFile, err := os.Create(path.Join(g.currentDir, "result.gpx"))
+	log.Infof("save gpx result to: %s", g.resultPath)
+
+	resultFile, err := os.Create(g.resultPath)
 	defer resultFile.Close()
 	if err != nil {
 		return errors.WithStack(err)

@@ -82,11 +82,27 @@ func (g *GarminCn) cloneScripts() error {
 	}
 	return nil
 }
+
 func (g *GarminCn) Auth(username, password string) {
 	g.username = username
 	g.password = password
 
 }
+
+func (g *GarminCn) Login() bool {
+	cmdStr := fmt.Sprintf("python3 %s/garmin_secret.py -u '%s' -p '%s' --cn", g.runningDir, g.username, g.password)
+	cmd := exec.Command("/bin/bash", "-c", cmdStr)
+	log.Infof("satrt run cmd: %s", cmdStr)
+
+	out, err := cmd.Output()
+	if err != nil {
+		log.Errorf("run cmd: %s", err)
+		return false
+	}
+	log.Infof("run garmin_secret out: %s", out)
+	return strings.Contains(string(out), "success")
+}
+
 func (g *GarminCn) Run() error {
 	if !pkg.FileExists(g.exportDir) {
 		return errors.New(fmt.Sprintf("exportDir: <%s> is not exists", g.exportDir))

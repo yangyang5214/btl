@@ -48,9 +48,8 @@ type TemplateAmap struct {
 	Center utils.LatLng
 }
 
-func NewGpxAmap(files []string) *GpxAmap {
+func NewGpxAmap() *GpxAmap {
 	return &GpxAmap{
-		files: files,
 		defaultColors: []color.Color{
 			colornames.Red,
 			colornames.Blue,
@@ -67,6 +66,14 @@ func NewGpxAmap(files []string) *GpxAmap {
 
 func (g *GpxAmap) SetStep(step int) {
 	g.step = step
+}
+
+func (g *GpxAmap) SetPoints(points [][]*utils.LatLng) {
+	g.points = points
+}
+
+func (g *GpxAmap) SetFiles(files []string) {
+	g.files = files
 }
 
 func (g *GpxAmap) SetIndexHtmlPath(indexHtmlPath string) {
@@ -99,26 +106,30 @@ func (g *GpxAmap) loadAmapKey() error {
 }
 
 func (g *GpxAmap) Run() error {
-	if len(g.files) == 0 {
-		return errors.New("input gpx files is empty")
-	}
-	for _, filename := range g.files {
-		log.Infof("gpx file is %s", filename)
-	}
-
 	err := g.loadAmapKey()
 	if err != nil {
 		return err
 	}
 
-	if g.amapKey == "" {
-		return errors.New("amap key is required")
+	if len(g.files) != 0 {
+		for _, filename := range g.files {
+			log.Infof("gpx file is %s", filename)
+		}
+
+		if g.amapKey == "" {
+			return errors.New("amap key is required")
+		}
+		points, err := utils.GetPoints(g.files)
+		if err != nil {
+			return err
+		}
+		g.points = points
 	}
-	points, err := utils.GetPoints(g.files)
-	if err != nil {
-		return err
+
+	if len(g.points) == 0 {
+		return errors.New("points is empty")
 	}
-	g.points = points
+
 	g.center = g.getCenter()
 
 	log.Info("start gen index.html")

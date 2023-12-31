@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/chromedp/cdproto/page"
@@ -23,6 +24,9 @@ func NewScreenshot(imgPath, htmlPath string) *Screenshot {
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
 func (s *Screenshot) Run() error {
+	dir := filepath.Dir(s.imgPath)
+	_ = os.MkdirAll(dir, os.ModePerm)
+
 	html, err := os.ReadFile(s.htmlPath)
 	if err != nil {
 		return err

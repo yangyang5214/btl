@@ -153,3 +153,22 @@ func GetPoints(gpxFiles []string) ([][]*LatLng, error) {
 	}
 	return result, nil
 }
+
+func GetPointsFromGpx(gpxs []*gpx.GPX) ([][]*LatLng, error) {
+	var result [][]*LatLng
+	for _, gpxData := range gpxs {
+		var points []*LatLng
+		for _, track := range gpxData.Tracks {
+			for _, seg := range track.Segments {
+				for _, pt := range seg.Points {
+					points = append(points, &LatLng{
+						Lat: pt.GetLatitude(),
+						Lng: pt.GetLongitude(),
+					})
+				}
+			}
+		}
+		result = append(result, points)
+	}
+	return result, nil
+}

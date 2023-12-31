@@ -22,7 +22,8 @@ var gpxAmapCmd = &cobra.Command{
 		if len(files) == 0 {
 			files = utils.FindGpxFiles(".")
 		}
-		gamap := gpx_amap.NewGpxAmap(files)
+		gamap := gpx_amap.NewGpxAmap()
+		gamap.SetFiles(files)
 		err := gamap.Run()
 		if err != nil {
 			log.Errorf("run gamap failed: %v", err)

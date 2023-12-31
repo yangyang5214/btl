@@ -1,6 +1,7 @@
 package gpx_amap
 
 import (
+	"fmt"
 	"image/color"
 	"testing"
 
@@ -9,27 +10,20 @@ import (
 )
 
 func Test1(t *testing.T) {
-	files := utils.FindGpxFiles("/Users/beer/beer/rides")
-	ga := NewGpxAmap()
-	ga.SetFiles(files)
-	//ga := NewGpxAmap([]string{
-	//	"/Users/beer/beer/rides/hai_nan.gpx",
-	//})
-	ga.SetStep(20)
-	//ga.SetColors([]color.Color{colornames.Red})
-	//ga.SetMapStyle(Dark)
-	//ga.SetMapStyle(Light)
-	//ga.SetMapStyle(Whitesmoke)
-	//ga.SetMapStyle(Grey)
-	//ga.SetMapStyle(Fresh)
-	//ga.SetMapStyle(Blue)
-	//ga.SetMapStyle(Darkblue)
-	//ga.SetMapStyle(Macaron)
-	ga.SetColors([]color.Color{
-		colornames.Red,
-	})
-	err := ga.Run()
-	if err != nil {
-		t.Fatal(err)
+	files := utils.FindGpxFiles("/Users/beer/beer/rides/shang_hai")
+
+	styles := []string{"whitesmoke", "grey", "dark", "light", "fresh", "blue", "darkblue", "macaron"}
+	for _, style := range styles {
+		ga := NewGpxAmap(style)
+		ga.SetFiles(files)
+		ga.SetStep(20)
+		ga.SetColors([]color.Color{
+			colornames.Red,
+		})
+		ga.SetImgPath(fmt.Sprintf("/tmp/result/%s.png", style))
+		err := ga.Run()
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }

@@ -38,7 +38,7 @@ func (s *Screenshot) Run() error {
 		// the navigation will trigger the "page.EventLoadEventFired" event too,
 		// so we should add the listener after the navigation.
 		chromedp.Navigate("about:blank"),
-		chromedp.EmulateViewport(1440, 900),
+		chromedp.EmulateViewport(1200, 1000),
 		// set the page content and wait until the page is loaded (including its resources).
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			frameTree, err := page.GetFrameTree().Do(ctx)
@@ -52,7 +52,7 @@ func (s *Screenshot) Run() error {
 			return nil
 		}),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			time.Sleep(3 * time.Second)
+			time.Sleep(10 * time.Second)
 			buf, err := page.CaptureScreenshot().Do(ctx)
 			if err != nil {
 				return err

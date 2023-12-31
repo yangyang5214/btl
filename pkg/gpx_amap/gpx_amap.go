@@ -48,7 +48,7 @@ type TemplateAmap struct {
 	Center utils.LatLng
 }
 
-func NewGpxAmap() *GpxAmap {
+func NewGpxAmap(style string) *GpxAmap {
 	return &GpxAmap{
 		defaultColors: []color.Color{
 			colornames.Red,
@@ -57,10 +57,10 @@ func NewGpxAmap() *GpxAmap {
 			colornames.Black,
 			colornames.Orange,
 		},
-		mapStyle:      Whitesmoke,
+		mapStyle:      "amap://styles/" + style,
 		imgPath:       "result.png",
 		indexHtmlPath: "index.html",
-		step:          1,
+		step:          10,
 	}
 }
 

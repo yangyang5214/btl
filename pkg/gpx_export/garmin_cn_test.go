@@ -36,7 +36,5 @@ func TestRun(t *testing.T) {
 func TestLogin(t *testing.T) {
 	g := NewGarminCn("")
 	t.Logf("username: <%v>, password: <%s>", username, password)
-	//password = "11"
-	g.Auth(username, password)
-	t.Log(g.Login())
+	t.Log(g.Auth(username, password))
 }

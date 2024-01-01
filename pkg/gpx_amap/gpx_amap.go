@@ -193,7 +193,7 @@ func (g *GpxAmap) drawLines() string {
 			var %s = new AMap.Polyline({
 				path: %s,
 				strokeColor: "%s",
-				strokeWeight: 3,
+				strokeWeight: 5,
 				lineJoin: 'round',
 				lineCap: 'round',
 			})

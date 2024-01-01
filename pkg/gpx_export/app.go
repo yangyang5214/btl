@@ -16,5 +16,5 @@ const (
 
 type AppExport interface {
 	Run() error
-	Auth(user, pwd string)
+	Auth(user, pwd string) bool
 }

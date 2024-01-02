@@ -10,14 +10,15 @@ import (
 )
 
 func Test1(t *testing.T) {
-	files := utils.FindGpxFiles("/Users/beer/beer/rides/shang_hai")
+	//files := utils.FindGpxFiles("/Users/beer/beer/rides/shang_hai")
+	files := utils.FindGpxFiles("/tmp/287053469.gpx")
 
 	//styles := []string{"whitesmoke", "grey", "dark", "light", "fresh", "blue", "darkblue", "macaron"}
 	styles := []string{"8ee61a45840f14ac60f33a799fbd00d8"}
 	for _, style := range styles {
 		ga := NewGpxAmap(style)
 		ga.SetFiles(files)
-		ga.SetStep(20)
+		//ga.SetStep(20)
 		ga.SetColors([]color.Color{
 			colornames.Red,
 		})

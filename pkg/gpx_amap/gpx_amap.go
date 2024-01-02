@@ -2,6 +2,7 @@ package gpx_amap
 
 import (
 	"fmt"
+	"github.com/qichengzx/coordtransform"
 	"github.com/yangyang5214/btl/pkg/model"
 	"image/color"
 	"os"
@@ -165,7 +166,11 @@ func (g *GpxAmap) drawLines() string {
 
 		for j := 0; j < len(points); j += g.step {
 			point := points[j]
-			sb.WriteString(fmt.Sprintf("[%s],", point.String()))
+
+			//https://lbs.amap.com/api/javascript-api-v2/guide/transform/convertfrom
+			//WGS84 to GCJ-02
+			lng, lat := coordtransform.WGS84toGCJ02(point.Lng, point.Lat)
+			sb.WriteString(fmt.Sprintf("[%f,%f],", lng, lat))
 			sb.WriteString("\n")
 		}
 		sb.WriteString("]")

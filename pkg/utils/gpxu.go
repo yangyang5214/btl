@@ -64,12 +64,12 @@ func CountPoints(positions [][]s2.LatLng) int {
 }
 
 func FindGpxFiles(dirPath string) []string {
+	if strings.HasSuffix(dirPath, ".gpx") {
+		return []string{dirPath}
+	}
 	absPath, err := filepath.Abs(dirPath)
 	if err != nil {
 		return nil
-	}
-	if absPath == dirPath {
-		return []string{dirPath} //是文件直接返回
 	}
 	d, err := os.ReadDir(absPath)
 	if err != nil {

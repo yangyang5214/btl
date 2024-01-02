@@ -19,6 +19,8 @@ type GarminCn struct {
 	username  string
 	password  string
 	exportDir string
+
+	skipUpdate bool
 }
 
 func NewGarminCn(exportDir string) *GarminCn {
@@ -27,7 +29,12 @@ func NewGarminCn(exportDir string) *GarminCn {
 		repoURL:    "git@github.com:yangyang5214/gpx_export.git",
 		runningDir: path.Join(userHome, ".gpx_export"),
 		exportDir:  exportDir,
+		skipUpdate: false,
 	}
+}
+
+func (g *GarminCn) SkipUpdate() {
+	g.skipUpdate = true
 }
 
 func (g *GarminCn) checkPythonVersion() error {
@@ -87,10 +94,12 @@ func (g *GarminCn) Auth(username, password string) bool {
 	g.username = username
 	g.password = password
 
-	err := g.cloneScripts()
-	if err != nil {
-		log.Errorf("clone script failed: %v", err)
-		return false
+	if g.skipUpdate {
+		err := g.cloneScripts()
+		if err != nil {
+			log.Errorf("clone script failed: %v", err)
+			return false
+		}
 	}
 
 	cmdStr := fmt.Sprintf("python3 %s/garmin_secret.py -u '%s' -p '%s' --cn", g.runningDir, g.username, g.password)

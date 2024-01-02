@@ -17,4 +17,5 @@ const (
 type AppExport interface {
 	Run() error
 	Auth(user, pwd string) bool
+	SkipUpdate()
 }

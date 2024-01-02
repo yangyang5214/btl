@@ -2,9 +2,9 @@ package gpx_amap
 
 import (
 	"fmt"
+	"github.com/yangyang5214/btl/pkg/model"
 	"image/color"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -37,10 +37,10 @@ type GpxAmap struct {
 
 	defaultColors []color.Color
 	mapStyle      string
-	amapKey       string
 	imgPath       string
 	indexHtmlPath string
 	step          int
+	amapKey       *model.AmapWebCode
 }
 
 type TemplateAmap struct {
@@ -61,6 +61,7 @@ func NewGpxAmap(style string) *GpxAmap {
 		imgPath:       "result.png",
 		indexHtmlPath: "index.html",
 		step:          10,
+		amapKey:       model.NewAmapWebCode(),
 	}
 }
 
@@ -92,31 +93,13 @@ func (g *GpxAmap) SetMapStyle(style string) {
 	g.mapStyle = style
 }
 
-func (g *GpxAmap) loadAmapKey() error {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	data, err := os.ReadFile(path.Join(homeDir, ".amap_key"))
-	if err != nil {
-		return err
-	}
-	g.amapKey = strings.Trim(string(data), "\n")
-	return nil
-}
-
 func (g *GpxAmap) Run() error {
-	err := g.loadAmapKey()
-	if err != nil {
-		return err
-	}
-
 	if len(g.files) != 0 {
 		for _, filename := range g.files {
 			log.Infof("gpx file is %s", filename)
 		}
 
-		if g.amapKey == "" {
+		if g.amapKey == nil {
 			return errors.New("amap key is required")
 		}
 		points, err := utils.GetPoints(g.files)
@@ -228,7 +211,14 @@ func (g *GpxAmap) start() string {
 `)
 	sb.WriteString("\n")
 
-	sb.WriteString(fmt.Sprintf(`<script src="https://webapi.amap.com/maps?v=1.4.15&key=%s"></script>`, g.amapKey))
+	sb.WriteString(fmt.Sprintf(`<script>
+    window._AMapSecurityConfig = {
+        securityJsCode: %s,
+    };
+</script>`, "'"+g.amapKey.Security+"'"))
+	sb.WriteString("\n")
+
+	sb.WriteString(fmt.Sprintf(`<script src="https://webapi.amap.com/maps?v=1.4.15&key=%s"></script>`, g.amapKey.Key))
 	sb.WriteString("\n")
 
 	sb.WriteString(`

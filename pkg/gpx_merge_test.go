@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"testing"
 )
@@ -27,10 +28,12 @@ func TestSetGpxDatas(t *testing.T) {
 		t.Fatal(err)
 	}
 	g := NewGpxMerge("")
-	err = g.SetGpxDatas([][]byte{bytes})
+
+	gpxData, err := gpx.ParseBytes(bytes)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
+	g.SetGpxDatas([]*gpx.GPX{gpxData})
 	g.SetResultPath("/tmp/result.gpx")
 	err = g.Run()
 	if err != nil {

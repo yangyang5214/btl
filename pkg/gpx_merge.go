@@ -31,15 +31,8 @@ func (g *GpxMerge) SetResultPath(p string) {
 	g.resultPath = p
 }
 
-func (g *GpxMerge) SetGpxDatas(gpxDatas [][]byte) error {
-	for _, data := range gpxDatas {
-		gpxData, err := gpx.ParseBytes(data)
-		if err != nil {
-			return err
-		}
-		g.gpxDatas = append(g.gpxDatas, gpxData)
-	}
-	return nil
+func (g *GpxMerge) SetGpxDatas(gpxDatas []*gpx.GPX) {
+	g.gpxDatas = gpxDatas
 }
 
 func (g *GpxMerge) loadGpxData() error {

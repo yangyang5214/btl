@@ -4,7 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -25,6 +24,7 @@ var gpxAmapCmd = &cobra.Command{
 	Use:   "gpx_amap",
 	Short: `gen image by amap`,
 	Run: func(cmd *cobra.Command, args []string) {
+		validateMyFlag()
 		if len(files) == 0 {
 			files = utils.FindGpxFiles(".")
 		}
@@ -42,8 +42,6 @@ func init() {
 	rootCmd.AddCommand(gpxAmapCmd)
 	gpxAmapCmd.Flags().StringSliceVarP(&files, "files", "f", []string{}, "xx.gpx")
 	gpxAmapCmd.Flags().StringVarP(&amapStyle, "style", "s", "", strings.Join(ValidChoices, "\n"))
-
-	cobra.OnInitialize(validateMyFlag)
 }
 
 func validateMyFlag() {
@@ -52,7 +50,6 @@ func validateMyFlag() {
 			return
 		}
 	}
-
-	_ = fmt.Sprintf("Invalid value for --myflag. Allowed values are: %v\n", ValidChoices)
+	log.Infof("Invalid value for --myflag. Allowed values are: %v\n", ValidChoices)
 	os.Exit(1)
 }

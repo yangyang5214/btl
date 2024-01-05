@@ -109,7 +109,7 @@ func (g *GpxAmap) Run() error {
 		g.points = points
 	}
 
-	if len(g.points) == 0 {
+	if len(g.points) == 0 || len(g.points[0]) == 0 {
 		return errors.New("points is empty")
 	}
 

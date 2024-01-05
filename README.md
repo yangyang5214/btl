@@ -6,76 +6,39 @@
 go install github.com/yangyang5214/btl@latest 
 ```
 
-## gist
-
-Download the github gist to a local file, including images
+### cmds
 
 ```shell
-btl gist <gist_id>
-btl gist 7f903d466483c1dcfa62e131bcbb7917
-```
+~ btl
+ 
+A longer description that spans multiple lines and likely contains
+examples and usage of using your application. For example:
 
-## json2csv
-
-json lines covert to CSV format
-
-```shell
-btl json2csv  -f xxx.json
-```
-
-## gpx_map
-
-```
-Usage:
-  btl gpx_map [flags]
-
-Flags:
-  -a, --attribution string   
-  -d, --dir string            (default ".")
-  -f, --files strings        xx.gpx
-  -h, --help                 help for gpx_map
-  -n, --name string           (default "osm")
-```
-
-```
-btl gpx_map ~/beer/rides
-```
-
-![](./images/gpx_map_1.png)
-
-![](./images/gpx_map_2.png)
-
-![](./images/gpx_map_3.png)
-
-## json2mind/csv2mind
-
-https://gist.github.com/yangyang5214/9b238a3d4a714bb8930404ddce3c5935
-
-Group statistics json by inputs fields, then output mind map
-
-### help
-
-```
-➜ btl json2mind -h
-json lines file transform to md file, then convert to mind map
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.
 
 Usage:
-  btl json2mind [flags]
+  btl [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  csv2mind    csv file covert to mind map
+  date        date format
+  email       send email
+  gist        download a gist to local md file
+  gpx2Json    gpx file to json
+  gpx_amap    gen image by amap
+  gpx_export  export gpx from apps
+  gpx_merge   merge gpx files
+  gpx_zip     zip gpx file to limited size.(remove some points)
+  help        Help about any command
+  json2csv    json to csv
+  json2mind   json lines file transform to md file, then convert to mind map
 
 Flags:
-  -g, --fields strings     Fields that require group by
-  -h, --help               help for json2mind
-  -f, --json_file string   jsonlines file path
+  -h, --help     help for btl
+  -t, --toggle   Help message for toggle
+
+Use "btl [command] --help" for more information about a command.
 ```
-
-### usage
-
-```shell
-btl json2mind -f xxx.json -g field1,field2
-```
-
-### online markdown to mind map
-
-https://markmap.js.org/repl
-
-https://wanglin2.github.io/mind-map/#/

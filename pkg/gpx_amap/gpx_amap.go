@@ -60,7 +60,7 @@ func NewGpxAmap(style string) *GpxAmap {
 		mapStyle:      "amap://styles/" + style,
 		imgPath:       "result.png",
 		indexHtmlPath: "index.html",
-		step:          10,
+		step:          1,
 		amapKey:       model.NewAmapWebCode(),
 	}
 }

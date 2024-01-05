@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -152,6 +153,35 @@ func saveCsv(filename string, datas []map[string]interface{}) error {
 func ColorToHex(c color.Color) string {
 	r, g, b, _ := c.RGBA()
 	return fmt.Sprintf("#%02X%02X%02X", r>>8, g>>8, b>>8)
+}
+
+func HexToRGBA(hex string) (color.Color, error) {
+	// Remove the '#' from the hex code
+	hex = hex[1:]
+
+	// Parse the hex components
+	r, err := strconv.ParseInt(hex[0:2], 16, 0)
+	if err != nil {
+		return nil, err
+	}
+	g, err := strconv.ParseInt(hex[2:4], 16, 0)
+	if err != nil {
+		return nil, err
+	}
+	b, err := strconv.ParseInt(hex[4:6], 16, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a color.RGBA
+	rgba := color.RGBA{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+		A: 255, // Set alpha to 255 (fully opaque)
+	}
+
+	return rgba, nil
 }
 
 func FileExists(fp string) bool {

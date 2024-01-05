@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/qichengzx/coordtransform"
 	. "image/color"
 	"math"
 	"os"
@@ -131,6 +132,12 @@ type LatLng struct {
 
 func (l LatLng) String() string {
 	return fmt.Sprintf("%f,%f", l.Lng, l.Lat)
+}
+
+// GCJ02String https://lbs.amap.com/api/javascript-api-v2/guide/transform/convertfrom
+func (l LatLng) GCJ02String() string {
+	lng, lat := coordtransform.WGS84toGCJ02(l.Lng, l.Lat)
+	return fmt.Sprintf("%f,%f,", lng, lat)
 }
 
 func GetPoints(gpxFiles []string) ([][]*LatLng, error) {

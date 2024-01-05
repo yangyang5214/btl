@@ -2,7 +2,6 @@ package gpx_amap
 
 import (
 	"fmt"
-	"github.com/qichengzx/coordtransform"
 	"github.com/yangyang5214/btl/pkg/model"
 	"image/color"
 	"os"
@@ -167,10 +166,7 @@ func (g *GpxAmap) drawLines() string {
 		for j := 0; j < len(points); j += g.step {
 			point := points[j]
 
-			//https://lbs.amap.com/api/javascript-api-v2/guide/transform/convertfrom
-			//WGS84 to GCJ-02
-			lng, lat := coordtransform.WGS84toGCJ02(point.Lng, point.Lat)
-			sb.WriteString(fmt.Sprintf("[%f,%f],", lng, lat))
+			sb.WriteString(fmt.Sprintf("[%s],", point.GCJ02String()))
 			sb.WriteString("\n")
 		}
 		sb.WriteString("]")
@@ -181,7 +177,7 @@ func (g *GpxAmap) drawLines() string {
 			var %s = new AMap.Polyline({
 				path: %s,
 				strokeColor: "%s",
-				strokeWeight: 5,
+				strokeWeight: 8,
 				lineJoin: 'round',
 				lineCap: 'round',
 			})
@@ -189,6 +185,44 @@ func (g *GpxAmap) drawLines() string {
 
 		sb.WriteString("\n")
 	}
+
+	sb.WriteString(`
+    var startIcon = new AMap.Icon({
+        size: new AMap.Size(25, 34),
+        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+        imageSize: new AMap.Size(135, 40),
+        imageOffset: new AMap.Pixel(-9, -3)
+    });
+
+    var endIcon = new AMap.Icon({
+        size: new AMap.Size(25, 34),
+        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+        imageSize: new AMap.Size(135, 40),
+        imageOffset: new AMap.Pixel(-95, -3)
+    });
+`)
+
+	startPoint := g.points[0][0].GCJ02String()
+	sb.WriteString(fmt.Sprintf(`
+    var startMarker = new AMap.Marker({
+        position: new AMap.LngLat(%s),
+        icon: startIcon,
+        offset: new AMap.Pixel(-13, -30)
+    });
+`, startPoint))
+
+	lastLine := g.points[len(g.points)-1]
+	endPoint := lastLine[len(lastLine)-1].GCJ02String()
+
+	sb.WriteString(fmt.Sprintf(`
+    var endMarker = new AMap.Marker({
+        position: new AMap.LngLat(%s),
+        icon: endIcon,
+        offset: new AMap.Pixel(-13, -30)
+    });
+`, endPoint))
+
+	sb.WriteString(`map.add([startMarker, endMarker]);`)
 
 	sb.WriteString("map.setFitView();")
 	sb.WriteString("\n")

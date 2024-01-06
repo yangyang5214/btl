@@ -2,9 +2,10 @@ package gpx_amap
 
 import (
 	"fmt"
-	"golang.org/x/image/colornames"
 	"image/color"
 	"testing"
+
+	"golang.org/x/image/colornames"
 
 	"github.com/yangyang5214/btl/pkg/utils"
 )

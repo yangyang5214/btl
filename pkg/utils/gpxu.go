@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/qichengzx/coordtransform"
 	. "image/color"
 	"math"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/qichengzx/coordtransform"
 
 	"github.com/yangyang5214/btl/pkg/model"
 

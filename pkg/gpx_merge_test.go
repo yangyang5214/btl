@@ -1,9 +1,10 @@
 package pkg
 
 import (
-	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"testing"
+
+	"github.com/tkrajina/gpxgo/gpx"
 )
 
 func TestMerge(t *testing.T) {

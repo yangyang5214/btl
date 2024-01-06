@@ -2,7 +2,6 @@ package gpx_amap
 
 import (
 	"fmt"
-	"github.com/yangyang5214/btl/pkg/model"
 	"image/color"
 	"os"
 	"strings"
@@ -10,21 +9,9 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
+	"github.com/yangyang5214/btl/pkg/model"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"golang.org/x/image/colornames"
-)
-
-var (
-	// Whitesmoke 好看
-	Whitesmoke = "amap://styles/whitesmoke"
-	Grey       = "amap://styles/grey"
-
-	Dark     = "amap://styles/dark"
-	Light    = "amap://styles/light"
-	Fresh    = "amap://styles/fresh"
-	Blue     = "amap://styles/blue"
-	Darkblue = "amap://styles/darkblue"
-	Macaron  = "amap://styles/macaron"
 )
 
 //https://lbs.amap.com/demo/javascript-api/example/overlayers/polyline-draw-and-edit
@@ -41,6 +28,7 @@ type GpxAmap struct {
 	indexHtmlPath string
 	step          int
 	amapKey       *model.AmapWebCode
+	waitSeconds   int32
 }
 
 type TemplateAmap struct {
@@ -67,6 +55,10 @@ func NewGpxAmap(style string) *GpxAmap {
 
 func (g *GpxAmap) SetStep(step int) {
 	g.step = step
+}
+
+func (g *GpxAmap) SetWaitSeconds(wait int32) {
+	g.waitSeconds = wait
 }
 
 func (g *GpxAmap) SetPoints(points [][]*utils.LatLng) {
@@ -133,6 +125,7 @@ func (g *GpxAmap) Run() error {
 	//screenshot
 	log.Info("start screenshot")
 	shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath)
+	shot.SetWaitSeconds(g.waitSeconds)
 	return shot.Run()
 }
 

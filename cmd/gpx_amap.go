@@ -4,9 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"os"
-	"strings"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg/gpx_amap"
@@ -14,9 +11,8 @@ import (
 )
 
 var (
-	files        []string
-	amapStyle    string
-	ValidChoices = []string{"whitesmoke", "grey", "dark", "light", "fresh", "blue", "darkblue", "macaron"}
+	files     []string
+	amapStyle string
 )
 
 // gpxAmapCmd represents the gpxAmap command
@@ -24,7 +20,6 @@ var gpxAmapCmd = &cobra.Command{
 	Use:   "gpx_amap",
 	Short: `gen image by amap`,
 	Run: func(cmd *cobra.Command, args []string) {
-		validateMyFlag()
 		if len(files) == 0 {
 			files = utils.FindGpxFiles(".")
 		}
@@ -41,15 +36,5 @@ var gpxAmapCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(gpxAmapCmd)
 	gpxAmapCmd.Flags().StringSliceVarP(&files, "files", "f", []string{}, "xx.gpx")
-	gpxAmapCmd.Flags().StringVarP(&amapStyle, "style", "s", "", strings.Join(ValidChoices, "\n"))
-}
-
-func validateMyFlag() {
-	for _, choice := range ValidChoices {
-		if amapStyle == choice {
-			return
-		}
-	}
-	log.Infof("Invalid value for --myflag. Allowed values are: %v\n", ValidChoices)
-	os.Exit(1)
+	gpxAmapCmd.Flags().StringVarP(&amapStyle, "style", "s", "8ee61a45840f14ac60f33a799fbd00d8", "amap style id")
 }

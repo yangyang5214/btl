@@ -4,22 +4,28 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"time"
+	time "time"
 
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 )
 
 type Screenshot struct {
-	imgPath  string
-	htmlPath string
+	imgPath     string
+	htmlPath    string
+	waitSeconds time.Duration
 }
 
 func NewScreenshot(imgPath, htmlPath string) *Screenshot {
 	return &Screenshot{
-		imgPath:  imgPath,
-		htmlPath: htmlPath,
+		imgPath:     imgPath,
+		htmlPath:    htmlPath,
+		waitSeconds: 5 * time.Second,
 	}
+}
+
+func (s *Screenshot) SetWaitSeconds(wait int32) {
+	s.waitSeconds = time.Duration(wait) * time.Second
 }
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
@@ -52,7 +58,7 @@ func (s *Screenshot) Run() error {
 			return nil
 		}),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			time.Sleep(5 * time.Second)
+			time.Sleep(s.waitSeconds)
 			buf, err := page.CaptureScreenshot().Do(ctx)
 			if err != nil {
 				return err

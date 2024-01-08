@@ -29,6 +29,9 @@ type GpxAmap struct {
 	step          int
 	amapKey       *model.AmapWebCode
 	waitSeconds   int32
+
+	markerStartEnd bool
+	strokeWeight   int
 }
 
 type TemplateAmap struct {
@@ -45,12 +48,18 @@ func NewGpxAmap(style string) *GpxAmap {
 			colornames.Black,
 			colornames.Orange,
 		},
-		mapStyle:      "amap://styles/" + style,
-		imgPath:       "result.png",
-		indexHtmlPath: "index.html",
-		step:          1,
-		amapKey:       model.NewAmapWebCode(),
+		mapStyle:       "amap://styles/" + style,
+		imgPath:        "result.png",
+		indexHtmlPath:  "index.html",
+		step:           1,
+		amapKey:        model.NewAmapWebCode(),
+		markerStartEnd: true,
+		strokeWeight:   8,
 	}
+}
+
+func (g *GpxAmap) SetStrokeWeight(wight int) {
+	g.strokeWeight = wight
 }
 
 func (g *GpxAmap) SetStep(step int) {
@@ -136,49 +145,11 @@ func (g *GpxAmap) randomColor(index int) string {
 	return r
 }
 
-func (g *GpxAmap) drawLines() string {
-	var sb strings.Builder
+func (g *GpxAmap) HideStartEndPoint() {
+	g.markerStartEnd = false
+}
 
-	sb.WriteString(fmt.Sprintf(`
-    var map = new AMap.Map("container", {
-        center: [%s],
-        mapStyle: "%s"
-    });
-`, g.center.String(), g.mapStyle))
-
-	sb.WriteString("\n")
-
-	//add paths
-	for index, points := range g.points {
-		randomColor := g.randomColor(index)
-		pathVar := fmt.Sprintf("pathIndex%d", index)
-		sb.WriteString(fmt.Sprintf("var %s = [", pathVar))
-
-		sb.WriteString("\n")
-
-		for j := 0; j < len(points); j += g.step {
-			point := points[j]
-
-			sb.WriteString(fmt.Sprintf("[%s],", point.GCJ02String()))
-			sb.WriteString("\n")
-		}
-		sb.WriteString("]")
-		sb.WriteString("\n")
-
-		polylineVar := fmt.Sprintf("polyline%d", index)
-		sb.WriteString(fmt.Sprintf(`
-			var %s = new AMap.Polyline({
-				path: %s,
-				strokeColor: "%s",
-				strokeWeight: 8,
-				lineJoin: 'round',
-				lineCap: 'round',
-			})
-			%s.setMap(map)`, polylineVar, pathVar, randomColor, polylineVar))
-
-		sb.WriteString("\n")
-	}
-
+func (g *GpxAmap) startEndMarker(sb strings.Builder) {
 	sb.WriteString(`
     var startIcon = new AMap.Icon({
         size: new AMap.Size(25, 34),
@@ -216,7 +187,53 @@ func (g *GpxAmap) drawLines() string {
 `, endPoint))
 
 	sb.WriteString(`map.add([startMarker, endMarker]);`)
+}
 
+func (g *GpxAmap) drawLines() string {
+	var sb strings.Builder
+
+	sb.WriteString(fmt.Sprintf(`
+    var map = new AMap.Map("container", {
+        center: [%s],
+        mapStyle: "%s"
+    });
+`, g.center.String(), g.mapStyle))
+
+	sb.WriteString("\n")
+
+	//add paths
+	for index, points := range g.points {
+		randomColor := g.randomColor(index)
+		pathVar := fmt.Sprintf("pathIndex%d", index)
+		sb.WriteString(fmt.Sprintf("var %s = [", pathVar))
+
+		sb.WriteString("\n")
+
+		for j := 0; j < len(points); j += g.step {
+			point := points[j]
+
+			sb.WriteString(fmt.Sprintf("[%s],", point.GCJ02String()))
+			sb.WriteString("\n")
+		}
+		sb.WriteString("]")
+		sb.WriteString("\n")
+
+		polylineVar := fmt.Sprintf("polyline%d", index)
+		sb.WriteString(fmt.Sprintf(`
+			var %s = new AMap.Polyline({
+				path: %s,
+				strokeColor: "%s",
+				strokeWeight: %d,
+				lineJoin: 'round',
+				lineCap: 'round',
+			})
+			%s.setMap(map)`, polylineVar, pathVar, randomColor, g.strokeWeight, polylineVar))
+
+		sb.WriteString("\n")
+	}
+	if g.markerStartEnd {
+		g.startEndMarker(sb)
+	}
 	sb.WriteString("map.setFitView();")
 	sb.WriteString("\n")
 

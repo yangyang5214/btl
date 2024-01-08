@@ -4,7 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/yangyang5214/btl/pkg"
+	"github.com/yangyang5214/btl/pkg/gpx_grid"
 
 	"github.com/spf13/cobra"
 )
@@ -15,7 +15,7 @@ var gpxGridCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		grid := pkg.NewGpxGrid()
+		grid := gpx_grid.NewGpxGrid()
 		err := grid.Run()
 		if err != nil {
 			panic(err)

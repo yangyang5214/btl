@@ -21,7 +21,7 @@ type EmailConfig struct {
 type EmailContent struct {
 	Subject string
 	Content string
-	Images  []string
+	Files   []string
 }
 
 func (e *EmailContent) String() []byte {
@@ -71,7 +71,7 @@ func (e *EmailNotify) Send(to []string, content *EmailContent) error {
 	e.gm.SetHeader("Subject", content.Subject)
 	e.gm.SetBody("text/plain", content.Content)
 
-	for _, image := range content.Images {
+	for _, image := range content.Files {
 		e.gm.Attach(image)
 	}
 

@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/tkrajina/gpxgo/gpx"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -52,4 +55,61 @@ func TestDistance(t *testing.T) {
 
 	distance := gpx.Distance2D(p1.Latitude, p1.Longitude, p2.Latitude, p2.Longitude, false)
 	t.Log(distance)
+}
+
+func TestIndent(t *testing.T) {
+	f, err := gpx.ParseFile("1.gpx")
+	if err != nil {
+		panic(err)
+	}
+	bytes, err := gpx.ToXml(f, gpx.ToXmlParams{
+		Indent: true,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	resultFile, err := os.Create("result.gpx")
+	defer resultFile.Close()
+	if err != nil {
+		panic(err)
+	}
+	_, err = resultFile.Write(bytes)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestPoint(t *testing.T) {
+	t.Run("test1", func(t *testing.T) {
+		f := 110.0
+		t.Logf("result is %v", strings.TrimRight(fmt.Sprintf("%.10f", f), "0."))  //  11
+		t.Logf("result is %v", strings.TrimSuffix(fmt.Sprintf("%.10f", f), "0.")) // 110.0000000000
+	})
+
+	t.Run("test2", func(t *testing.T) {
+		f := 0.000056
+		t.Logf("result is %v", strings.TrimRight(fmt.Sprintf("%.10f", f), "0."))  //0.000056
+		t.Logf("result is %v", strings.TrimSuffix(fmt.Sprintf("%.10f", f), "0.")) //0.000056
+	})
+}
+
+func TestNewGpx(t *testing.T) {
+	gpxData := &gpx.GPX{}
+	bytes, err := gpx.ToXml(gpxData, gpx.ToXmlParams{
+		Indent: true,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	resultFile, err := os.Create("new.gpx")
+	defer resultFile.Close()
+	if err != nil {
+		panic(err)
+	}
+	_, err = resultFile.Write(bytes)
+	if err != nil {
+		panic(err)
+	}
 }

@@ -149,7 +149,7 @@ func (g *GpxAmap) HideStartEndPoint() {
 	g.markerStartEnd = false
 }
 
-func (g *GpxAmap) startEndMarker(sb strings.Builder) {
+func (g *GpxAmap) startEndMarker(sb *strings.Builder) {
 	sb.WriteString(`
     var startIcon = new AMap.Icon({
         size: new AMap.Size(25, 34),
@@ -233,7 +233,7 @@ func (g *GpxAmap) drawLines() string {
 		sb.WriteString("\n")
 	}
 	if g.markerStartEnd {
-		g.startEndMarker(sb)
+		g.startEndMarker(&sb)
 	}
 	sb.WriteString("map.setFitView();")
 	sb.WriteString("\n")

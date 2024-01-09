@@ -212,7 +212,8 @@ func (g *GpxAmap) drawLines() string {
 		for j := 0; j < len(points); j += g.step {
 			point := points[j]
 
-			sb.WriteString(fmt.Sprintf("[%s],", point.GCJ02String()))
+			//sb.WriteString(fmt.Sprintf("[%s],", point.GCJ02String()))
+			sb.WriteString(fmt.Sprintf("[%s],", point.String()))
 			sb.WriteString("\n")
 		}
 		sb.WriteString("]")

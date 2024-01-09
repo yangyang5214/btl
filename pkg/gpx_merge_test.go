@@ -8,7 +8,7 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	g := NewGpxMerge("/tmp/2")
+	g := NewGpxMerge("/tmp/test")
 	err := g.Run()
 	if err != nil {
 		t.Fatal(err)

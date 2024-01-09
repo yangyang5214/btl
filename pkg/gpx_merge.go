@@ -81,14 +81,12 @@ func (g *GpxMerge) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	firstGpx := gpxDatas[0]
-
-	points := firstGpx.Tracks[0].Segments[0].Points
 	for i := 1; i < len(gpxDatas); i++ {
-		points = append(points, gpxDatas[i].Tracks[0].Segments[0].Points...)
+		currentGpx := gpxDatas[i]
+		firstGpx.Tracks = append(firstGpx.Tracks, currentGpx.Tracks...)
 	}
-
-	firstGpx.Tracks[0].Segments[0].Points = points
 
 	date, err := firstGpx.ToXml(gpx.ToXmlParams{
 		Indent: true, //相差不大

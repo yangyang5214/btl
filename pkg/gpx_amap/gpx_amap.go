@@ -32,6 +32,8 @@ type GpxAmap struct {
 
 	markerStartEnd bool
 	strokeWeight   int
+
+	screenshot bool
 }
 
 type TemplateAmap struct {
@@ -55,6 +57,7 @@ func NewGpxAmap(style string) *GpxAmap {
 		amapKey:        model.NewAmapWebCode(),
 		markerStartEnd: true,
 		strokeWeight:   8,
+		screenshot:     false,
 	}
 }
 
@@ -80,6 +83,10 @@ func (g *GpxAmap) SetFiles(files []string) {
 
 func (g *GpxAmap) SetIndexHtmlPath(indexHtmlPath string) {
 	g.indexHtmlPath = indexHtmlPath
+}
+
+func (g *GpxAmap) Screenshot() {
+	g.screenshot = true
 }
 
 func (g *GpxAmap) SetImgPath(imgPath string) {
@@ -131,11 +138,13 @@ func (g *GpxAmap) Run() error {
 		return err
 	}
 
-	//screenshot
-	log.Info("start screenshot")
-	shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath)
-	shot.SetWaitSeconds(g.waitSeconds)
-	return shot.Run()
+	if g.screenshot {
+		log.Info("start screenshot")
+		shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath)
+		shot.SetWaitSeconds(g.waitSeconds)
+		return shot.Run()
+	}
+	return nil
 }
 
 func (g *GpxAmap) randomColor(index int) string {

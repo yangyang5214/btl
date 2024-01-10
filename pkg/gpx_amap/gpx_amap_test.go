@@ -1,6 +1,8 @@
 package gpx_amap
 
 import (
+	"golang.org/x/image/colornames"
+	"image/color"
 	"testing"
 
 	"github.com/yangyang5214/btl/pkg/utils"
@@ -16,9 +18,9 @@ func Test1(t *testing.T) {
 	for _, style := range styles {
 		ga := NewGpxAmap(style)
 		ga.SetFiles(files)
-		//ga.SetColors([]color.Color{
-		//	colornames.Red,
-		//})
+		ga.SetColors([]color.Color{
+			colornames.White,
+		})
 		ga.SetStrokeWeight(10)
 		ga.HideStartEndPoint()
 		err := ga.Run()

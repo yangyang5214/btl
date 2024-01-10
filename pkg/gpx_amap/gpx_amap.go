@@ -90,6 +90,7 @@ func (g *GpxAmap) Screenshot() {
 }
 
 func (g *GpxAmap) SetImgPath(imgPath string) {
+	g.screenshot = true
 	g.imgPath = imgPath
 }
 

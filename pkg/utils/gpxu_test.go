@@ -114,3 +114,9 @@ func TestNewGpx(t *testing.T) {
 		panic(err)
 	}
 }
+
+func Test1111(t *testing.T) {
+	f, _ := gpx.ParseFile("/Users/beer/Downloads/HaiNan.gpx")
+	speedsDistances := f.MovingData().SpeedsDistances
+	t.Log(speedsDistances[0])
+}

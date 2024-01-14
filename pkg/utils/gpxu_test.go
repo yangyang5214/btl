@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/tkrajina/gpxgo/gpx"
 )
 
 func TestGetDate(t *testing.T) {

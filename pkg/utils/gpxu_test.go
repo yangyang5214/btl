@@ -119,4 +119,7 @@ func Test1111(t *testing.T) {
 	f, _ := gpx.ParseFile("/Users/beer/Downloads/HaiNan.gpx")
 	speedsDistances := f.MovingData().SpeedsDistances
 	t.Log(speedsDistances[0])
+	t.Log(f.MovingData().MaxSpeed * 60 * 60 / 1000.0)
+	t.Log(f.Tracks[0].MovingData().MaxSpeed * 60 * 60 / 1000.0)
+	t.Log(f.Tracks[0].Segments[0].MovingData().MaxSpeed * 60 * 60 / 1000.0)
 }

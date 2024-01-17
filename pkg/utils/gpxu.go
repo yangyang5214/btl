@@ -36,6 +36,9 @@ func ParseGpxData(files []string) ([]*gpx.GPX, error) {
 			log.Errorf("gpx parse file <%s> error: %v", p, err)
 			return nil, errors.WithStack(err)
 		}
+		if len(gpxData.Tracks) == 0 {
+			continue
+		}
 		results = append(results, gpxData)
 	}
 	return results, nil

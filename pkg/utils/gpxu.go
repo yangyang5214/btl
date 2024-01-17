@@ -39,6 +39,9 @@ func ParseGpxData(files []string) ([]*gpx.GPX, error) {
 		if len(gpxData.Tracks) == 0 {
 			continue
 		}
+		if gpxData.GetTrackPointsNo() == 0 {
+			continue
+		}
 		results = append(results, gpxData)
 	}
 	return results, nil

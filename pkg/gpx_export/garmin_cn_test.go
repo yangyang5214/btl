@@ -34,7 +34,8 @@ func TestRun(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	g := NewGarminCn("")
+	g := NewGarminCn()
 	t.Logf("username: <%v>, password: <%s>", username, password)
-	t.Log(g.Auth(username, password))
+	g.Init("/Users/beer/.gpx_export", "/tmp", username, password)
+	t.Log(g.Auth())
 }

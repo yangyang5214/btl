@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -29,7 +30,7 @@ var gpxExportCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ge := gpx_export.NewGpxExport(app, username, password)
 
-		absPath, err := filepath.Abs(outDir)
+		absPath, err := filepath.Abs(path.Join(outDir))
 		if err != nil {
 			panic(err)
 		}
@@ -39,7 +40,7 @@ var gpxExportCmd = &cobra.Command{
 				panic(err)
 			}
 		}
-		ge.SetExportDir(absPath)
+		ge.SetExportDir(path.Join(absPath, app))
 		err = ge.Run()
 		if err != nil {
 			log.Errorf("export gpx failed: %v", err)

@@ -67,6 +67,9 @@ func (k *KeepExporter) Run() error {
 }
 
 func (k *KeepExporter) Auth() bool {
+	if len(k.username) != 11 {
+		return false // 手机号
+	}
 	success, err := login(k.username, k.password)
 	if err != nil {
 		log.Errorf("login error: %v", err)

@@ -6,6 +6,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
@@ -112,21 +113,20 @@ func (g *GpxMerge) Run() error {
 
 func (g *GpxMerge) sortByDate(files []*gpx.GPX) ([]*gpx.GPX, error) {
 	dateMap := make(map[int64]*gpx.GPX)
+	keys := make([]int64, 0, len(dateMap))
 	for _, f := range files {
-		startTime := utils.GetStartTime(f)
+		startTime := f.TimeBounds().StartTime.UnixMilli()
+		keys = append(keys, startTime)
 		dateMap[startTime] = f
 	}
 
-	//get sorted files
-	keys := make([]int64, 0, len(dateMap))
-	for key := range dateMap {
-		keys = append(keys, key)
-	}
 	sort.Slice(keys, func(i, j int) bool {
 		return keys[i] < keys[j]
 	})
 	var result []*gpx.GPX
-	for _, k := range keys {
+	for index, k := range keys {
+		startTime := time.UnixMilli(k).Format("2006-01-02 15:04:05")
+		log.Infof("index %d, time: %s", index+1, startTime)
 		result = append(result, dateMap[k])
 	}
 	return result, nil

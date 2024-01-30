@@ -20,10 +20,6 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 )
 
-func GetStartTime(f *gpx.GPX) int64 {
-	return f.Tracks[0].Segments[0].Points[0].Timestamp.Unix()
-}
-
 func ParseGpxData(files []string) ([]*gpx.GPX, error) {
 	var results []*gpx.GPX
 	for _, f := range files {

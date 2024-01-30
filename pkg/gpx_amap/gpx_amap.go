@@ -58,6 +58,7 @@ func NewGpxAmap(style string) *GpxAmap {
 		markerStartEnd: true,
 		strokeWeight:   8,
 		screenshot:     false,
+		waitSeconds:    5,
 	}
 }
 

@@ -78,15 +78,15 @@ func (g *GpxMerge) Run() error {
 	}
 
 	log.Infof("merge gpx files count: %d", len(g.gpxDatas))
-	gpxDatas, err := g.sortByDate(g.gpxDatas)
+	err := g.sortByDate()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	firstGpx := gpxDatas[0]
+	firstGpx := g.gpxDatas[0]
 	points := firstGpx.Tracks[0].Segments[0].Points
-	for i := 1; i < len(gpxDatas); i++ {
-		points = append(points, gpxDatas[i].Tracks[0].Segments[0].Points...)
+	for i := 1; i < len(g.gpxDatas); i++ {
+		points = append(points, g.gpxDatas[i].Tracks[0].Segments[0].Points...)
 	}
 	firstGpx.Tracks[0].Segments[0].Points = points[1:]
 
@@ -111,10 +111,10 @@ func (g *GpxMerge) Run() error {
 	return nil
 }
 
-func (g *GpxMerge) sortByDate(files []*gpx.GPX) ([]*gpx.GPX, error) {
+func (g *GpxMerge) sortByDate() error {
 	dateMap := make(map[int64]*gpx.GPX)
 	keys := make([]int64, 0, len(dateMap))
-	for _, f := range files {
+	for _, f := range g.gpxDatas {
 		startTime := f.TimeBounds().StartTime.UnixMilli()
 		keys = append(keys, startTime)
 		dateMap[startTime] = f
@@ -129,5 +129,6 @@ func (g *GpxMerge) sortByDate(files []*gpx.GPX) ([]*gpx.GPX, error) {
 		log.Infof("index %d, time: %s", index+1, startTime)
 		result = append(result, dateMap[k])
 	}
-	return result, nil
+	g.gpxDatas = result
+	return nil
 }

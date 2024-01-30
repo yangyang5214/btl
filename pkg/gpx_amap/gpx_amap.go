@@ -151,8 +151,9 @@ func (g *GpxAmap) Run() error {
 
 func (g *GpxAmap) randomColor(index int) string {
 	relIndex := index % len(g.defaultColors)
-	r := pkg.ColorToHex(g.defaultColors[relIndex])
-	//log.Infof("index %d, use color %s", index, r)
+	usedColor := g.defaultColors[relIndex]
+	r := pkg.ColorToHex(usedColor)
+	log.Infof("index %d, use color %s", index, r)
 	return r
 }
 

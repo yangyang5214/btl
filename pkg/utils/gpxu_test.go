@@ -9,6 +9,11 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 )
 
+func TestFindGpxFiles(t *testing.T) {
+	r := FindGpxFiles("/Users/beer/beer/rides/shang_hai")
+	t.Log(r)
+}
+
 func TestGpxtract(t *testing.T) {
 	r, err := ParseGpxData([]string{
 		"/tmp/2/20191228_上午骑车.gpx",

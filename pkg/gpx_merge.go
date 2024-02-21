@@ -93,7 +93,7 @@ func (g *GpxMerge) Run() error {
 	firstGpx.Tracks[0].Segments[0].Points = points[1:]
 
 	date, err := firstGpx.ToXml(gpx.ToXmlParams{
-		Indent: false,
+		Indent: true,
 	})
 	if err != nil {
 		return err

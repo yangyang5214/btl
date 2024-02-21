@@ -78,12 +78,7 @@ func (g *GpxMerge) Run() error {
 		return fmt.Errorf("no gpx files found")
 	}
 
-	g.log.Infof("start sort gpx by date")
-	err := g.sortByDate()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	g.log.Infof("sort gpx by date end")
+	g.gpxDatas = utils.SortGpx(g.gpxDatas)
 
 	g.log.Infof("merge gpx files count: %d", len(g.gpxDatas))
 	if len(g.gpxDatas) == 0 {
@@ -98,7 +93,7 @@ func (g *GpxMerge) Run() error {
 	firstGpx.Tracks[0].Segments[0].Points = points[1:]
 
 	date, err := firstGpx.ToXml(gpx.ToXmlParams{
-		Indent: true, //相差不大
+		Indent: false,
 	})
 	if err != nil {
 		return err

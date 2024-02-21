@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	log2 "github.com/go-kratos/kratos/v2/log"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg/gpx_amap"
@@ -23,7 +24,7 @@ var gpxAmapCmd = &cobra.Command{
 		if len(files) == 0 {
 			files = utils.FindGpxFiles(".")
 		}
-		gamap := gpx_amap.NewGpxAmap(amapStyle)
+		gamap := gpx_amap.NewGpxAmap(amapStyle, log2.DefaultLogger)
 		gamap.SetFiles(files)
 		gamap.Screenshot()
 		err := gamap.Run()

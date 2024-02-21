@@ -2,15 +2,15 @@ package utils
 
 import (
 	"fmt"
+	"github.com/qichengzx/coordtransform"
 	. "image/color"
 	"math"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/qichengzx/coordtransform"
 
 	"github.com/yangyang5214/btl/pkg/model"
 
@@ -144,30 +144,39 @@ func (l LatLng) GCJ02String() string {
 }
 
 func GetPoints(gpxFiles []string) ([][]*LatLng, error) {
-	var result [][]*LatLng
+	var gpxs []*gpx.GPX
 	for _, gf := range gpxFiles {
 		gpxData, err := gpx.ParseFile(gf)
 		if err != nil {
 			return nil, err
 		}
-
-		var points []*LatLng
-		for _, track := range gpxData.Tracks {
-			for _, seg := range track.Segments {
-				for _, pt := range seg.Points {
-					points = append(points, &LatLng{
-						Lat: pt.GetLatitude(),
-						Lng: pt.GetLongitude(),
-					})
-				}
-			}
-		}
-		result = append(result, points)
+		gpxs = append(gpxs, gpxData)
 	}
-	return result, nil
+	return GetPointsFromGpx(gpxs)
 }
 
+func SortGpx(gpxs []*gpx.GPX) []*gpx.GPX {
+	dateMap := make(map[int64]*gpx.GPX)
+	keys := make([]int64, 0, len(dateMap))
+	for _, f := range gpxs {
+		startTime := f.TimeBounds().StartTime.UnixMilli()
+		keys = append(keys, startTime)
+		dateMap[startTime] = f
+	}
+
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+	var result []*gpx.GPX
+	for _, k := range keys {
+		result = append(result, dateMap[k])
+	}
+	return result
+}
+
+// GetPointsFromGpx 外部调用
 func GetPointsFromGpx(gpxs []*gpx.GPX) ([][]*LatLng, error) {
+	gpxs = SortGpx(gpxs)
 	var result [][]*LatLng
 	for _, gpxData := range gpxs {
 		var points []*LatLng

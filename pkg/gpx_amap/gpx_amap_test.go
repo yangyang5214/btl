@@ -1,6 +1,7 @@
 package gpx_amap
 
 import (
+	"github.com/go-kratos/kratos/v2/log"
 	"image/color"
 	"testing"
 
@@ -17,7 +18,7 @@ func Test1(t *testing.T) {
 	//styles := []string{"whitesmoke", "grey", "dark", "light", "fresh", "blue", "darkblue", "macaron"}
 	styles := []string{"8ee61a45840f14ac60f33a799fbd00d8"}
 	for _, style := range styles {
-		ga := NewGpxAmap(style)
+		ga := NewGpxAmap(style, log.DefaultLogger)
 		ga.SetFiles(files)
 		ga.SetColors([]color.Color{
 			colornames.Red,

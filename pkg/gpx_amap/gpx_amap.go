@@ -2,12 +2,12 @@ package gpx_amap
 
 import (
 	"fmt"
+	"github.com/go-kratos/kratos/v2/log"
 	"image/color"
 	"os"
 	"strings"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/model"
 	"github.com/yangyang5214/btl/pkg/utils"
@@ -34,6 +34,8 @@ type GpxAmap struct {
 	strokeWeight   int
 
 	screenshot bool
+
+	log *log.Helper
 }
 
 type TemplateAmap struct {
@@ -41,7 +43,7 @@ type TemplateAmap struct {
 	Center utils.LatLng
 }
 
-func NewGpxAmap(style string) *GpxAmap {
+func NewGpxAmap(style string, logger log.Logger) *GpxAmap {
 	return &GpxAmap{
 		defaultColors: []color.Color{
 			colornames.Red,
@@ -59,6 +61,7 @@ func NewGpxAmap(style string) *GpxAmap {
 		strokeWeight:   8,
 		screenshot:     false,
 		waitSeconds:    5,
+		log:            log.NewHelper(logger),
 	}
 }
 
@@ -106,7 +109,7 @@ func (g *GpxAmap) SetMapStyle(style string) {
 func (g *GpxAmap) Run() error {
 	if len(g.files) != 0 {
 		for _, filename := range g.files {
-			log.Infof("gpx file is %s", filename)
+			g.log.Infof("gpx file is %s", filename)
 		}
 
 		if g.amapKey == nil {
@@ -125,7 +128,7 @@ func (g *GpxAmap) Run() error {
 
 	g.center = g.getCenter()
 
-	log.Info("start gen index.html")
+	g.log.Info("start gen index.html")
 
 	var sb strings.Builder
 	sb.WriteString(g.start())
@@ -141,10 +144,14 @@ func (g *GpxAmap) Run() error {
 	}
 
 	if g.screenshot {
-		log.Info("start screenshot")
+		g.log.Info("start screenshot")
 		shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath)
 		shot.SetWaitSeconds(g.waitSeconds)
-		return shot.Run()
+		err = shot.Run()
+		if err != nil {
+			return err
+		}
+		g.log.Infof("screenshot success")
 	}
 	return nil
 }
@@ -153,7 +160,7 @@ func (g *GpxAmap) randomColor(index int) string {
 	relIndex := index % len(g.defaultColors)
 	usedColor := g.defaultColors[relIndex]
 	r := pkg.ColorToHex(usedColor)
-	log.Infof("index %d, use color %s", index, r)
+	g.log.Infof("index %d, use color %s", index, r)
 	return r
 }
 

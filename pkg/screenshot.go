@@ -68,5 +68,5 @@ func (s *Screenshot) Run() error {
 	); err != nil {
 		return err
 	}
-	return nil
+	return chromedp.Cancel(ctx)
 }

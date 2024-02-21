@@ -8,23 +8,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/utils"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type GpxMerge struct {
 	currentDir string
 	gpxDatas   []*gpx.GPX
 	resultPath string
+	log        *log.Helper
 }
 
-func NewGpxMerge(workDir string) *GpxMerge {
+func NewGpxMerge(workDir string, logger log.Logger) *GpxMerge {
 	return &GpxMerge{
 		currentDir: workDir,
 		resultPath: path.Join(workDir, "result.gpx"),
+		log:        log.NewHelper(logger),
 	}
 }
 
@@ -48,13 +49,13 @@ func (g *GpxMerge) loadGpxData() error {
 			continue
 		}
 		if strings.HasSuffix(dir.Name(), ".gpx") {
-			log.Infof("find gpx file %s", dir.Name())
+			g.log.Infof("find gpx file %s", dir.Name())
 			gpxFiles = append(gpxFiles, path.Join(g.currentDir, dir.Name()))
 		}
 	}
 
 	if len(gpxFiles) == 0 {
-		log.Info("not find gpx files in current directory")
+		g.log.Info("not find gpx files in current directory")
 		return nil
 	}
 	gpxDatas, err := utils.ParseGpxData(gpxFiles)
@@ -77,10 +78,16 @@ func (g *GpxMerge) Run() error {
 		return fmt.Errorf("no gpx files found")
 	}
 
-	log.Infof("merge gpx files count: %d", len(g.gpxDatas))
+	g.log.Infof("start sort gpx by date")
 	err := g.sortByDate()
 	if err != nil {
 		return errors.WithStack(err)
+	}
+	g.log.Infof("sort gpx by date end")
+
+	g.log.Infof("merge gpx files count: %d", len(g.gpxDatas))
+	if len(g.gpxDatas) == 0 {
+		return errors.New("gpx files is zero")
 	}
 
 	firstGpx := g.gpxDatas[0]
@@ -97,7 +104,7 @@ func (g *GpxMerge) Run() error {
 		return err
 	}
 
-	log.Infof("save gpx result to: %s", g.resultPath)
+	g.log.Infof("save gpx result to: %s", g.resultPath)
 
 	resultFile, err := os.Create(g.resultPath)
 	defer resultFile.Close()
@@ -126,7 +133,7 @@ func (g *GpxMerge) sortByDate() error {
 	var result []*gpx.GPX
 	for index, k := range keys {
 		startTime := time.UnixMilli(k).Format("2006-01-02 15:04:05")
-		log.Infof("index %d, time: %s", index+1, startTime)
+		g.log.Infof("index %d, time: %s", index+1, startTime)
 		result = append(result, dateMap[k])
 	}
 	g.gpxDatas = result

@@ -6,6 +6,7 @@ package cmd
 import (
 	"os"
 
+	log2 "github.com/go-kratos/kratos/v2/log"
 	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
 
@@ -21,7 +22,7 @@ var garminGpxCmd = &cobra.Command{
 		log.Info("garminGpx cmd called")
 
 		pwd, _ := os.Getwd()
-		gpx := pkg.NewGpxMerge(pwd)
+		gpx := pkg.NewGpxMerge(pwd, log2.DefaultLogger)
 		err := gpx.Run()
 		if err != nil {
 			log.Fatalf("error running garmin gpx: %v", err)

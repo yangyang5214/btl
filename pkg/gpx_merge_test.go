@@ -4,11 +4,13 @@ import (
 	"os"
 	"testing"
 
+	"github.com/go-kratos/kratos/v2/log"
+
 	"github.com/tkrajina/gpxgo/gpx"
 )
 
 func TestMerge(t *testing.T) {
-	g := NewGpxMerge("/tmp/test")
+	g := NewGpxMerge("/tmp/test", log.DefaultLogger)
 	err := g.Run()
 	if err != nil {
 		t.Fatal(err)
@@ -28,7 +30,7 @@ func TestSetGpxDatas(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	g := NewGpxMerge("")
+	g := NewGpxMerge("", log.DefaultLogger)
 
 	gpxData, err := gpx.ParseBytes(bytes)
 	if err != nil {

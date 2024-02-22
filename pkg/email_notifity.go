@@ -3,6 +3,7 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 
@@ -65,7 +66,12 @@ func LoadConfigFromEnv() (*EmailConfig, error) {
 	return &config, nil
 }
 
-func (e *EmailNotify) Send(to []string, content *EmailContent) error {
+func (e *EmailNotify) Send(to []string, content *EmailContent) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %+v", r)
+		}
+	}()
 	e.gm.SetHeader("From", e.config.From)
 	e.gm.SetHeader("To", to...)
 	e.gm.SetHeader("Subject", content.Subject)

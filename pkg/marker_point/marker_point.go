@@ -107,7 +107,7 @@ func (m *MarkerPoint) addRange(point *LngLat, index int) string {
 	return fmt.Sprintf(`
 var circle%d = new AMap.Circle({
         center: [%f,%f],
-        radius: 1000,
+        radius: 500,
         borderWeight: 3,
         strokeColor: "#FF33FF", 
         strokeOpacity: 0,

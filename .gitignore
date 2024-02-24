@@ -6,4 +6,4 @@ pkg/gpx_amap/index.html
 py/garmin_export_out
 **/__pycache__
 garmin_export_out
-marker_point.html
+marker_point*

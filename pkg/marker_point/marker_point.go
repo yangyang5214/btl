@@ -10,8 +10,9 @@ import (
 )
 
 type MarkerPoint struct {
-	input string
-	log   *log.Helper
+	input     string
+	log       *log.Helper
+	showRange bool
 }
 
 type LngLat struct {
@@ -19,10 +20,11 @@ type LngLat struct {
 	Lat float64
 }
 
-func NewMarkerPoint(input string) *MarkerPoint {
+func NewMarkerPoint(input string, showRange bool) *MarkerPoint {
 	return &MarkerPoint{
-		input: input,
-		log:   log.NewHelper(log.DefaultLogger),
+		input:     input,
+		showRange: showRange,
+		log:       log.NewHelper(log.DefaultLogger),
 	}
 }
 
@@ -44,12 +46,14 @@ func (m *MarkerPoint) Run() error {
 	var sb strings.Builder
 	sb.WriteString(m.start())
 	for i, point := range points {
-		mp := m.formatPointMarker(point, i)
-		sb.WriteString(mp)
+		sb.WriteString(m.formatPointMarker(point, i))
+		if m.showRange {
+			sb.WriteString(m.addRange(point, i))
+		}
 	}
 	sb.WriteString(m.end())
 
-	outFile, err := os.Create("marker_point.html")
+	outFile, err := os.Create(fmt.Sprintf("marker_point_show_range_%v.html", m.showRange))
 	if err != nil {
 		return err
 	}
@@ -97,6 +101,25 @@ func (m *MarkerPoint) start() string {
         zoom: 13
     });
 `
+}
+
+func (m *MarkerPoint) addRange(point *LngLat, index int) string {
+	return fmt.Sprintf(`
+var circle%d = new AMap.Circle({
+        center: [%f,%f],
+        radius: 1000,
+        borderWeight: 3,
+        strokeColor: "#FF33FF", 
+        strokeOpacity: 0,
+        strokeWeight: 6,
+        fillOpacity: 0.4,
+        strokeStyle: 'dashed',
+        strokeDasharray: [10, 10], 
+        fillColor: '#1791fc',
+        zIndex: 50,
+    })
+    circle%d.setMap(map)
+`, index, point.Lng, point.Lat, index)
 }
 
 func (m *MarkerPoint) formatPointMarker(point *LngLat, index int) string {

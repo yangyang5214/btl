@@ -1,9 +1,10 @@
 package gpx_amap
 
 import (
-	"github.com/go-kratos/kratos/v2/log"
 	"image/color"
 	"testing"
+
+	"github.com/go-kratos/kratos/v2/log"
 
 	"golang.org/x/image/colornames"
 

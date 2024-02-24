@@ -2,10 +2,11 @@ package gpx_amap
 
 import (
 	"fmt"
-	"github.com/go-kratos/kratos/v2/log"
 	"image/color"
 	"os"
 	"strings"
+
+	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/pkg/errors"
 	"github.com/yangyang5214/btl/pkg"

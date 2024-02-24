@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>默认点标记</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <style>
+        html,
+        body,
+        #container {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+<div id="container"></div>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=d681abe16c6b76a8da6d2762ad881134"></script>
+<script type="text/javascript">
+    var marker, map = new AMap.Map("container", {
+        resizeEnable: true,
+        zoom: 13
+    });
+
+    marker = new AMap.Marker({
+        position: [116.406315, 39.908775],
+    });
+    marker.setMap(map);
+</script>
+</body>
+</html>

@@ -16,8 +16,9 @@ type MarkerPoint struct {
 }
 
 type LngLat struct {
-	Lng float64
-	Lat float64
+	Lng  float64
+	Lat  float64
+	Icon string
 }
 
 func NewMarkerPoint(input string, showRange bool) *MarkerPoint {
@@ -37,8 +38,9 @@ func (m *MarkerPoint) Run() error {
 	jsonResult := gjson.Parse(string(datas))
 	for _, jsonItem := range jsonResult.Array() {
 		points = append(points, &LngLat{
-			Lng: jsonItem.Get("Longitude").Float(),
-			Lat: jsonItem.Get("Latitude").Float(),
+			Lng:  jsonItem.Get("Longitude").Float(),
+			Lat:  jsonItem.Get("Latitude").Float(),
+			Icon: jsonItem.Get("Icon").Str,
 		})
 	}
 	m.log.Infof("all points is %d", len(points))
@@ -51,6 +53,8 @@ func (m *MarkerPoint) Run() error {
 			sb.WriteString(m.addRange(point, i))
 		}
 	}
+
+	sb.WriteString(m.setFitView(points))
 	sb.WriteString(m.end())
 
 	outFile, err := os.Create(fmt.Sprintf("marker_point_show_range_%v.html", m.showRange))
@@ -62,14 +66,39 @@ func (m *MarkerPoint) Run() error {
 	return nil
 }
 
+func (m *MarkerPoint) setFitView(points []*LngLat) string {
+	step := len(points) / 10
+	if step < 10 {
+		step = 1
+	}
+	var positions strings.Builder
+	for i := 0; i < len(points); i += step {
+		positions.WriteString(fmt.Sprintf("[%f,%f],", points[i].Lng, points[i].Lat))
+	}
+	return fmt.Sprintf(`
+		var positions = [
+			%s
+		]
+		var polygon = new AMap.Polygon({
+			path: positions,
+			map: map,
+			strokeOpacity: 0,
+			fillOpacity: 0,
+			bubble: true
+		});
+		var overlaysList = map.getAllOverlays('polygon');
+		map.setFitView(overlaysList);
+	`, positions.String())
+}
+
 func (m *MarkerPoint) end() string {
 	return `
-</script>
-</body>
-</html>
-`
-
+		</script>
+		</body>
+		</html>
+		`
 }
+
 func (m *MarkerPoint) start() string {
 	return `
 <!doctype html>
@@ -123,10 +152,19 @@ var circle%d = new AMap.Circle({
 }
 
 func (m *MarkerPoint) formatPointMarker(point *LngLat, index int) string {
+	icon := point.Icon
+	if icon == "" {
+		icon = "https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png"
+	}
 	return fmt.Sprintf(`
     marker%d = new AMap.Marker({
         position: [%f, %f],
+		icon: new AMap.Icon({
+			 image: "%s",
+			 size: new AMap.Size(22, 28),  //图标所处区域大小
+			 imageSize: new AMap.Size(22,28) //图标大小
+		})	
     });
     marker%d.setMap(map);
-`, index, point.Lng, point.Lat, index)
+`, index, point.Lng, point.Lat, icon, index)
 }

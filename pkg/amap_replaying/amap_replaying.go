@@ -11,12 +11,13 @@ import (
 type AmapReplaying struct {
 	gpxData *gpx.GPX
 	log     *log.Helper
+	points  []gpx.GPXPoint
 }
 
-func NewAmapReplaying(gpxData *gpx.GPX) *AmapReplaying {
+func NewAmapReplaying(gpxData *gpx.GPX, logger log.Logger) *AmapReplaying {
 	return &AmapReplaying{
 		gpxData: gpxData,
-		log:     log.NewHelper(log.DefaultLogger),
+		log:     log.NewHelper(logger),
 	}
 }
 
@@ -40,17 +41,12 @@ func (r *AmapReplaying) Run() error {
 func (r *AmapReplaying) addPoints() string {
 	var sb strings.Builder
 	sb.WriteString("var  lineArr = [\n")
-
-	var length int
-	for _, track := range r.gpxData.Tracks {
-		for _, segment := range track.Segments {
-			for i := 0; i < len(segment.Points); i += 30 {
-				point := segment.Points[i]
-				sb.WriteString(fmt.Sprintf("[%f,%f],\n", point.Point.Longitude, point.Point.Latitude))
-			}
-			length = length + len(segment.Points)
-		}
+	points := r.gpxData.Tracks[0].Segments[0].Points
+	for i := 0; i < len(points); i += 50 {
+		point := points[i]
+		sb.WriteString(fmt.Sprintf("[%f,%f],\n", point.Point.Longitude, point.Point.Latitude))
 	}
+	r.points = points
 	sb.WriteString("]")
 	return sb.String()
 }
@@ -85,11 +81,12 @@ func (r *AmapReplaying) start() string {
 }
 
 func (r *AmapReplaying) moveAnimation(milliSeconds int) string {
-	return fmt.Sprintf(`
+	var sb strings.Builder
+	moveAnimation := fmt.Sprintf(`
     AMap.plugin('AMap.MoveAnimation', function () {
         var map = new AMap.Map("container", {
             resizeEnable: true,
-            zoom: 17
+            zoom: 6
         });
 
 
@@ -109,14 +106,15 @@ func (r *AmapReplaying) moveAnimation(milliSeconds int) string {
             map: map,
             path: lineArr,
             showDir: true,
-            strokeColor: "#3366FF",  //线颜色
-            strokeWeight: 3,      //线宽
+            strokeColor: "#000000",  //线颜色
+            strokeWeight: 8,      //线宽
         });
 
         var passedPolyline = new AMap.Polyline({
             map: map,
-            strokeColor: "#FF0000",  //线颜色
-            strokeWeight: 3,      //线宽
+			showDir: true,
+            strokeColor: "#ff0000",  //线颜色
+            strokeWeight: 8,      //线宽
         });
 
 
@@ -134,13 +132,55 @@ func (r *AmapReplaying) moveAnimation(milliSeconds int) string {
                 autoRotation: true,
             });
         };
-    });
 `, milliSeconds)
+
+	sb.WriteString(moveAnimation)
+	sb.WriteString(r.startEndMarker(r.points[0], r.points[len(r.points)-1]))
+	sb.WriteString("\n    	});\n")
+	return sb.String()
 }
+
 func (r *AmapReplaying) end() string {
 	return `
 </script>
 </body>
 </html>
 `
+}
+
+func (g *AmapReplaying) startEndMarker(start, end gpx.GPXPoint) string {
+	var sb strings.Builder
+	sb.WriteString(`
+    var startIcon = new AMap.Icon({
+        size: new AMap.Size(25, 34),
+        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+        imageSize: new AMap.Size(135, 40),
+        imageOffset: new AMap.Pixel(-9, -3)
+    });
+
+    var endIcon = new AMap.Icon({
+        size: new AMap.Size(25, 34),
+        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+        imageSize: new AMap.Size(135, 40),
+        imageOffset: new AMap.Pixel(-95, -3)
+    });
+`)
+
+	sb.WriteString(fmt.Sprintf(`
+    var startMarker = new AMap.Marker({
+        position: [%f,%f],
+        icon: startIcon,
+        offset: new AMap.Pixel(-13, -30)
+    });
+`, start.Longitude, start.Latitude))
+
+	sb.WriteString(fmt.Sprintf(`
+    var endMarker = new AMap.Marker({
+        position: [%f,%f],
+        icon: endIcon,
+        offset: new AMap.Pixel(-13, -30)
+    });
+`, end.Longitude, end.Latitude))
+	sb.WriteString(`map.add([startMarker, endMarker]);`)
+	return sb.String()
 }

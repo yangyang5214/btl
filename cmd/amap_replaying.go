@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/amap_replaying"
@@ -16,7 +17,7 @@ var amapReplayingCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		ar := amap_replaying.NewAmapReplaying(gpxData)
+		ar := amap_replaying.NewAmapReplaying(gpxData, log.DefaultLogger)
 		err = ar.Run()
 		if err != nil {
 			panic(err)

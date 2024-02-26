@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>轨迹回放</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=04625a30c4c1d00ab371618a37bcc59f"></script>
+<script>
+    window.onload = function () {
+        setTimeout(function () {
+            startAnimation();
+        }, 5000);
+    }
+
+    var  lineArr = [[116.478935, 39.997761], [116.478939, 39.997825], [116.478912, 39.998549], [116.478912, 39.998549], [116.478998, 39.998555], [116.478998, 39.998555], [116.479282, 39.99856], [116.479658, 39.998528], [116.480151, 39.998453], [116.480784, 39.998302], [116.480784, 39.998302], [116.481149, 39.998184], [116.481573, 39.997997], [116.481863, 39.997846], [116.482072, 39.997718], [116.482362, 39.997718], [116.483633, 39.998935], [116.48367, 39.998968], [116.484648, 39.999861]];
+
+    AMap.plugin('AMap.MoveAnimation', function () {
+        var map = new AMap.Map("container", {
+            resizeEnable: true,
+            zoom: 17
+        });
+
+
+        var marker = new AMap.Marker({
+            map: map,
+            position: lineArr[0],
+            icon: new AMap.Icon({
+                image: "https://merge-gpx-public-1256523277.cos.ap-guangzhou.myqcloud.com/icons/biker.png",
+                size: new AMap.Size(22, 22),  //图标所处区域大小
+                imageSize: new AMap.Size(22,22) //图标大小
+            }),
+            offset: new AMap.Pixel(-13, -26),
+        });
+
+        // 绘制轨迹
+        var polyline = new AMap.Polyline({
+            map: map,
+            path: lineArr,
+            showDir: true,
+            strokeColor: "#3366FF",  //线颜色
+            strokeWeight: 6,      //线宽
+        });
+
+        var passedPolyline = new AMap.Polyline({
+            map: map,
+            strokeColor: "#FF0000",  //线颜色
+            strokeWeight: 6,      //线宽
+        });
+
+
+        marker.on('moving', function (e) {
+            passedPolyline.setPath(e.passedPath);
+            map.setCenter(e.target.getPosition(), true)
+        });
+
+        map.setFitView();
+
+
+        window.startAnimation = function startAnimation() {
+            marker.moveAlong(lineArr, {
+                duration: 1200, //todo 计算
+                autoRotation: true,
+            });
+        };
+    });
+</script>
+</body>
+</html>

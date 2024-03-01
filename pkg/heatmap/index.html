@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <script>
+        window._AMapSecurityConfig = {
+            securityJsCode: 'a384e97096fafd0e65dd8db52a8de562',
+        };
+    </script>
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=04625a30c4c1d00ab371618a37bcc59f"></script>
+    <script src="https://webapi.amap.com/ui/1.1/main.js?v=1.1.2"></script>
+</head>
+
+<body>
+<div id="container"></div>
+<script>
+    var map = new AMap.Map('container', {
+        zoom: 8
+    });
+
+    //加载PathSimplifier，loadUI的路径参数为模块名中 'ui/' 之后的部分
+    AMapUI.load(['ui/misc/PathSimplifier'], function (PathSimplifier) {
+        if (!PathSimplifier.supportCanvas) {
+            alert('当前环境不支持 Canvas！');
+            return;
+        }
+        //启动页面
+        initPage(PathSimplifier);
+    });
+
+    function initPage(PathSimplifier) {
+        //创建组件实例
+        var pathSimplifierIns = new PathSimplifier({
+            zIndex: 100,
+            map: map, //所属的地图实例
+            getPath: function (pathData, pathIndex) {
+                //返回轨迹数据中的节点坐标信息，[AMap.LngLat, AMap.LngLat...] 或者 [[lng|number,lat|number],...]
+                return pathData.path;
+            },
+            getHoverTitle: function (pathData, pathIndex, pointIndex) {
+                //返回鼠标悬停时显示的信息
+                if (pointIndex >= 0) {
+                    //鼠标悬停在某个轨迹节点上
+                    return pathData.name + '，点:' + pointIndex + '/' + pathData.path.length;
+                }
+                //鼠标悬停在节点之间的连线上
+                return pathData.name + '，点数量' + pathData.path.length;
+            },
+            renderOptions: {
+                pathLineStyle: {
+                    strokeStyle: 'red',
+                    lineWidth: 1,
+                    dirArrowStyle: true
+                }
+            }
+        });
+
+        //这里构建两条简单的轨迹，仅作示例
+        pathSimplifierIns.setData([
+            {
+                name: '轨迹0',
+                path: [
+                    [100.340417, 27.376994],
+                    [108.426354, 37.827452],
+                    [113.392174, 31.208439],
+                    [124.905846, 42.232876]
+                ]
+            },
+            {
+                name: '大地线',
+                path: PathSimplifier.getGeodesicPath([116.405289, 39.904987], [87.61792, 43.793308], 500)
+            }
+        ]);
+    }
+</script>
+</body>
+</html>

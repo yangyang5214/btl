@@ -26,7 +26,7 @@
 <div id="container"></div>
 <script>
     var map = new AMap.Map('container', {
-        zoom: 8
+        resizeEnable: true
     });
 
     //加载PathSimplifier，loadUI的路径参数为模块名中 'ui/' 之后的部分
@@ -60,9 +60,17 @@
             renderOptions: {
                 pathLineStyle: {
                     strokeStyle: 'red',
-                    lineWidth: 1,
+                    lineWidth: 6,
                     dirArrowStyle: true
-                }
+                },
+                startPointStyle: {
+                    radius: 0,
+                    lineWidth: 0,
+                },
+                endPointStyle: {
+                    radius: 0,
+                    lineWidth: 0,
+                },
             }
         });
 

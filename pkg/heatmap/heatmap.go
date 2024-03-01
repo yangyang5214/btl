@@ -2,10 +2,11 @@ package heatmap
 
 import (
 	"fmt"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/tidwall/gjson"
 	"os"
 	"strings"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tidwall/gjson"
 )
 
 type HeatMap struct {
@@ -57,8 +58,8 @@ func (h *HeatMap) start() string {
 func (h *HeatMap) lines() string {
 	var sb strings.Builder
 	sb.WriteString(`
- var map = new AMap.Map('container', {
-        zoom: 8
+    var map = new AMap.Map('container', {
+        resizeEnable: true
     });
 
     //加载PathSimplifier，loadUI的路径参数为模块名中 'ui/' 之后的部分
@@ -92,8 +93,16 @@ func (h *HeatMap) lines() string {
             renderOptions: {
                 pathLineStyle: {
                     strokeStyle: 'red',
-                    lineWidth: 1,
+                    lineWidth: 5,
                     dirArrowStyle: true
+                },
+				startPointStyle: {
+                    radius: 0,
+                    lineWidth: 0,
+                },
+                endPointStyle: {
+                    radius: 0,
+                    lineWidth: 0,
                 }
             }
         });
@@ -117,8 +126,6 @@ pathSimplifierIns.setData([
 	if err != nil {
 		panic(err)
 	}
-
-	ids = ids[:5]
 
 	h.log.Infof("all line size %d", len(ids))
 	for _, id := range ids {

@@ -2,10 +2,11 @@ package amap_replaying
 
 import (
 	"fmt"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"strings"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tkrajina/gpxgo/gpx"
 )
 
 type AmapReplaying struct {

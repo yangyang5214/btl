@@ -2,10 +2,11 @@ package heatmap
 
 import (
 	"encoding/json"
-	"github.com/tidwall/gjson"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 type MergeGpx struct {

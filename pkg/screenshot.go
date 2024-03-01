@@ -59,7 +59,9 @@ func (s *Screenshot) Run() error {
 		}),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			time.Sleep(s.waitSeconds)
-			buf, err := page.CaptureScreenshot().Do(ctx)
+			cs := page.CaptureScreenshot()
+			cs.Quality = 100
+			buf, err := cs.Do(ctx)
 			if err != nil {
 				return err
 			}

@@ -30,5 +30,4 @@ var gpxFile string
 func init() {
 	rootCmd.AddCommand(amapReplayingCmd)
 	amapReplayingCmd.Flags().StringVarP(&gpxFile, "gpx_file", "f", "", "a gpx file")
-
 }

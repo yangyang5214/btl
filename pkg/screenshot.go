@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 	time "time"
@@ -35,7 +36,7 @@ func (s *Screenshot) Run() error {
 
 	html, err := os.ReadFile(s.htmlPath)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
@@ -49,11 +50,11 @@ func (s *Screenshot) Run() error {
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			frameTree, err := page.GetFrameTree().Do(ctx)
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 
 			if err := page.SetDocumentContent(frameTree.Frame.ID, string(html)).Do(ctx); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			return nil
 		}),
@@ -63,12 +64,12 @@ func (s *Screenshot) Run() error {
 			cs.Quality = 100
 			buf, err := cs.Do(ctx)
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			return os.WriteFile(s.imgPath, buf, 0644)
 		}),
 	); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return chromedp.Cancel(ctx)
 }

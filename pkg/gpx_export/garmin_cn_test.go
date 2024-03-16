@@ -5,6 +5,8 @@ import (
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 var (
@@ -26,7 +28,7 @@ func init() {
 }
 
 func TestRun(t *testing.T) {
-	g := NewGpxExport(GarminCN, username, password)
+	g := NewGpxExport(log.DefaultLogger, GarminCN, username, password)
 	err := g.Run()
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +36,7 @@ func TestRun(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	g := NewGarminCn()
+	g := NewGarminCn(log.DefaultLogger)
 	t.Logf("username: <%v>, password: <%s>", username, password)
 	g.Init("/Users/beer/.gpx_export", "/tmp", username, password)
 	t.Log(g.Auth())

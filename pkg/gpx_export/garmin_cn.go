@@ -5,8 +5,9 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/go-kratos/kratos/v2/log"
+
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type GarminCn struct {
@@ -15,10 +16,13 @@ type GarminCn struct {
 	username  string
 	password  string
 	exportDir string
+	log       *log.Helper
 }
 
-func NewGarminCn() *GarminCn {
-	return &GarminCn{}
+func NewGarminCn(logger log.Logger) *GarminCn {
+	return &GarminCn{
+		log: log.NewHelper(log.With(logger, "garmin_cn")),
+	}
 }
 
 func (g *GarminCn) Init(gitDir string, exportDir string, username, password string) {
@@ -31,30 +35,30 @@ func (g *GarminCn) Init(gitDir string, exportDir string, username, password stri
 func (g *GarminCn) Auth() bool {
 	cmdStr := fmt.Sprintf("python3 %s/garmin_secret.py -u '%s' -p '%s' --cn", g.gitDir, g.username, g.password)
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
-	log.Infof("satrt run cmd: %s", cmdStr)
+	g.log.Infof("start run cmd: %s", cmdStr)
 
 	out, err := cmd.Output()
 	if err != nil {
-		log.Errorf("run cmd: %s", err)
+		g.log.Errorf("run cmd: %s", err)
 		return false
 	}
-	log.Infof("run garmin_secret out: %s", out)
+	g.log.Infof("run garmin_secret out: %s", out)
 	return strings.Contains(string(out), "success")
 }
 
 func (g *GarminCn) Run() error {
 	cmdStr := fmt.Sprintf("python3 %s/garmin_export.py --is-cn -u '%s' -p '%s' --out %s", g.gitDir, g.username, g.password, g.exportDir)
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
-	log.Infof("satrt run cmd: %s", cmdStr)
+	g.log.Infof("satrt run cmd: %s", cmdStr)
 
 	garminExportOut, err := cmd.Output()
 	if err != nil {
-		log.Infof("run cmd: %s", err)
+		g.log.Infof("run cmd: %s", err)
 		return err
 	}
 	result := string(garminExportOut)
 	result = strings.Trim(result, "")
-	log.Infof("run garmin_export result:\n %s", result)
+	g.log.Infof("run garmin_export result:\n %s", result)
 	if strings.HasSuffix(result, "seconds") {
 		return errors.New(result)
 	}

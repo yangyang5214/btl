@@ -1,15 +1,12 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
+	"github.com/go-kratos/kratos/v2/log"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/gpx_export"
@@ -28,7 +25,7 @@ var gpxExportCmd = &cobra.Command{
 	Short: "export gpx from apps",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ge := gpx_export.NewGpxExport(app, username, password)
+		ge := gpx_export.NewGpxExport(log.DefaultLogger, app, username, password)
 
 		absPath, err := filepath.Abs(path.Join(outDir))
 		if err != nil {
@@ -43,8 +40,7 @@ var gpxExportCmd = &cobra.Command{
 		ge.SetExportDir(path.Join(absPath, app))
 		err = ge.Run()
 		if err != nil {
-			log.Errorf("export gpx failed: %v", err)
-			return
+			panic(err)
 		}
 	},
 }

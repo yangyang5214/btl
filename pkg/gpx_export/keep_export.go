@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
+	"path"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type KeepExporter struct {
@@ -17,6 +19,7 @@ type KeepExporter struct {
 
 	username string
 	password string
+	log      *log.Helper
 }
 
 const (
@@ -40,8 +43,10 @@ func login(mobile string, password string) (bool, error) {
 	return resp.StatusCode == http.StatusOK, nil
 }
 
-func NewKeep() *KeepExporter {
-	return &KeepExporter{}
+func NewKeep(logger log.Logger) *KeepExporter {
+	return &KeepExporter{
+		log: log.NewHelper(log.With(logger, "keep")),
+	}
 }
 
 func (k *KeepExporter) Init(gitDir, exportDir string, username, password string) {
@@ -54,16 +59,31 @@ func (k *KeepExporter) Init(gitDir, exportDir string, username, password string)
 func (k *KeepExporter) Run() error {
 	cmdStr := fmt.Sprintf("python3 %s/keep_export.py %s %s --out %s", k.gitDir, k.username, k.password, k.exportDir)
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
-	log.Infof("satrt run cmd: %s", cmdStr)
+	k.log.Infof("start run cmd: %s", cmdStr)
 
 	runtimeLog, err := cmd.Output()
 	if err != nil {
-		log.Infof("run cmd: %s", err)
+		k.log.Infof("run cmd: %s", err)
 		return err
 	}
 	result := string(runtimeLog)
 	result = strings.Trim(result, "")
-	log.Infof("run keep result:\n %s", result)
+	k.log.Infof("run keep result:\n %s", result)
+
+	cyclingDir := path.Join(k.exportDir, "cycling")
+	_ = os.MkdirAll(cyclingDir, 0755)
+	cmdStr = fmt.Sprintf("python3 %s/keep_export_cycling.py %s %s --out %s", k.gitDir, k.username, k.password, cyclingDir)
+	cmd = exec.Command("/bin/bash", "-c", cmdStr)
+	k.log.Infof("start run cmd: %s", cmdStr)
+
+	runtimeLog, err = cmd.Output()
+	if err != nil {
+		k.log.Infof("run cmd: %s", err)
+		return err
+	}
+	result = string(runtimeLog)
+	result = strings.Trim(result, "")
+	k.log.Infof("run keep result:\n %s", result)
 	return nil
 }
 
@@ -73,7 +93,7 @@ func (k *KeepExporter) Auth() bool {
 	}
 	success, err := login(k.username, k.password)
 	if err != nil {
-		log.Errorf("login error: %v", err)
+		k.log.Errorf("login error: %v", err)
 		return false
 	}
 	return success

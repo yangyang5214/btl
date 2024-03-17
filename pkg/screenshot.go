@@ -15,6 +15,7 @@ type Screenshot struct {
 	imgPath     string
 	htmlPath    string
 	waitSeconds time.Duration
+	ctx         context.Context
 }
 
 func NewScreenshot(imgPath, htmlPath string) *Screenshot {
@@ -22,6 +23,7 @@ func NewScreenshot(imgPath, htmlPath string) *Screenshot {
 		imgPath:     imgPath,
 		htmlPath:    htmlPath,
 		waitSeconds: 5 * time.Second,
+		ctx:         context.Background(),
 	}
 }
 
@@ -31,6 +33,9 @@ func (s *Screenshot) SetWaitSeconds(wait int32) {
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
 func (s *Screenshot) Run() error {
+	ctx, cancel := context.WithTimeout(s.ctx, time.Second*60)
+	defer cancel()
+
 	dir := filepath.Dir(s.imgPath)
 	_ = os.MkdirAll(dir, os.ModePerm)
 
@@ -38,10 +43,9 @@ func (s *Screenshot) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	ctx, cancel := chromedp.NewContext(context.Background())
+	chromeCtx, cancel := chromedp.NewContext(ctx)
 	defer cancel()
-
-	if err = chromedp.Run(ctx,
+	if err = chromedp.Run(chromeCtx,
 		// the navigation will trigger the "page.EventLoadEventFired" event too,
 		// so we should add the listener after the navigation.
 		chromedp.Navigate("about:blank"),
@@ -71,5 +75,5 @@ func (s *Screenshot) Run() error {
 	); err != nil {
 		return errors.WithStack(err)
 	}
-	return chromedp.Cancel(ctx)
+	return chromedp.Cancel(chromeCtx)
 }

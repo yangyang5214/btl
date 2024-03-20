@@ -1,19 +1,23 @@
 package pkg
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"github.com/antchfx/htmlquery"
-	"github.com/chromedp/cdproto/dom"
-	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/chromedp"
-	"github.com/go-kratos/kratos/v2/log"
+	"image/jpeg"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/antchfx/htmlquery"
+	"github.com/chromedp/cdproto/dom"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
+	"github.com/go-kratos/kratos/v2/log"
+	"golang.org/x/image/webp"
 )
 
 type Xhs struct {
@@ -31,6 +35,9 @@ func NewXhs(u string) *Xhs {
 }
 
 func (s *Xhs) Run() error {
+	if s.urlStr == "" {
+		return nil
+	}
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
@@ -72,13 +79,13 @@ func (s *Xhs) saveDir(r *Result) error {
 		return err
 	}
 	for index, urlStr := range r.ImageUrls {
-		p := path.Join("key", fmt.Sprintf("%d.png", index))
-		s.log.Info("save img %s", p)
-		bytes, err := s.download(urlStr)
+		p := path.Join(key, fmt.Sprintf("%d.jpg", index))
+		s.log.Infof("save img %s", p)
+		imgData, err := s.download(urlStr)
 		if err != nil {
 			return err
 		}
-		err = s.writeFileByBytes(bytes, p)
+		err = s.saveWebpImg(imgData, p)
 		if err != nil {
 			return err
 		}
@@ -96,13 +103,23 @@ func (s *Xhs) writeFile(content string, p string) error {
 	return nil
 }
 
-func (s *Xhs) writeFileByBytes(content []byte, p string) error {
-	f, err := os.Create(p)
+func (s *Xhs) saveWebpImg(data []byte, p string) error {
+	webpImage, err := webp.Decode(bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	_, _ = f.Write(content)
+
+	jpegFile, err := os.Create(p)
+	if err != nil {
+		return err
+	}
+	defer jpegFile.Close()
+
+	// Encode the WebP image to JPEG and save it to the file
+	err = jpeg.Encode(jpegFile, webpImage, &jpeg.Options{Quality: 100})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -112,12 +129,13 @@ func (s *Xhs) download(u string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	bytes, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	return bytes, nil
+	return data, nil
 }
+
 func navigate(url string, headers map[string]interface{}) chromedp.Tasks {
 	return chromedp.Tasks{
 		network.Enable(),

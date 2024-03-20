@@ -2,10 +2,11 @@ package pkg
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
-	time "time"
+	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"

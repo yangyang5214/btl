@@ -78,6 +78,10 @@ func (s *Xhs) saveDir(r *Result) error {
 	if err != nil {
 		return err
 	}
+
+	if len(r.ImageUrls) > 5 {
+		r.ImageUrls = r.ImageUrls[:5]
+	}
 	for index, urlStr := range r.ImageUrls {
 		p := path.Join(key, fmt.Sprintf("%d.jpg", index))
 		s.log.Infof("save img %s", p)

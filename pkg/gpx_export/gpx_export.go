@@ -59,7 +59,7 @@ func (e *GpxExport) Run() error {
 		appExport = NewKeep(e.logger)
 	case GarminCN:
 		appExport = NewGarminCn(e.logger)
-	case Garmin:
+	case GarminCom:
 		appExport = NewGarmin(e.logger)
 	//
 	default:

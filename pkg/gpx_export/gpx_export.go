@@ -59,6 +59,8 @@ func (e *GpxExport) Run() error {
 		appExport = NewKeep(e.logger)
 	case GarminCN:
 		appExport = NewGarminCn(e.logger)
+	case Garmin:
+		appExport = NewGarmin(e.logger)
 	//
 	default:
 		return errors.New(fmt.Sprintf("%s app not supported", e.app))

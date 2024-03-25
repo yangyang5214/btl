@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GarminCn 国区
-type GarminCn struct {
+// Garmin 国际
+type Garmin struct {
 	gitDir string
 
 	username  string
@@ -20,20 +20,20 @@ type GarminCn struct {
 	log       *log.Helper
 }
 
-func NewGarminCn(logger log.Logger) *GarminCn {
-	return &GarminCn{
-		log: log.NewHelper(log.With(logger, "garmin_cn")),
+func NewGarmin(logger log.Logger) *Garmin {
+	return &Garmin{
+		log: log.NewHelper(log.With(logger, "garmin")),
 	}
 }
 
-func (g *GarminCn) Init(gitDir string, exportDir string, username, password string) {
+func (g *Garmin) Init(gitDir string, exportDir string, username, password string) {
 	g.gitDir = gitDir
 	g.exportDir = exportDir
 	g.username = username
 	g.password = password
 }
 
-func (g *GarminCn) Auth() bool {
+func (g *Garmin) Auth() bool {
 	cmdStr := fmt.Sprintf("python3 %s/garmin_secret.py -u '%s' -p '%s' --cn", g.gitDir, g.username, g.password)
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
 	g.log.Infof("start run cmd: %s", cmdStr)
@@ -47,8 +47,8 @@ func (g *GarminCn) Auth() bool {
 	return strings.Contains(string(out), "success")
 }
 
-func (g *GarminCn) Run() error {
-	cmdStr := fmt.Sprintf("python3 %s/garmin_export.py --is-cn -u '%s' -p '%s' --out %s", g.gitDir, g.username, g.password, g.exportDir)
+func (g *Garmin) Run() error {
+	cmdStr := fmt.Sprintf("python3 %s/garmin_export.py -u '%s' -p '%s' --out %s", g.gitDir, g.username, g.password, g.exportDir)
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
 	g.log.Infof("satrt run cmd: %s", cmdStr)
 

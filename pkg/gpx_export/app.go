@@ -17,14 +17,16 @@ var (
 	Apps = []App{
 		Strava,
 		GarminCN,
+		GarminCom,
 		Keep,
 	}
 )
 
 const (
-	Strava   App = "strava"
-	GarminCN App = "garmin_cn"
-	Keep     App = "keep"
+	Strava    App = "strava"
+	GarminCN  App = "garmin_cn"
+	GarminCom App = "garmin"
+	Keep      App = "keep"
 )
 
 type AppExport interface {

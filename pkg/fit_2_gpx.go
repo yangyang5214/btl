@@ -69,12 +69,12 @@ func (s *Fit2Gpx) init() error {
 }
 
 type point struct {
-	ts       int64
-	lat      float64
-	lng      float64
-	distance float64
-	speed    float64
-	altitude float64
+	Ts       int64   `json:"ts"`
+	Lat      float64 `json:"lat"`
+	Lng      float64 `json:"lng"`
+	Distance float64 `json:"distance"`
+	Speed    float64 `json:"speed"`
+	Altitude float64 `json:"altitude"`
 }
 
 func (s *Fit2Gpx) process() ([]*point, error) {
@@ -113,6 +113,18 @@ func (s *Fit2Gpx) process() ([]*point, error) {
 	return points, nil
 }
 
+var gpxDemo = `
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="Garmin Connect" version="1.1"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/11.xsd"
+  xmlns:ns3="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+  xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns2="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+  <trk> 
+  </trk> 
+</gpx> 
+`
+
 func (s *Fit2Gpx) Run() error {
 	if len(s.fitFile) == 0 {
 		s.log.Infof("not fit file")
@@ -126,23 +138,29 @@ func (s *Fit2Gpx) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	gpxFile, err := gpx.ParseString("") //todo
+	gpxData, err := gpx.ParseString(gpxDemo)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	var gpxPoints []*gpx.GPXPoint
+	var gpxPoints []gpx.GPXPoint
 	for _, p := range points {
-		gpxPoints = append(gpxPoints, &gpx.GPXPoint{
+		item := gpx.GPXPoint{
 			Point: gpx.Point{
-				Latitude:  p.lat,
-				Longitude: p.lng,
-				Elevation: *gpx.NewNullableFloat64(p.altitude),
+				Latitude:  p.Lat,
+				Longitude: p.Lng,
+				Elevation: *gpx.NewNullableFloat64(p.Altitude),
 			},
-			Timestamp: time.UnixMilli(p.ts),
-		})
+			Timestamp: time.UnixMilli(p.Ts),
+		}
+		gpxPoints = append(gpxPoints, item)
+	}
+	gpxData.Tracks[0].Segments = []gpx.GPXTrackSegment{
+		{
+			Points: gpxPoints,
+		},
 	}
 
-	newXml, err := gpxFile.ToXml(gpx.ToXmlParams{
+	newXml, err := gpxData.ToXml(gpx.ToXmlParams{
 		Indent: true,
 	})
 	f, err := os.Create(s.resultGpx)

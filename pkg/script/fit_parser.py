@@ -1,8 +1,10 @@
 import json
-from datetime import datetime
-from garmin_fit_sdk import Decoder, Stream
-import sys
 import os
+import sys
+from datetime import datetime
+
+from garmin_fit_sdk import Decoder, Stream
+
 
 # pip3 install garmin-fit-sdk
 
@@ -17,7 +19,7 @@ class Point:
         self.altitude = altitude
 
 
-def main(f: str):
+def main(f: str, result: str):
     if not os.path.exists(f):
         print(f'file: {f} not exist, exit')
         return
@@ -39,13 +41,13 @@ def main(f: str):
         p = Point(ts, lat, lng, distance, speed, altitude)
         results.append(p)
 
-    with open('result.json', 'w') as f:
+    with open(result, 'w') as f:
         json.dump(results, f, default=vars)
 
 
 if __name__ == '__main__':
     args = sys.argv
-    if len(args) == 1:
+    if len(args) < 3:
         print('no fit file param')
         sys.exit(0)
-    main(args[1])
+    main(args[1], args[2])

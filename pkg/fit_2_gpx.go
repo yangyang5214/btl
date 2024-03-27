@@ -120,6 +120,9 @@ var gpxDemo = `
   xmlns:ns3="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
   xmlns="http://www.topografix.com/GPX/1/1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns2="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+	<metadata>
+		<author>gpxt</author>
+	</metadata>
   <trk> 
   </trk> 
 </gpx> 
@@ -150,7 +153,7 @@ func (s *Fit2Gpx) Run() error {
 				Longitude: p.Lng,
 				Elevation: *gpx.NewNullableFloat64(p.Altitude),
 			},
-			Timestamp: time.UnixMilli(p.Ts),
+			Timestamp: time.UnixMilli(p.Ts * 1000),
 		}
 		gpxPoints = append(gpxPoints, item)
 	}

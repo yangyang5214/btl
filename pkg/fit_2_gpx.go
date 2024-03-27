@@ -153,7 +153,7 @@ func (s *Fit2Gpx) Run() error {
 				Longitude: p.Lng,
 				Elevation: *gpx.NewNullableFloat64(p.Altitude),
 			},
-			Timestamp: time.UnixMilli(p.Ts * 1000),
+			Timestamp: time.Unix(p.Ts, 0).UTC(),
 		}
 		gpxPoints = append(gpxPoints, item)
 	}

@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg"
 )
@@ -14,7 +15,7 @@ var screenshotCmd = &cobra.Command{
 	Short: "screenshot for input html",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ss := pkg.NewScreenshot("result.png", htmlPath)
+		ss := pkg.NewScreenshot("result.png", htmlPath, log.DefaultLogger)
 		err := ss.Run()
 		if err != nil {
 			panic(err)

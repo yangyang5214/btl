@@ -36,7 +36,8 @@ type GpxAmap struct {
 
 	screenshot bool
 
-	log *log.Helper
+	log    *log.Helper
+	logger log.Logger
 }
 
 type TemplateAmap struct {
@@ -53,6 +54,7 @@ func NewGpxAmap(style string, logger log.Logger) *GpxAmap {
 			colornames.Black,
 			colornames.Orange,
 		},
+		logger:         logger,
 		mapStyle:       "amap://styles/" + style,
 		imgPath:        "result.png",
 		indexHtmlPath:  "index.html",
@@ -146,7 +148,7 @@ func (g *GpxAmap) Run() error {
 
 	if g.screenshot {
 		g.log.Info("start screenshot")
-		shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath)
+		shot := pkg.NewScreenshot(g.imgPath, g.indexHtmlPath, g.logger)
 		shot.SetWaitSeconds(g.waitSeconds)
 		err = shot.Run()
 		if err != nil {

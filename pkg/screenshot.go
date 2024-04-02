@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"github.com/go-kratos/kratos/v2/log"
 	"os"
 	"path/filepath"
 	"time"
@@ -17,14 +18,16 @@ type Screenshot struct {
 	htmlPath    string
 	waitSeconds time.Duration
 	ctx         context.Context
+	log         *log.Helper
 }
 
-func NewScreenshot(imgPath, htmlPath string) *Screenshot {
+func NewScreenshot(imgPath, htmlPath string, logger log.Logger) *Screenshot {
 	return &Screenshot{
 		imgPath:     imgPath,
 		htmlPath:    htmlPath,
 		waitSeconds: 5 * time.Second,
 		ctx:         context.Background(),
+		log:         log.NewHelper(logger),
 	}
 }
 

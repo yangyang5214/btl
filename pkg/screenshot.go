@@ -34,7 +34,7 @@ func (s *Screenshot) SetWaitSeconds(wait int32) {
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
 func (s *Screenshot) Run() error {
-	ctx, cancel := context.WithTimeout(s.ctx, time.Second*60)
+	ctxTimeout, cancel := context.WithTimeout(s.ctx, time.Second*60)
 	defer cancel()
 
 	dir := filepath.Dir(s.imgPath)
@@ -44,7 +44,7 @@ func (s *Screenshot) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	chromeCtx, cancel := chromedp.NewContext(ctx)
+	chromeCtx, cancel := chromedp.NewContext(ctxTimeout)
 	defer cancel()
 	if err = chromedp.Run(chromeCtx,
 		// the navigation will trigger the "page.EventLoadEventFired" event too,

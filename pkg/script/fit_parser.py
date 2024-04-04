@@ -32,6 +32,9 @@ def main(f: str, result: str):
     results: list[Point] = []
     for point in points:
         ts = datetime.timestamp(point['timestamp'])
+        position_lat = point.get('position_lat')
+        if position_lat is None:
+            continue
         lat = point['position_lat'] * (180 / 2 ** 31)
         lng = point['position_long'] * (180 / 2 ** 31)
         distance = point['distance']

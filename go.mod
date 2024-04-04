@@ -3,6 +3,7 @@ module github.com/yangyang5214/btl
 go 1.20
 
 require (
+	github.com/antchfx/htmlquery v1.3.0
 	github.com/chromedp/cdproto v0.0.0-20231011050154-1d073bb38998
 	github.com/chromedp/chromedp v0.9.3
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
@@ -19,8 +20,6 @@ require (
 )
 
 require (
-	github.com/antchfx/htmlquery v1.3.0 // indirect
-	github.com/antchfx/xmlquery v1.3.18 // indirect
 	github.com/antchfx/xpath v1.2.4 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

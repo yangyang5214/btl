@@ -31,7 +31,10 @@ def main(f: str, result: str):
 
     results: list[Point] = []
     for point in points:
-        ts = datetime.timestamp(point['timestamp'])
+        timestamp = point.get('timestamp')
+        if not timestamp:
+            break
+        ts = datetime.timestamp(timestamp)
         position_lat = point.get('position_lat')
         if position_lat is None:
             continue
@@ -51,6 +54,7 @@ def main(f: str, result: str):
 if __name__ == '__main__':
     args = sys.argv
     if len(args) < 3:
+        # python3 fit_parser.py xxx.fit xxx.json
         print('no fit file param')
         sys.exit(0)
     main(args[1], args[2])

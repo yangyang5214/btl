@@ -95,7 +95,7 @@ func (s *Fit2Gpx) process() ([]*point, error) {
 	s.log.Infof("run cmd %s", cmd)
 	err = exec.Command("/bin/bash", "-c", cmd).Run()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errors.New("文件解析错误 联系开发者")
 	}
 
 	bytesData, err := os.ReadFile(fpath)
@@ -103,12 +103,12 @@ func (s *Fit2Gpx) process() ([]*point, error) {
 		return nil, errors.WithStack(err)
 	}
 	var points []*point
-	if len(bytesData) == 0 {
-		return nil, errors.New("fit file parser failed")
-	}
 	err = json.Unmarshal(bytesData, &points)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errors.New("文件解析错误 联系开发者")
+	}
+	if len(points) == 0 {
+		return nil, errors.New("文件缺数据 请使用源数据文件")
 	}
 	return points, nil
 }

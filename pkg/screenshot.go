@@ -37,7 +37,8 @@ func (s *Screenshot) SetWaitSeconds(wait int32) {
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
 func (s *Screenshot) Run() error {
-	ctxTimeout, cancel := context.WithTimeout(s.ctx, time.Second*60)
+	s.log.Infof("waitSeconds is %v", s.waitSeconds)
+	ctxTimeout, cancel := context.WithTimeout(s.ctx, s.waitSeconds*3)
 	defer cancel()
 
 	dir := filepath.Dir(s.imgPath)

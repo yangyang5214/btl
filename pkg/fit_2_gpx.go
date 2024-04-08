@@ -72,8 +72,6 @@ type point struct {
 	Ts       int64   `json:"ts"`
 	Lat      float64 `json:"lat"`
 	Lng      float64 `json:"lng"`
-	Distance float64 `json:"distance"`
-	Speed    float64 `json:"speed"`
 	Altitude float64 `json:"altitude"`
 }
 
@@ -97,7 +95,10 @@ func (s *Fit2Gpx) process() ([]*point, error) {
 	if err != nil {
 		return nil, errors.New("文件解析错误 联系开发者")
 	}
+	return ParserPyResult(fpath)
+}
 
+func ParserPyResult(fpath string) ([]*point, error) {
 	bytesData, err := os.ReadFile(fpath)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -105,7 +106,7 @@ func (s *Fit2Gpx) process() ([]*point, error) {
 	var points []*point
 	err = json.Unmarshal(bytesData, &points)
 	if err != nil {
-		return nil, errors.New("文件解析错误 联系开发者")
+		return nil, errors.New("内部错误")
 	}
 	if len(points) == 0 {
 		return nil, errors.New("文件缺数据 请使用源数据文件")

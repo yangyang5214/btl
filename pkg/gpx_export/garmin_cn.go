@@ -22,7 +22,7 @@ type GarminCn struct {
 
 func NewGarminCn(logger log.Logger) *GarminCn {
 	return &GarminCn{
-		log: log.NewHelper(log.With(logger, "garmin_cn")),
+		log: log.NewHelper(log.With(logger, "app", "garmin_cn")),
 	}
 }
 

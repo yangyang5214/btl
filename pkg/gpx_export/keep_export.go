@@ -45,7 +45,7 @@ func login(mobile string, password string) (bool, error) {
 
 func NewKeep(logger log.Logger) *KeepExporter {
 	return &KeepExporter{
-		log: log.NewHelper(log.With(logger, "keep")),
+		log: log.NewHelper(log.With(logger, "app", "keep")),
 	}
 }
 

@@ -22,7 +22,7 @@ type Garmin struct {
 
 func NewGarmin(logger log.Logger) *Garmin {
 	return &Garmin{
-		log: log.NewHelper(log.With(logger, "garmin")),
+		log: log.NewHelper(log.With(logger, "app", "garmin")),
 	}
 }
 

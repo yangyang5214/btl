@@ -80,5 +80,10 @@ func (s *Screenshot) Run() error {
 	); err != nil {
 		return errors.WithStack(err)
 	}
-	return chromedp.Cancel(chromeCtx)
+	err = chromedp.Cancel(chromeCtx)
+	if err != nil {
+		s.log.Errorf("cancel chrome error: %+v", err)
+		return nil
+	}
+	return nil
 }

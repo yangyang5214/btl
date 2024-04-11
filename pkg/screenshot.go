@@ -36,7 +36,7 @@ func (s *Screenshot) SetWaitSeconds(wait int32) {
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
 func (s *Screenshot) Run() error {
-	s.log.Infof("waitSeconds is %v", s.waitSeconds)
+	s.log.Infof("screentshot for %s, waitSeconds is %v", s.urlStr, s.waitSeconds)
 	ctxTimeout, cancel := context.WithTimeout(s.ctx, s.waitSeconds*5)
 	defer cancel()
 

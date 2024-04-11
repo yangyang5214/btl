@@ -9,23 +9,22 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 )
 
 type Screenshot struct {
 	imgPath     string
-	htmlPath    string
+	urlStr      string
 	waitSeconds time.Duration
 	ctx         context.Context
 	log         *log.Helper
 }
 
-func NewScreenshot(imgPath, htmlPath string, logger log.Logger) *Screenshot {
+func NewScreenshot(imgPath, urlStr string, logger log.Logger) *Screenshot {
 	return &Screenshot{
 		imgPath:     imgPath,
-		htmlPath:    htmlPath,
-		waitSeconds: 5 * time.Second,
+		urlStr:      urlStr,
+		waitSeconds: 3 * time.Second,
 		ctx:         context.Background(),
 		log:         log.NewHelper(logger),
 	}
@@ -44,46 +43,18 @@ func (s *Screenshot) Run() error {
 	dir := filepath.Dir(s.imgPath)
 	_ = os.MkdirAll(dir, os.ModePerm)
 
-	html, err := os.ReadFile(s.htmlPath)
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	var err error
 	chromeCtx, cancel := chromedp.NewContext(ctxTimeout)
 	defer cancel()
-	if err = chromedp.Run(chromeCtx,
-		// the navigation will trigger the "page.EventLoadEventFired" event too,
-		// so we should add the listener after the navigation.
-		chromedp.Navigate("about:blank"),
-		chromedp.EmulateViewport(1440, 900),
-		// set the page content and wait until the page is loaded (including its resources).
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			frameTree, err := page.GetFrameTree().Do(ctx)
-			if err != nil {
-				return errors.WithStack(err)
-			}
 
-			if err := page.SetDocumentContent(frameTree.Frame.ID, string(html)).Do(ctx); err != nil {
-				return errors.WithStack(err)
-			}
-			return nil
-		}),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			time.Sleep(s.waitSeconds)
-			cs := page.CaptureScreenshot()
-			cs.Quality = 100
-			buf, err := cs.Do(ctx)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			return os.WriteFile(s.imgPath, buf, 0644)
-		}),
+	var buf []byte
+	if err = chromedp.Run(chromeCtx,
+		chromedp.Navigate(s.urlStr),
+		chromedp.EmulateViewport(1440, 900),
+		chromedp.Sleep(s.waitSeconds),
+		chromedp.CaptureScreenshot(&buf),
 	); err != nil {
 		return errors.WithStack(err)
 	}
-	err = chromedp.Cancel(chromeCtx)
-	if err != nil {
-		s.log.Errorf("cancel chrome error: %+v", err)
-		return nil
-	}
-	return nil
+	return os.WriteFile(s.imgPath, buf, 0644)
 }

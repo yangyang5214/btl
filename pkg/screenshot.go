@@ -36,8 +36,8 @@ func (s *Screenshot) SetWaitSeconds(wait int32) {
 
 // Run https://github.com/chromedp/chromedp/issues/941#issuecomment-961181348
 func (s *Screenshot) Run() error {
-	s.log.Infof("screentshot for %s, waitSeconds is %v", s.urlStr, s.waitSeconds)
-	ctxTimeout, cancel := context.WithTimeout(s.ctx, s.waitSeconds*5)
+	s.log.Infof("screenshot for %s, waitSeconds is %v", s.urlStr, s.waitSeconds)
+	ctxTimeout, cancel := context.WithTimeout(s.ctx, time.Minute*3)
 	defer cancel()
 
 	dir := filepath.Dir(s.imgPath)
@@ -51,7 +51,7 @@ func (s *Screenshot) Run() error {
 	if err = chromedp.Run(chromeCtx,
 		chromedp.Navigate(s.urlStr),
 		chromedp.EmulateViewport(1440, 900),
-		chromedp.Sleep(s.waitSeconds),
+		chromedp.Sleep(s.waitSeconds*2),
 		chromedp.CaptureScreenshot(&buf),
 	); err != nil {
 		return errors.WithStack(err)

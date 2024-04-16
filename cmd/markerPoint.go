@@ -15,7 +15,7 @@ var markerPointCmd = &cobra.Command{
 	Short: "amap marker point",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		mp := marker_point.NewMarkerPoint(pointsFile, showRange)
+		mp := marker_point.NewMarkerPoint(filePath, showRange)
 		err := mp.Run()
 		if err != nil {
 			panic(err)
@@ -24,12 +24,10 @@ var markerPointCmd = &cobra.Command{
 }
 
 var (
-	pointsFile string
-	showRange  bool
+	showRange bool
 )
 
 func init() {
 	rootCmd.AddCommand(markerPointCmd)
-	markerPointCmd.Flags().StringVarP(&pointsFile, "point_file", "f", "", "points file")
 	markerPointCmd.Flags().BoolVarP(&showRange, "range", "s", false, "show range")
 }

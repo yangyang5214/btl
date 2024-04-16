@@ -14,10 +14,8 @@ import (
 )
 
 var (
-	app      string
-	username string
-	password string
-	outDir   string
+	app    string
+	outDir string
 )
 
 // gpxExportCmd represents the gpxExport command
@@ -49,8 +47,6 @@ var gpxExportCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(gpxExportCmd)
 	gpxExportCmd.Flags().StringVarP(&app, "app", "a", "", strings.Join(gpx_export.Apps, "\n"))
-	gpxExportCmd.Flags().StringVarP(&username, "user", "u", "", "username")
-	gpxExportCmd.Flags().StringVarP(&password, "pwd", "p", "", "password")
 	gpxExportCmd.Flags().StringVarP(&outDir, "out", "o", "garmin_export_out", "garmin_export_out dir")
 
 	_ = gpxExportCmd.MarkFlagRequired("app")

@@ -12,7 +12,7 @@ var fitToGpxCmd = &cobra.Command{
 	Short: "fit to gpx file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fit := pkg.NewFit2Gpx(fitFile, log.DefaultLogger)
+		fit := pkg.NewFit2Gpx(filePath, log.DefaultLogger)
 		err := fit.Run()
 		if err != nil {
 			panic(err)
@@ -20,9 +20,6 @@ var fitToGpxCmd = &cobra.Command{
 	},
 }
 
-var fitFile string
-
 func init() {
 	rootCmd.AddCommand(fitToGpxCmd)
-	fitToGpxCmd.Flags().StringVarP(&fitFile, "fit", "f", "", "xx.fit")
 }

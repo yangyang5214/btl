@@ -15,7 +15,7 @@ var json2mindCmd = &cobra.Command{
 	Short: "json lines file transform to md file, then convert to mind map",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		j := pkg.NewJsonGroup(jsonFile, fields)
+		j := pkg.NewJsonGroup(filePath, fields)
 		err := j.Run()
 		if err != nil {
 			log.Fatalf("errors in json2mind: %v", err)
@@ -24,14 +24,10 @@ var json2mindCmd = &cobra.Command{
 	},
 }
 
-var jsonFile string
 var fields []string
 
 func init() {
 	rootCmd.AddCommand(json2mindCmd)
-
-	json2mindCmd.Flags().StringVarP(&jsonFile, "json_file", "f", "", "jsonlines file path")
 	json2mindCmd.Flags().StringSliceVarP(&fields, "fields", "g", []string{}, "Fields that require group by")
-	_ = json2mindCmd.MarkFlagRequired("json_file")
 	_ = json2mindCmd.MarkFlagRequired("fields")
 }

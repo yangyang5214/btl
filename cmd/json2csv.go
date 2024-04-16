@@ -27,7 +27,4 @@ var fPath string
 
 func init() {
 	rootCmd.AddCommand(json2csvCmd)
-
-	json2csvCmd.Flags().StringVarP(&fPath, "filepath", "f", "", "csv file path")
-	_ = json2csvCmd.MarkFlagRequired("filepath")
 }

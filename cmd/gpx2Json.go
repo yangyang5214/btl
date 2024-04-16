@@ -26,5 +26,4 @@ var gpx2JsonCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gpx2JsonCmd)
-	gpx2JsonCmd.Flags().StringVarP(&gpx2JsonFile, "file", "f", "", "gpx file import")
 }

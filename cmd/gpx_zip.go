@@ -38,6 +38,5 @@ var (
 
 func init() {
 	rootCmd.AddCommand(gpxSplitCmd)
-	gpxSplitCmd.Flags().StringVarP(&f, "filepath", "f", "", "input gpx file path")
 	gpxSplitCmd.Flags().Int32("size", s, "limit size(MB)")
 }

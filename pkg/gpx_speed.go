@@ -55,15 +55,25 @@ func (s *GpxSpeed) Run() error {
 		return err
 	}
 
-	var resultPoints []gpx.GPXPoint
-	startTime := time.Now()
 	prePoint := points[0]
+	startTime := prePoint.Timestamp
+
+	resultPoints := []gpx.GPXPoint{
+		{
+			Point: gpx.Point{
+				Latitude:  prePoint.Latitude,
+				Longitude: prePoint.Longitude,
+				Elevation: prePoint.Elevation,
+			},
+			Timestamp: startTime,
+		},
+	}
 	for i := 1; i < len(points); i++ {
 		curPoint := points[i]
 
 		distLen := prePoint.Distance3D(&curPoint.Point)
-		ts := distLen * s.speed
-		curTime := startTime.Add(time.Duration(ts) * time.Second)
+		ts := distLen * 1000 / s.speed
+		curTime := startTime.Add(time.Duration(ts) * time.Millisecond)
 		resultPoints = append(resultPoints, gpx.GPXPoint{
 			Point: gpx.Point{
 				Latitude:  curPoint.Latitude,

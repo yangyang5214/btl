@@ -7,6 +7,7 @@ import (
 	"github.com/twpayne/go-kml"
 	"golang.org/x/image/colornames"
 	"os"
+	"path/filepath"
 )
 
 type options struct {
@@ -34,7 +35,10 @@ type Gpx2Kml struct {
 // https://developers.google.com/kml/documentation/topicsinkml?hl=zh-cn
 // https://github.com/twpayne/go-kml
 func NewGpx2Kml(gpxFile string, logger log.Logger, opts ...Option) *Gpx2Kml {
-	op := new(options)
+	op := &options{
+		name:       "轨迹",
+		resultFile: "result.kml",
+	}
 	for _, opt := range opts {
 		opt(op)
 	}
@@ -78,6 +82,13 @@ const (
 )
 
 func (s *Gpx2Kml) Run() error {
+	s.log.Infof("import gpx file %s", s.gpxFile)
+	p, err := filepath.Abs(s.gpxFile)
+	if err != nil {
+		return err
+	}
+	s.gpxFile = p
+
 	points, err := s.getAllPoints()
 
 	highlightStyle := kml.SharedStyle(

@@ -8,3 +8,4 @@ py/garmin_export_out
 garmin_export_out
 marker_point*
 index.html
+pkg/*kml

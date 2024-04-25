@@ -10,7 +10,7 @@ import (
 // gpxSpeedCmd represents the gpxSpeed command
 var gpxSpeedCmd = &cobra.Command{
 	Use:   "gpx_speed",
-	Short: "",
+	Short: "customize gpx speed",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := pkg.NewGpxSpeed(filePath, speed, log.DefaultLogger).Run()

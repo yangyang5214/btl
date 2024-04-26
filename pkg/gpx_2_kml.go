@@ -130,13 +130,14 @@ func (s *Gpx2Kml) Run() error {
 
 	k := kml.KML(
 		kml.Document(
+			kml.Name(s.opts.name+".kml"),
 			kml.StyleMap(styleMap),
 			kml.Style(normalStyle),
 			kml.Style(highlightStyle),
 			kml.Placemark(
 				kml.Name(s.opts.name),
-				kml.GxTrack(points...),
 				kml.StyleURL(styleMap.URL()),
+				kml.GxTrack(points...),
 			),
 		),
 	)

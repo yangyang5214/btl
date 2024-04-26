@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/xml"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
@@ -91,55 +92,44 @@ func (s *Gpx2Kml) Run() error {
 
 	points, err := s.getAllPoints()
 
-	highlightStyle := kml.SharedStyle(
-		"highlight",
+	normalStyle := kml.SharedStyle(
+		"multiTrack_n",
 		kml.IconStyle(
 			kml.Icon(
-				kml.Href("http://maps.google.com/mapfiles/kml/paddle/red-stars.png"),
+				kml.Href("https://earth.google.com/images/kml-icons/track-directional/track-0.png"),
 			),
 		),
 		kml.LineStyle(
 			kml.Color(colornames.Red),
-			kml.Width(8),
-		),
-	)
-	normalStyle := kml.SharedStyle(
-		"normal",
-		kml.IconStyle(
-			kml.Icon(
-				kml.Href("http://maps.google.com/mapfiles/kml/paddle/wht-blank.png"),
-			),
-		),
-		kml.LineStyle(
-			kml.Color(colornames.Blue),
-			kml.Width(6),
+			kml.Width(3),
 		),
 	)
 
-	styleMap := kml.SharedStyleMap(
-		"styleMap",
+	multiTrack := kml.SharedStyleMap(
+		string(StyleStateNormal),
 		kml.Pair(
 			kml.Key(StyleStateNormal),
 			kml.StyleURL(normalStyle.URL()),
-		),
-		kml.Pair(
-			kml.Key(StyleStateHighlight),
-			kml.StyleURL(highlightStyle.URL()),
 		),
 	)
 
 	k := kml.KML(
 		kml.Document(
 			kml.Name(s.opts.name+".kml"),
-			kml.StyleMap(styleMap),
-			kml.Style(normalStyle),
-			kml.Style(highlightStyle),
+			multiTrack,
+			normalStyle,
 			kml.Placemark(
 				kml.Name(s.opts.name),
-				kml.StyleURL(styleMap.URL()),
+				kml.StyleURL(multiTrack.URL()),
 				kml.GxTrack(points...),
 			),
 		),
+	)
+
+	k.Attr = append(k.Attr,
+		xml.Attr{Name: xml.Name{Local: "xmlns:gx"}, Value: "http://www.google.com/kml/ext/2.2"},
+		xml.Attr{Name: xml.Name{Local: "xmlns:kml"}, Value: "http://www.opengis.net/kml/2.2"},
+		xml.Attr{Name: xml.Name{Local: "xmlns:atom"}, Value: "http://www.w3.org/2005/Atom"},
 	)
 
 	f, err := os.Create(s.opts.resultFile)

@@ -1,8 +1,9 @@
 package pkg
 
 import (
-	"github.com/go-kratos/kratos/v2/log"
 	"testing"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 func TestShot(t *testing.T) {

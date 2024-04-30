@@ -4,13 +4,14 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/pkg/errors"
-	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"os/exec"
 	"path"
 	"time"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
+	"github.com/tkrajina/gpxgo/gpx"
 )
 
 type Fit2Gpx struct {

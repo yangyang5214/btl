@@ -2,24 +2,40 @@ package pkg
 
 import (
 	"encoding/xml"
+	"image/color"
+	"os"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/twpayne/go-kml"
 	"golang.org/x/image/colornames"
-	"os"
-	"path/filepath"
 )
 
 type options struct {
 	name       string
 	resultFile string
+	icon       string
+	speed      int32
+	color      color.RGBA
 }
 
 type Option func(*options)
 
 func WithName(name string) Option {
 	return func(o *options) { o.name = name }
+}
+
+func WithIcon(icon string) Option {
+	return func(o *options) { o.icon = icon }
+}
+
+func WithColor(color color.RGBA) Option {
+	return func(o *options) { o.color = color }
+}
+
+func WithSpeed(speed int32) Option {
+	return func(o *options) { o.speed = speed }
 }
 
 func WithResultFile(resultFile string) Option {
@@ -30,6 +46,7 @@ type Gpx2Kml struct {
 	gpxFile string
 	log     *log.Helper
 	opts    options
+	loggger log.Logger
 }
 
 // NewGpx2Kml
@@ -39,22 +56,22 @@ func NewGpx2Kml(gpxFile string, logger log.Logger, opts ...Option) *Gpx2Kml {
 	op := &options{
 		name:       "轨迹",
 		resultFile: "result.kml",
+		icon:       "https://earth.google.com/images/kml-icons/track-directional/track-0.png",
+		color:      colornames.Red,
+		speed:      100,
 	}
 	for _, opt := range opts {
 		opt(op)
 	}
 	return &Gpx2Kml{
 		gpxFile: gpxFile,
+		loggger: logger,
 		log:     log.NewHelper(logger),
 		opts:    *op,
 	}
 }
 
-func (s *Gpx2Kml) getAllPoints() (points []kml.Element, err error) {
-	gpxData, err := gpx.ParseFile(s.gpxFile)
-	if err != nil {
-		return
-	}
+func (s *Gpx2Kml) getAllPoints(gpxData *gpx.GPX) (points []kml.Element, err error) {
 	for _, track := range gpxData.Tracks {
 		for _, segment := range track.Segments {
 			for _, p := range segment.Points {
@@ -83,24 +100,24 @@ const (
 )
 
 func (s *Gpx2Kml) Run() error {
-	s.log.Infof("import gpx file %s", s.gpxFile)
-	p, err := filepath.Abs(s.gpxFile)
+	gspeed := NewGpxSpeed(s.gpxFile, s.opts.speed, s.loggger)
+	gpxData, err := gspeed.process()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
-	s.gpxFile = p
-
-	points, err := s.getAllPoints()
-
+	points, err := s.getAllPoints(gpxData)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	normalStyle := kml.SharedStyle(
 		"multiTrack_n",
 		kml.IconStyle(
 			kml.Icon(
-				kml.Href("https://earth.google.com/images/kml-icons/track-directional/track-0.png"),
+				kml.Href(s.opts.icon),
 			),
 		),
 		kml.LineStyle(
-			kml.Color(colornames.Red),
+			kml.Color(s.opts.color),
 			kml.Width(3),
 		),
 	)

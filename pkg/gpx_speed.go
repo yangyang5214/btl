@@ -1,11 +1,13 @@
 package pkg
 
 import (
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
-	"os"
-	"time"
 )
 
 type GpxSpeed struct {
@@ -45,14 +47,18 @@ func (s *GpxSpeed) getAllPoints(gpxData *gpx.GPX) ([]gpx.GPXPoint, error) {
 	return points.Points, nil
 }
 
-func (s *GpxSpeed) Run() error {
-	gpxData, err := gpx.ParseFile(s.gpxFile)
+func (s *GpxSpeed) process() (*gpx.GPX, error) {
+	p, err := filepath.Abs(s.gpxFile)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	gpxData, err := gpx.ParseFile(p)
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 	points, err := s.getAllPoints(gpxData)
 	if err != nil {
-		return err
+		return nil, errors.WithStack(err)
 	}
 
 	prePoint := points[0]
@@ -88,8 +94,14 @@ func (s *GpxSpeed) Run() error {
 	}
 
 	gpxData.Tracks[0].Segments[0].Points = resultPoints
+	return gpxData, nil
+}
 
-	//save gpx file
+func (s *GpxSpeed) Run() error {
+	gpxData, err := s.process()
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	newXml, err := gpxData.ToXml(gpx.ToXmlParams{
 		Indent: true,
 	})

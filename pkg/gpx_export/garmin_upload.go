@@ -2,8 +2,9 @@ package gpx_export
 
 import (
 	"fmt"
-	"github.com/go-kratos/kratos/v2/log"
 	"os/exec"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type GarminUpload struct {

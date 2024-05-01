@@ -1,6 +1,3 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -15,7 +12,8 @@ var gpx2kmlCmd = &cobra.Command{
 	Short: "gpx to kml file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := pkg.NewGpx2Kml(filePath, log.DefaultLogger).Run()
+		opts := pkg.WithSpeed(speed)
+		err := pkg.NewGpx2Kml(filePath, log.DefaultLogger, opts).Run()
 		if err != nil {
 			panic(err)
 		}
@@ -24,4 +22,5 @@ var gpx2kmlCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gpx2kmlCmd)
+	gpx2kmlCmd.Flags().Int32Var(&speed, "speed", 100, "set speed")
 }

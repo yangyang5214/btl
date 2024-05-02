@@ -37,6 +37,6 @@ var gpxAmapCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gpxAmapCmd)
-	gpxAmapCmd.Flags().StringSliceVarP(&files, "files", "f", []string{}, "xx.gpx")
+	gpxAmapCmd.Flags().StringSliceVarP(&files, "files", "", []string{}, "xx.gpx")
 	gpxAmapCmd.Flags().StringVarP(&amapStyle, "style", "s", "8ee61a45840f14ac60f33a799fbd00d8", "amap style id")
 }

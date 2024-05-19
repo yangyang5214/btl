@@ -45,17 +45,44 @@ func (s *Screenshot) Run() error {
 	_ = os.MkdirAll(dir, os.ModePerm)
 
 	var err error
+	s.log.Info("Creating Chrome context...")
 	chromeCtx, cancel := chromedp.NewContext(ctxTimeout)
 	defer cancel()
 
 	var buf []byte
+	s.log.Info("Starting chromedp.Run...")
 	if err = chromedp.Run(chromeCtx,
 		chromedp.Navigate(s.urlStr),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			s.log.Info("Navigation complete")
+			return nil
+		}),
 		chromedp.EmulateViewport(1440, 900),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			s.log.Info("Viewport emulation complete")
+			return nil
+		}),
 		chromedp.Sleep(s.waitSeconds*2),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			s.log.Info("Sleep complete")
+			return nil
+		}),
 		chromedp.CaptureScreenshot(&buf),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			s.log.Info("Screenshot capture complete")
+			return nil
+		}),
 	); err != nil {
+		s.log.Errorf("Error during chromedp.Run: %v", err)
 		return errors.WithStack(err)
 	}
-	return os.WriteFile(s.imgPath, buf, 0644)
+
+	s.log.Info("Writing screenshot to file...")
+	if err = os.WriteFile(s.imgPath, buf, 0644); err != nil {
+		s.log.Errorf("Error writing file: %v", err)
+		return errors.WithStack(err)
+	}
+
+	s.log.Info("Screenshot saved successfully")
+	return nil
 }

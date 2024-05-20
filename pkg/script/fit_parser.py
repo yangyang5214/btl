@@ -10,11 +10,12 @@ from garmin_fit_sdk import Decoder, Stream
 
 class Point:
 
-    def __init__(self, ts, lat, lng, altitude):
+    def __init__(self, ts, lat, lng, altitude, hr):
         self.ts = int(ts)
         self.lat = lat
         self.lng = lng
         self.altitude = altitude
+        self.hr = hr
 
 
 def main(f: str, result: str):
@@ -40,7 +41,8 @@ def main(f: str, result: str):
         lng = point['position_long'] * (180 / 2 ** 31)
         altitude = point.get('enhanced_altitude', 0)
 
-        p = Point(ts, lat, lng, altitude)
+        hr = point.get('heart_rate', 0)
+        p = Point(ts, lat, lng, altitude, hr)
         results.append(p)
 
     with open(result, 'w') as f:

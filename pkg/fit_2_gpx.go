@@ -3,6 +3,7 @@ package pkg
 import (
 	_ "embed"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"os"
 	"os/exec"
@@ -70,10 +71,11 @@ func (s *Fit2Gpx) init() error {
 }
 
 type point struct {
-	Ts       int64   `json:"ts"`
-	Lat      float64 `json:"lat"`
-	Lng      float64 `json:"lng"`
-	Altitude float64 `json:"altitude"`
+	Ts        int64   `json:"ts"`
+	Lat       float64 `json:"lat"`
+	Lng       float64 `json:"lng"`
+	Altitude  float64 `json:"altitude"`
+	HeartRate int     `json:"hr"`
 }
 
 func (s *Fit2Gpx) process() ([]*point, error) {
@@ -157,6 +159,30 @@ func (s *Fit2Gpx) Run() error {
 			},
 			Timestamp: time.Unix(p.Ts, 0).UTC(),
 		}
+		//Extensions
+
+		var trackExt gpx.ExtensionNode
+		if p.HeartRate != 0 {
+			trackExt = gpx.ExtensionNode{
+				XMLName: xml.Name{
+					Space: "ns3",
+					Local: "TrackPointExtension",
+				},
+				Nodes: []gpx.ExtensionNode{
+					{
+						XMLName: xml.Name{
+							Space: "ns3",
+							Local: "hr",
+						},
+						Data: fmt.Sprintf("%d", p.HeartRate),
+					},
+				},
+			}
+			item.Extensions = gpx.Extension{
+				Nodes: []gpx.ExtensionNode{trackExt},
+			}
+		}
+
 		gpxPoints = append(gpxPoints, item)
 	}
 	gpxData.Tracks[0].Segments = []gpx.GPXTrackSegment{

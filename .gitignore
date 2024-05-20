@@ -9,3 +9,4 @@ garmin_export_out
 marker_point*
 index.html
 pkg/*kml
+pkg/script/result.json

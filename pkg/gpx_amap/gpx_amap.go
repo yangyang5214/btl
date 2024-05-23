@@ -52,7 +52,6 @@ func NewGpxAmap(style string, logger log.Logger) *GpxAmap {
 			colornames.Blue,
 			colornames.Green,
 			colornames.Black,
-			colornames.Orange,
 		},
 		logger:         logger,
 		mapStyle:       "amap://styles/" + style,

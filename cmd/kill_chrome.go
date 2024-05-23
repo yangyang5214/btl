@@ -12,7 +12,7 @@ var killChromeCmd = &cobra.Command{
 	Short: "kill all chrome process(chromium)",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		killChromeProcesses()
+		KillChromeProcesses()
 	},
 }
 
@@ -20,7 +20,7 @@ func init() {
 	rootCmd.AddCommand(killChromeCmd)
 }
 
-func killChromeProcesses() {
+func KillChromeProcesses() {
 	processes, err := process.Processes()
 	if err != nil {
 		panic(err)

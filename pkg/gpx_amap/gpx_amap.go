@@ -2,12 +2,10 @@ package gpx_amap
 
 import (
 	"fmt"
+	"github.com/go-kratos/kratos/v2/log"
 	"image/color"
 	"os"
 	"strings"
-	"time"
-
-	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/pkg/errors"
 	"github.com/yangyang5214/btl/pkg"
@@ -38,6 +36,8 @@ type GpxAmap struct {
 
 	log    *log.Helper
 	logger log.Logger
+
+	htmlPath string
 }
 
 type TemplateAmap struct {
@@ -64,6 +64,7 @@ func NewGpxAmap(style string, logger log.Logger) *GpxAmap {
 		screenshot:     false,
 		waitSeconds:    5,
 		log:            log.NewHelper(logger),
+		htmlPath:       "index.html",
 	}
 }
 
@@ -81,6 +82,10 @@ func (g *GpxAmap) SetWaitSeconds(wait int32) {
 
 func (g *GpxAmap) SetPoints(points [][]*utils.LatLng) {
 	g.points = points
+}
+
+func (g *GpxAmap) SetHtmlPath(htmlPath string) {
+	g.htmlPath = htmlPath
 }
 
 func (g *GpxAmap) SetFiles(files []string) {
@@ -133,18 +138,17 @@ func (g *GpxAmap) Run() error {
 	sb.WriteString(g.drawLines())
 	sb.WriteString(g.end())
 
-	htmlUrl := fmt.Sprintf("/tmp/%d.html", time.Now().UnixMilli())
-	err := os.WriteFile(htmlUrl, []byte(sb.String()), 0755)
+	err := os.WriteFile(g.htmlPath, []byte(sb.String()), 0755)
 	if err != nil {
 		return err
 	}
 
 	if g.screenshot {
 		defer func() {
-			_ = os.Remove(htmlUrl)
+			_ = os.Remove(g.htmlPath)
 		}()
 		g.log.Info("start screenshot")
-		shot := pkg.NewScreenshot(g.imgPath, "file://"+htmlUrl, g.logger)
+		shot := pkg.NewScreenshot(g.imgPath, "file://"+g.htmlPath, g.logger)
 		shot.SetWaitSeconds(g.waitSeconds)
 		err = shot.Run()
 		if err != nil {

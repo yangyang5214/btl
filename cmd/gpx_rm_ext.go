@@ -4,11 +4,9 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"os"
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/tkrajina/gpxgo/gpx"
+	"os"
 )
 
 // gpxRmExt represents the gpxRemoveExtension command
@@ -26,11 +24,10 @@ var gpxRmExt = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gpxRmExt)
-	gpxRmExt.Flags().StringVarP(&gpxFile, "gpx_file", "f", "", "a gpx file")
 }
 
 func Main() error {
-	newGpxData, err := gpx.ParseFile(gpxFile)
+	newGpxData, err := gpx.ParseFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -55,16 +52,11 @@ func Main() error {
 	newXml, err := newGpxData.ToXml(gpx.ToXmlParams{
 		Indent: true,
 	})
-	f1, err := os.Create("remove_extension_" + getLastName(gpxFile))
+	f1, err := os.Create("remove_extension_result.gpx")
 	if err != nil {
 		return err
 	}
 	defer f1.Close()
 	_, _ = f1.Write(newXml)
 	return nil
-}
-
-func getLastName(p string) string {
-	arr := strings.Split(p, "/")
-	return arr[len(arr)-1]
 }

@@ -4,7 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/yangyang5214/btl/pkg"
 
 	"github.com/spf13/cobra"
@@ -16,14 +15,7 @@ var gpxSplitCmd = &cobra.Command{
 	Short: "zip gpx file to limited size.(remove some points)",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if s == 0 {
-			s = 25
-		}
-		if f == "" {
-			log.Info("filepath is required")
-			return
-		}
-		gs := pkg.NewGpxZip(f, s)
+		gs := pkg.NewGpxZip(filePath, step)
 		err := gs.Run()
 		if err != nil {
 			panic(err)
@@ -32,11 +24,10 @@ var gpxSplitCmd = &cobra.Command{
 }
 
 var (
-	f string
-	s int32
+	step int
 )
 
 func init() {
 	rootCmd.AddCommand(gpxSplitCmd)
-	gpxSplitCmd.Flags().Int32("size", s, "limit size(MB)")
+	gpxSplitCmd.Flags().Int("s", step, "")
 }

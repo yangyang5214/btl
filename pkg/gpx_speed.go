@@ -50,14 +50,17 @@ func (s *GpxSpeed) getAllPoints(gpxData *gpx.GPX) ([]gpx.GPXPoint, error) {
 func (s *GpxSpeed) process() (*gpx.GPX, error) {
 	p, err := filepath.Abs(s.gpxFile)
 	if err != nil {
+		s.log.Errorf("get file abs path err %+v", err)
 		return nil, err
 	}
 	gpxData, err := gpx.ParseFile(p)
 	if err != nil {
+		s.log.Errorf("gpx ParseFile err %+v", err)
 		return nil, errors.WithStack(err)
 	}
 	points, err := s.getAllPoints(gpxData)
 	if err != nil {
+		s.log.Errorf("get all points err %+v", err)
 		return nil, errors.WithStack(err)
 	}
 

@@ -157,6 +157,9 @@ func parseInt(v string) int64 {
 
 func (s *Fit2Gpx) process() (*Session, error) {
 	csvPath := path.Join("/tmp", fmt.Sprintf("%d.csv", time.Now().UnixMilli()))
+	defer func() {
+		_ = os.Remove(csvPath)
+	}()
 	err := s.fit2Csv(csvPath)
 	if err != nil {
 		return nil, err

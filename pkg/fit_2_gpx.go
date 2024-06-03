@@ -96,7 +96,12 @@ func (s *Fit2Gpx) parserCsv(csvPath string) (*Session, error) {
 
 func (s *Fit2Gpx) parserRecord(msgs []string) (*Record, error) {
 	m := make(map[string]string)
-	for i := 3; i < 13; i += 3 {
+	for i := 3; i < len(msgs)-3; i += 3 {
+		k := msgs[i]
+		v := msgs[i+1]
+		if k == "" && v == "" {
+			break
+		}
 		m[msgs[i]] = msgs[i+1]
 	}
 
@@ -119,15 +124,25 @@ func (s *Fit2Gpx) parserRecord(msgs []string) (*Record, error) {
 	}
 
 	return &Record{
-		Ts:        tsInt, //todo
+		Ts:        tsInt + 631036800,
 		Lat:       lat,
 		Lng:       parseFloat(m["position_long"]),
-		Altitude:  parseFloat(m["altitude"]),
+		Altitude:  parserAttr(m, []string{"altitude", "enhanced_altitude"}),
 		HeartRate: parseInt(m["heart_rate"]),
 		Distance:  parseFloat(m["distance"]),
-		Speed:     parseFloat(m["speed"]),
+		Speed:     parserAttr(m, []string{"speed", "enhanced_speed"}),
 		Cadence:   parseInt(m["cadence"]),
 	}, nil
+}
+
+func parserAttr(m map[string]string, fields []string) float64 {
+	for _, field := range fields {
+		v, ok := m[field]
+		if ok {
+			return parseFloat(v)
+		}
+	}
+	return 0
 }
 
 func parseFloat(v string) float64 {
@@ -191,9 +206,12 @@ func (s *Fit2Gpx) Run() error {
 				Longitude: p.Lng * 180 / 2147483648,
 				Elevation: *gpx.NewNullableFloat64(p.Altitude),
 			},
-			Timestamp: time.Unix(p.Ts+631036800, 0).UTC(),
+			Timestamp: time.Unix(p.Ts, 0).UTC(),
 		}
-		item.Extensions = genExtensions(p)
+		exts := genExtensions(p)
+		if exts != nil {
+			item.Extensions = *exts
+		}
 
 		gpxPoints = append(gpxPoints, item)
 	}
@@ -215,46 +233,59 @@ func (s *Fit2Gpx) Run() error {
 	return nil
 }
 
-func genExtensions(p *Record) gpx.Extension {
-	var trackExt gpx.ExtensionNode
-	trackExt = gpx.ExtensionNode{
-		XMLName: xml.Name{
-			Space: "ns3",
-			Local: "TrackPointExtension",
-		},
+func genExtensions(p *Record) *gpx.Extension {
+
+	var nodes []gpx.ExtensionNode
+	if p.Cadence != 0 {
+		nodes = append(nodes, gpx.ExtensionNode{
+			XMLName: xml.Name{
+				Space: "ns3",
+				Local: "cadence",
+			},
+			Data: fmt.Sprintf("%d", p.Cadence),
+		})
+	}
+
+	if p.Altitude != 0 {
+		nodes = append(nodes, gpx.ExtensionNode{
+			XMLName: xml.Name{
+				Space: "ns3",
+				Local: "distance",
+			},
+			Data: fmt.Sprintf("%f", p.Distance),
+		})
+	}
+
+	if p.HeartRate != 0 {
+		nodes = append(nodes, gpx.ExtensionNode{
+			XMLName: xml.Name{
+				Space: "ns3",
+				Local: "hr",
+			},
+			Data: fmt.Sprintf("%d", p.HeartRate),
+		})
+	}
+	if p.Speed != 0 {
+		nodes = append(nodes, gpx.ExtensionNode{
+			XMLName: xml.Name{
+				Space: "ns3",
+				Local: "speed",
+			},
+			Data: fmt.Sprintf("%f", p.Speed),
+		})
+	}
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	return &gpx.Extension{
 		Nodes: []gpx.ExtensionNode{
 			{
 				XMLName: xml.Name{
 					Space: "ns3",
-					Local: "hr",
+					Local: "TrackPointExtension",
 				},
-				Data: fmt.Sprintf("%d", p.HeartRate),
-			},
-			{
-				XMLName: xml.Name{
-					Space: "ns3",
-					Local: "cadence",
-				},
-				Data: fmt.Sprintf("%d", p.Cadence),
-			},
-			{
-				XMLName: xml.Name{
-					Space: "ns3",
-					Local: "distance",
-				},
-				Data: fmt.Sprintf("%f", p.Distance),
-			},
-			{
-				XMLName: xml.Name{
-					Space: "ns3",
-					Local: "speed",
-				},
-				Data: fmt.Sprintf("%f", p.Speed),
-			},
-		},
-	}
-
-	return gpx.Extension{
-		Nodes: []gpx.ExtensionNode{trackExt},
+				Nodes: nodes,
+			}},
 	}
 }

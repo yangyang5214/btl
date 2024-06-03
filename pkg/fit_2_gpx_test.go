@@ -44,3 +44,11 @@ func TestParserCsv(t *testing.T) {
 	}
 	t.Log(session.points[0])
 }
+
+func TestNewFit2Gpx(t *testing.T) {
+	fp := NewFit2Gpx("/Users/beer/Downloads/361850974_ACTIVITY.fit", log.DefaultLogger)
+	err := fp.Run()
+	if err != nil {
+		panic(err)
+	}
+}

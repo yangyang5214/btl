@@ -8,7 +8,7 @@ import (
 
 // fitToGpxCmd represents the fitToGpx command
 var fitToGpxCmd = &cobra.Command{
-	Use:   "fit_2_gpx",
+	Use:   "fit2gpx",
 	Short: "fit to gpx file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {

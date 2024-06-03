@@ -9,13 +9,16 @@ from garmin_fit_sdk import Decoder, Stream
 # pip3 install garmin-fit-sdk
 
 class Point:
+    distance = 0
+    speed = 0
+    cadence = 0
+    altitude = 0
+    hr = 0
 
-    def __init__(self, ts, lat, lng, altitude, hr):
+    def __init__(self, ts, lat, lng):
         self.ts = int(ts)
         self.lat = lat
         self.lng = lng
-        self.altitude = altitude
-        self.hr = hr
 
 
 def main(f: str, result: str):
@@ -39,10 +42,15 @@ def main(f: str, result: str):
             continue
         lat = point['position_lat'] * (180 / 2 ** 31)
         lng = point['position_long'] * (180 / 2 ** 31)
-        altitude = point.get('enhanced_altitude', 0)
 
-        hr = point.get('heart_rate', 0)
-        p = Point(ts, lat, lng, altitude, hr)
+        p = Point(ts, lat, lng)
+
+        p.hr = point.get('heart_rate', 0)
+        p.altitude = point.get('enhanced_altitude', 0)
+        p.distance = point.get('distance', 0)
+        p.speed = point.get('enhanced_speed', 0)
+        p.cadence = point.get('cadence', 0)
+
         results.append(p)
 
     with open(result, 'w') as f:

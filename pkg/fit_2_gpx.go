@@ -191,7 +191,7 @@ func (s *Fit2Gpx) Run() error {
 				Longitude: p.Lng * 180 / 2147483648,
 				Elevation: *gpx.NewNullableFloat64(p.Altitude),
 			},
-			Timestamp: time.Unix(p.Ts, 0).UTC(),
+			Timestamp: time.Unix(p.Ts+631036800, 0).UTC(),
 		}
 		item.Extensions = genExtensions(p)
 

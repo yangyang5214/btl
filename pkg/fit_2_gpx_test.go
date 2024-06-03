@@ -42,5 +42,5 @@ func TestParserCsv(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	t.Log(session)
+	t.Log(session.points[0])
 }

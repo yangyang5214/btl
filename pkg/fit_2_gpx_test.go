@@ -27,3 +27,20 @@ func TestFit2Gpx(t *testing.T) {
 		}
 	}
 }
+
+func TestFit2Csv(t *testing.T) {
+	fg := NewFit2Gpx("/Users/beer/Downloads/240525144003.fit", log.DefaultLogger)
+	err := fg.fit2Csv("/tmp/1.csv")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestParserCsv(t *testing.T) {
+	fg := NewFit2Gpx("/Users/beer/Downloads/240525144003.fit", log.DefaultLogger)
+	session, err := fg.parserCsv("/tmp/1.csv")
+	if err != nil {
+		panic(err)
+	}
+	t.Log(session)
+}

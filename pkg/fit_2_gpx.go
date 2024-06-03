@@ -2,12 +2,14 @@ package pkg
 
 import (
 	_ "embed"
-	"encoding/json"
+	"encoding/csv"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -16,26 +18,23 @@ import (
 )
 
 type Fit2Gpx struct {
-	fitFile   string
-	log       *log.Helper
-	workDir   string
-	runFile   string
-	resultGpx string
+	fitFile    string
+	log        *log.Helper
+	workDir    string
+	fitCSVTool string
+	resultGpx  string
 }
-
-//go:embed script/fit_parser.py
-var fit2gpx string
 
 func NewFit2Gpx(fitFile string, logger log.Logger) *Fit2Gpx {
 	homeDir, _ := os.UserHomeDir()
 	workDir := path.Join(homeDir, ".fit2gpx")
 	_ = os.MkdirAll(workDir, 0755)
 	return &Fit2Gpx{
-		fitFile:   fitFile,
-		log:       log.NewHelper(logger),
-		workDir:   workDir,
-		runFile:   path.Join(workDir, "fit_parser.py"),
-		resultGpx: "result.gpx",
+		fitFile:    fitFile,
+		log:        log.NewHelper(logger),
+		workDir:    workDir,
+		fitCSVTool: path.Join(workDir, "FitCSVTool.jar"),
+		resultGpx:  "result.gpx",
 	}
 }
 
@@ -43,91 +42,116 @@ func (s *Fit2Gpx) SetResultPath(resultPath string) {
 	s.resultGpx = resultPath
 }
 
-func (s *Fit2Gpx) init() error {
-	_, err := os.Stat(s.runFile)
-	if err == nil {
-		return nil //skip
-	}
-	f, err := os.Create(s.runFile)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.WriteString(fit2gpx)
-	if err != nil {
-		return err
-	}
-	cmds := []string{
-		"pip3 install garmin-fit-sdk",
-	}
-	for _, cmd := range cmds {
-		err = exec.Command("/bin/bash", "-c", cmd).Run()
-		if err != nil {
-			s.log.Errorf("run cmd %s failed", cmd)
-			return errors.WithStack(err)
-		}
-	}
-	return nil
+type Session struct {
+	points []*Record
 }
 
-//	{
-//	  "ts": 1716680184,
-//	  "lat": 30.102142682299018,
-//	  "lng": 118.86114215478301,
-//	  "hr": 121,
-//	  "altitude": 1764.6,
-//	  "distance": 145.31,
-//	  "speed": 0.989,
-//	  "cadence": 0
-//	}
-type point struct {
-	Ts        int64   `json:"ts"`
-	Lat       float64 `json:"lat"`
-	Lng       float64 `json:"lng"`
-	Altitude  float64 `json:"altitude"`
-	HeartRate int     `json:"hr"`
-	Distance  float64 `json:"distance"`
-	Speed     float64 `json:"speed"`
-	Cadence   int     `json:"cadence"`
+type Record struct {
+	Ts        int64
+	Lat       float64
+	Lng       float64
+	Altitude  float64
+	HeartRate int64
+	Distance  float64
+	Speed     float64
+	Cadence   int64
 }
 
-func (s *Fit2Gpx) process() ([]*point, error) {
-	fpath := path.Join("/tmp", fmt.Sprintf("%d.json", time.Now().UnixMilli()))
-	newFile, err := os.Create(fpath)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	err = newFile.Close()
+func (s *Fit2Gpx) fit2Csv(csvPath string) error {
+	cmd := fmt.Sprintf("java -jar %s -b %s %s", s.fitCSVTool, s.fitFile, csvPath)
+	s.log.Infof("run cmd %s", cmd)
+	return exec.Command("/bin/bash", "-c", cmd).Run()
+}
+
+func (s *Fit2Gpx) parserCsv(csvPath string) (*Session, error) {
+	csvFile, err := os.Open(csvPath)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = os.Remove(fpath)
-	}()
+	session := &Session{}
+	r := csv.NewReader(csvFile)
+	r.FieldsPerRecord = -1
 
-	cmd := fmt.Sprintf("python3 %s %s %s", s.runFile, s.fitFile, fpath)
-	s.log.Infof("run cmd %s", cmd)
-	err = exec.Command("/bin/bash", "-c", cmd).Run()
-	if err != nil {
-		return nil, errors.New("文件解析错误 联系开发者")
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		if record[2] == "record" {
+			robj, err := s.parserRecord(record)
+			if err != nil {
+				return nil, err
+			}
+			if robj != nil {
+				session.points = append(session.points, robj)
+			}
+		}
 	}
-	return ParserPyResult(fpath)
+	return session, err
 }
 
-func ParserPyResult(fpath string) ([]*point, error) {
-	bytesData, err := os.ReadFile(fpath)
+func (s *Fit2Gpx) parserRecord(msgs []string) (*Record, error) {
+	m := make(map[string]string)
+	for i := 3; i < 13; i += 3 {
+		m[msgs[i]] = msgs[i+1]
+	}
+
+	ts, ok := m["timestamp"]
+	if !ok {
+		return nil, nil
+	}
+	if ts == "1" {
+		return nil, nil //ignore
+	}
+
+	tsInt, err := strconv.ParseInt(ts, 10, 64)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil
 	}
-	var points []*point
-	err = json.Unmarshal(bytesData, &points)
+
+	lat := parseFloat(m["position_lat"])
+	if lat == 0 {
+		return nil, nil //ignore
+	}
+
+	return &Record{
+		Ts:        tsInt, //todo
+		Lat:       lat,
+		Lng:       parseFloat(m["position_long"]),
+		Altitude:  parseFloat(m["altitude"]),
+		HeartRate: parseInt(m["heart_rate"]),
+		Distance:  parseFloat(m["distance"]),
+		Speed:     parseFloat(m["speed"]),
+		Cadence:   parseInt(m["cadence"]),
+	}, nil
+}
+
+func parseFloat(v string) float64 {
+	r, _ := strconv.ParseFloat(v, 64)
+	return r
+}
+
+func parseInt(v string) int64 {
+	r, _ := strconv.ParseInt(v, 10, 64)
+	return r
+}
+
+func (s *Fit2Gpx) process() (*Session, error) {
+	csvPath := path.Join("/tmp", fmt.Sprintf("%d.csv", time.Now().UnixMilli()))
+	err := s.fit2Csv(csvPath)
 	if err != nil {
-		return nil, errors.New("内部错误")
+		return nil, err
 	}
-	if len(points) == 0 {
-		return nil, errors.New("文件缺数据 请使用源数据文件")
+
+	session, err := s.parserCsv(csvPath)
+	if err != nil {
+		return nil, err
 	}
-	return points, nil
+	return session, nil
 }
 
 var gpxDemo = `
@@ -150,14 +174,11 @@ func (s *Fit2Gpx) Run() error {
 		s.log.Infof("not fit file")
 		return nil
 	}
-	err := s.init()
+	session, err := s.process()
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	points, err := s.process()
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	points := session.points
 	gpxData, err := gpx.ParseString(gpxDemo)
 	if err != nil {
 		return errors.WithStack(err)
@@ -166,8 +187,8 @@ func (s *Fit2Gpx) Run() error {
 	for _, p := range points {
 		item := gpx.GPXPoint{
 			Point: gpx.Point{
-				Latitude:  p.Lat,
-				Longitude: p.Lng,
+				Latitude:  p.Lat * 180 / 2147483648,
+				Longitude: p.Lng * 180 / 2147483648,
 				Elevation: *gpx.NewNullableFloat64(p.Altitude),
 			},
 			Timestamp: time.Unix(p.Ts, 0).UTC(),
@@ -194,7 +215,7 @@ func (s *Fit2Gpx) Run() error {
 	return nil
 }
 
-func genExtensions(p *point) gpx.Extension {
+func genExtensions(p *Record) gpx.Extension {
 	var trackExt gpx.ExtensionNode
 	trackExt = gpx.ExtensionNode{
 		XMLName: xml.Name{

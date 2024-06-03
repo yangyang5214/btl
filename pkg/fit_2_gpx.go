@@ -70,12 +70,25 @@ func (s *Fit2Gpx) init() error {
 	return nil
 }
 
+//	{
+//	  "ts": 1716680184,
+//	  "lat": 30.102142682299018,
+//	  "lng": 118.86114215478301,
+//	  "hr": 121,
+//	  "altitude": 1764.6,
+//	  "distance": 145.31,
+//	  "speed": 0.989,
+//	  "cadence": 0
+//	}
 type point struct {
 	Ts        int64   `json:"ts"`
 	Lat       float64 `json:"lat"`
 	Lng       float64 `json:"lng"`
 	Altitude  float64 `json:"altitude"`
 	HeartRate int     `json:"hr"`
+	Distance  float64 `json:"distance"`
+	Speed     float64 `json:"speed"`
+	Cadence   int     `json:"cadence"`
 }
 
 func (s *Fit2Gpx) process() ([]*point, error) {
@@ -159,29 +172,7 @@ func (s *Fit2Gpx) Run() error {
 			},
 			Timestamp: time.Unix(p.Ts, 0).UTC(),
 		}
-		//Extensions
-
-		var trackExt gpx.ExtensionNode
-		if p.HeartRate != 0 {
-			trackExt = gpx.ExtensionNode{
-				XMLName: xml.Name{
-					Space: "ns3",
-					Local: "TrackPointExtension",
-				},
-				Nodes: []gpx.ExtensionNode{
-					{
-						XMLName: xml.Name{
-							Space: "ns3",
-							Local: "hr",
-						},
-						Data: fmt.Sprintf("%d", p.HeartRate),
-					},
-				},
-			}
-			item.Extensions = gpx.Extension{
-				Nodes: []gpx.ExtensionNode{trackExt},
-			}
-		}
+		item.Extensions = genExtensions(p)
 
 		gpxPoints = append(gpxPoints, item)
 	}
@@ -201,4 +192,48 @@ func (s *Fit2Gpx) Run() error {
 	defer f.Close()
 	_, _ = f.Write(newXml)
 	return nil
+}
+
+func genExtensions(p *point) gpx.Extension {
+	var trackExt gpx.ExtensionNode
+	trackExt = gpx.ExtensionNode{
+		XMLName: xml.Name{
+			Space: "ns3",
+			Local: "TrackPointExtension",
+		},
+		Nodes: []gpx.ExtensionNode{
+			{
+				XMLName: xml.Name{
+					Space: "ns3",
+					Local: "hr",
+				},
+				Data: fmt.Sprintf("%d", p.HeartRate),
+			},
+			{
+				XMLName: xml.Name{
+					Space: "ns3",
+					Local: "cadence",
+				},
+				Data: fmt.Sprintf("%d", p.Cadence),
+			},
+			{
+				XMLName: xml.Name{
+					Space: "ns3",
+					Local: "distance",
+				},
+				Data: fmt.Sprintf("%f", p.Distance),
+			},
+			{
+				XMLName: xml.Name{
+					Space: "ns3",
+					Local: "speed",
+				},
+				Data: fmt.Sprintf("%f", p.Speed),
+			},
+		},
+	}
+
+	return gpx.Extension{
+		Nodes: []gpx.ExtensionNode{trackExt},
+	}
 }

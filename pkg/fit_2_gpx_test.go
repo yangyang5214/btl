@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// 批量 fit 转 http
 func TestFit2Gpx(t *testing.T) {
 	targetDir := "/Users/beer/Downloads/5月2日-5月26日318川藏骑行数据"
 	entries, err := os.ReadDir(targetDir)

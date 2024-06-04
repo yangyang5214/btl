@@ -2,6 +2,7 @@ package gpx_export
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"os/exec"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -44,12 +45,11 @@ func (s *GarminUpload) Run() error {
 		cmdStr = cmdStr + " --is-cn"
 	}
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
-	s.log.Infof("satrt run cmd: %s", cmdStr)
+	s.log.Infof("start run cmd: %s", cmdStr)
 
 	out, err := cmd.Output()
 	if err != nil {
-		s.log.Errorf("run cmd: %s", err)
-		return err
+		return errors.New("导入失败")
 	}
 	s.log.Infof("run cmd out: %s", out)
 	return nil

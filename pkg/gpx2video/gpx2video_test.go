@@ -6,7 +6,7 @@ import (
 )
 
 func TestRouteVideo(t *testing.T) {
-	gpxFilePath := "/Users/beer/Downloads/activity_365437876.gpx"
+	gpxFilePath := "/Users/beer/Downloads/GOTOES_1421451299181451.gpx"
 
 	//f, err := os.CreateTemp("", "gpx2video*")
 	//if err != nil {

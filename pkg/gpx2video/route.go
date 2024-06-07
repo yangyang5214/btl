@@ -45,6 +45,11 @@ func (s *RouteVideo) Run() error {
 	imgBound := genImageBound(points)
 
 	prePoint := points[0]
+	err = s.genImage(0, points, imgBound)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	for i := 1; i < len(points); i++ {
 		curPoint := points[i]
 
@@ -118,8 +123,10 @@ func (s *RouteVideo) copyPre(num int, startTime time.Time) error {
 	prePath := s.genImagePath(startTime)
 	for i := 1; i < num; i++ {
 		curPath := s.genImagePath(startTime.Add(time.Duration(i) * time.Second))
-		err := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp %s %s", prePath, curPath)).Run()
+		cpCmd := fmt.Sprintf("cp %s %s", prePath, curPath)
+		err := exec.Command("/bin/bash", "-c", cpCmd).Run()
 		if err != nil {
+			s.log.Errorf("run cmd <%s> failed", cpCmd)
 			return err
 		}
 	}

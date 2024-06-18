@@ -37,7 +37,23 @@ var routeCmd = &cobra.Command{
 	},
 }
 
+var imgCmd = &cobra.Command{
+	Use:   "img",
+	Short: "img overview",
+	Run: func(cmd *cobra.Command, args []string) {
+		s, err := gpx2video.NewImgOverview(filePath, log.DefaultLogger)
+		if err != nil {
+			panic(err)
+		}
+		err = s.Run()
+		if err != nil {
+			panic(err)
+		}
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(gpx2videoCmd)
 	gpx2videoCmd.AddCommand(routeCmd)
+	gpx2videoCmd.AddCommand(imgCmd)
 }

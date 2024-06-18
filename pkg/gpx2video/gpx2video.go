@@ -20,6 +20,8 @@ type Point struct {
 type ImageBound struct {
 	xPoints, yPoints       []float64
 	minX, maxX, minY, maxY float64
+
+	width, height int
 }
 
 // 解析 GPX 文件

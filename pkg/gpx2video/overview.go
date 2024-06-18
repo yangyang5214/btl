@@ -58,8 +58,8 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 	dc.Clear()
 
 	// 计算缩放比例
-	scaleX := float64(width) / (imgBound.maxX - imgBound.minX)
-	scaleY := float64(height) / (imgBound.maxY - imgBound.minY)
+	scaleX := float64(width-50) / (imgBound.maxX - imgBound.minX)
+	scaleY := float64(height-50) / (imgBound.maxY - imgBound.minY)
 	scale := math.Min(scaleX, scaleY)
 
 	xPoints := imgBound.xPoints
@@ -68,6 +68,7 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 	minX, maxX, minY, maxY := imgBound.minX, imgBound.maxX, imgBound.minY, imgBound.maxY
 
 	dc.SetRGB(1, 0, 0)
+	dc.SetLineWidth(2)
 
 	size := len(xPoints)
 	for i := 1; i < size; i++ {

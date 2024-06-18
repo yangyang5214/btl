@@ -1,11 +1,15 @@
 package gpx2video
 
 import (
+	_ "embed"
 	"github.com/tkrajina/gpxgo/gpx"
 	"math"
 	"os"
 	"time"
 )
+
+//go:embed ttf/kai.ttf
+var kai []byte
 
 const R = 6378137
 

@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
 	"math"
+	"os"
 )
 
 type ImgOverview struct {
@@ -67,7 +68,8 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 
 	minX, maxX, minY, maxY := imgBound.minX, imgBound.maxX, imgBound.minY, imgBound.maxY
 
-	dc.SetRGB(1, 0, 0)
+	dc.SetRGB(1, 1, 0) //黄色
+	//dc.SetRGB(1, 0, 0) //红色
 	dc.SetLineWidth(2)
 
 	size := len(xPoints)
@@ -80,5 +82,47 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 		dc.DrawLine(x1, y1, x2, y2)
 	}
 	dc.Stroke()
+
+	circleSize := 10.0
+
+	err := loadFontFace(dc, 16)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	// 标记起点
+	startX := (xPoints[0]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
+	startY := (float64(height) - (yPoints[0]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
+	dc.SetRGB(0, 1, 0)
+	dc.DrawCircle(startX, startY, circleSize)
+	dc.Fill()
+	dc.SetRGB(1, 1, 1) // 设置字体颜色为白色
+	dc.DrawStringAnchored("起", startX, startY, 0.5, 0.5)
+
+	// 标记终点
+	endX := (xPoints[size-1]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
+	endY := (float64(height) - (yPoints[size-1]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
+	dc.SetRGB(1, 0, 0)
+	dc.DrawCircle(endX, endY, circleSize)
+	dc.Fill()
+	dc.SetRGB(1, 1, 1) // 设置字体颜色为白色
+	dc.DrawStringAnchored("终", endX, endY, 0.5, 0.5)
+
 	return dc.SavePNG(outputImagePath)
+}
+
+func loadFontFace(dc *gg.Context, points float64) error {
+	p := "kai.ttf"
+	_, err := os.Stat(p)
+	if err != nil {
+		err = os.WriteFile(p, kai, 0644)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+	err = dc.LoadFontFace(p, points)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }

@@ -1,12 +1,14 @@
 package gpx2video
 
 import (
+	"fmt"
 	"github.com/fogleman/gg"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"github.com/tkrajina/gpxgo/gpx"
 	"math"
 	"os"
+	"path"
 )
 
 type ImgOverview struct {
@@ -83,7 +85,7 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 	}
 	dc.Stroke()
 
-	circleSize := 10.0
+	circleSize := 15.0
 
 	err := loadFontFace(dc, 16)
 	if err != nil {
@@ -111,14 +113,16 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 	return dc.SavePNG(outputImagePath)
 }
 
+func ttfPath() string {
+	homeDir, _ := os.UserHomeDir()
+	return path.Join(homeDir, ".ttf", "chinese.ttf")
+}
+
 func loadFontFace(dc *gg.Context, points float64) error {
-	p := "kai.ttf"
+	p := ttfPath()
 	_, err := os.Stat(p)
 	if err != nil {
-		err = os.WriteFile(p, kai, 0644)
-		if err != nil {
-			return errors.WithStack(err)
-		}
+		return fmt.Errorf("ttf path %s not exist", p)
 	}
 	err = dc.LoadFontFace(p, points)
 	if err != nil {

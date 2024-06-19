@@ -8,9 +8,6 @@ import (
 	"time"
 )
 
-//go:embed ttf/kai.ttf
-var kai []byte
-
 const R = 6378137
 
 type Point struct {

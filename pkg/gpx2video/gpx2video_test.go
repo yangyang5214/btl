@@ -2,6 +2,7 @@ package gpx2video
 
 import (
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tkrajina/gpxgo/gpx"
 	"testing"
 )
 
@@ -15,11 +16,11 @@ func TestRouteVideo(t *testing.T) {
 
 	workDir := "/tmp/111"
 
-	route, err := NewRouteVideo(gpxFilePath, log.DefaultLogger, workDir)
+	gpxData, err := gpx.ParseFile(gpxFilePath)
 	if err != nil {
 		panic(err)
 	}
-
+	route := NewRouteVideo(gpxData, log.DefaultLogger, workDir)
 	err = route.Run()
 	if err != nil {
 		panic(err)

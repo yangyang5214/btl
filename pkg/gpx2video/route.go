@@ -5,6 +5,7 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
+	"github.com/tkrajina/gpxgo/gpx"
 	"math"
 	"os"
 	"os/exec"
@@ -14,29 +15,26 @@ import (
 )
 
 type RouteVideo struct {
-	gpxFile       string
 	log           *log.Helper
 	workDir       string
 	width, height int
 	outMp4        string
+	gpxData       *gpx.GPX
 }
 
-func NewRouteVideo(gpxFile string, logger log.Logger, workDir string) (*RouteVideo, error) {
+func NewRouteVideo(gpxData *gpx.GPX, logger log.Logger, workDir string) *RouteVideo {
 	return &RouteVideo{
-		gpxFile: gpxFile,
+		gpxData: gpxData,
 		workDir: workDir,
 		log:     log.NewHelper(logger),
 		width:   800,
 		height:  600,
 		outMp4:  "out.mp4",
-	}, nil
+	}
 }
 
 func (s *RouteVideo) Run() error {
-	s.log.Infof("gpx2video gpx file is %s", s.gpxFile)
-
-	//get all points
-	session, err := parseGPX(s.gpxFile)
+	session, err := parseGPX(s.gpxData)
 	if err != nil {
 		return errors.WithStack(err)
 	}

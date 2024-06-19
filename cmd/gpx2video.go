@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
+	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/gpx2video"
 	"os"
 )
@@ -26,10 +27,11 @@ var routeCmd = &cobra.Command{
 		defer func() {
 			_ = os.Remove(tmpDir)
 		}()
-		s, err := gpx2video.NewRouteVideo(filePath, log.DefaultLogger, tmpDir)
+		gpxData, err := gpx.ParseFile(filePath)
 		if err != nil {
 			panic(err)
 		}
+		s := gpx2video.NewRouteVideo(gpxData, log.DefaultLogger, tmpDir)
 		err = s.Run()
 		if err != nil {
 			panic(err)
@@ -41,10 +43,11 @@ var imgCmd = &cobra.Command{
 	Use:   "img",
 	Short: "img overview",
 	Run: func(cmd *cobra.Command, args []string) {
-		s, err := gpx2video.NewImgOverview(filePath, log.DefaultLogger)
+		gpxData, err := gpx.ParseFile(filePath)
 		if err != nil {
 			panic(err)
 		}
+		s := gpx2video.NewImgOverview(gpxData, log.DefaultLogger)
 		err = s.Run()
 		if err != nil {
 			panic(err)

@@ -12,32 +12,23 @@ import (
 )
 
 type ImgOverview struct {
-	gpxFile string
 	log     *log.Helper
 	gpxData *gpx.GPX
 	width   int
 	height  int
 }
 
-func NewImgOverview(gpxFile string, logger log.Logger) (*ImgOverview, error) {
-	gpxData, err := gpx.ParseFile(gpxFile)
-	if err != nil {
-		return nil, err
-	}
+func NewImgOverview(gpxData *gpx.GPX, logger log.Logger) *ImgOverview {
 	return &ImgOverview{
-		gpxFile: gpxFile,
 		log:     log.NewHelper(logger),
 		gpxData: gpxData,
 		width:   800,
 		height:  600,
-	}, nil
+	}
 }
 
 func (s *ImgOverview) Run() error {
-	s.log.Infof("gpx2video img cmd, gpx file is %s", s.gpxFile)
-
-	//get all points
-	session, err := parseGPX(s.gpxFile)
+	session, err := parseGPX(s.gpxData)
 	if err != nil {
 		return errors.WithStack(err)
 	}

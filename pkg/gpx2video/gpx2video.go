@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"github.com/tkrajina/gpxgo/gpx"
 	"math"
-	"os"
 	"time"
 )
 
@@ -38,18 +37,7 @@ type ImageBound struct {
 }
 
 // 解析 GPX 文件
-func parseGPX(filePath string) (*Session, error) {
-	gpxFile, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer gpxFile.Close()
-
-	gpxData, err := gpx.Parse(gpxFile)
-	if err != nil {
-		return nil, err
-	}
-
+func parseGPX(gpxData *gpx.GPX) (*Session, error) {
 	var points []Point
 	for _, track := range gpxData.Tracks {
 		for _, segment := range track.Segments {

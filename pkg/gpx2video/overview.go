@@ -37,13 +37,14 @@ func (s *ImgOverview) Run() error {
 	s.log.Infof("gpx2video img cmd, gpx file is %s", s.gpxFile)
 
 	//get all points
-	points, err := parseGPX(s.gpxFile)
+	session, err := parseGPX(s.gpxFile)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	s.log.Infof("all points size %d", len(points))
+	s.log.Infof("all points size %d", len(session.points))
+	imgBound := genImageBound(session)
+	s.log.Infof("max/avg speed is %f,%f", imgBound.maxSpeed, imgBound.avgSpeed)
 
-	imgBound := genImageBound(points)
 	imgBound.width = s.width
 	imgBound.height = s.height
 
@@ -51,6 +52,7 @@ func (s *ImgOverview) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	s.log.Infof("gen gpx img overview success")
 	return nil
 }
 
@@ -70,20 +72,37 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 
 	minX, maxX, minY, maxY := imgBound.minX, imgBound.maxX, imgBound.minY, imgBound.maxY
 
-	dc.SetRGB(1, 1, 0) //黄色
-	//dc.SetRGB(1, 0, 0) //红色
-	dc.SetLineWidth(2)
+	dc.SetLineWidth(8)
+
+	speeds := imgBound.speeds
+	maxSpeed := imgBound.maxSpeed
+	avgSpeed := imgBound.avgSpeed
 
 	size := len(xPoints)
 	for i := 1; i < size; i++ {
+		speed := speeds[i-1]
+		if speed < avgSpeed {
+			normalizedSpeed := speed / avgSpeed
+			r := normalizedSpeed
+			g := 1.0
+			b := 0.0
+			dc.SetRGB(r, g, b) // 绿色到黄色的渐变
+		} else {
+			normalizedSpeed := (speed - avgSpeed) / (maxSpeed - avgSpeed)
+			r := 1.0
+			g := 1.0 - normalizedSpeed
+			b := 0.0
+			dc.SetRGB(r, g, b) // 黄色到红色的渐变
+		}
+
 		x1 := (xPoints[i-1]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
 		y1 := (float64(height) - (yPoints[i-1]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
 
 		x2 := (xPoints[i]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
 		y2 := (float64(height) - (yPoints[i]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
 		dc.DrawLine(x1, y1, x2, y2)
+		dc.Stroke()
 	}
-	dc.Stroke()
 
 	circleSize := 15.0
 

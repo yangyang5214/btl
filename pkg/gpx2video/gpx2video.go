@@ -16,17 +16,29 @@ type Point struct {
 	Elevation float64
 
 	Timestamp time.Time
+
+	Speed float64
+}
+
+type Session struct {
+	points   []Point
+	maxSpeed float64
+	avgSpeed float64
 }
 
 type ImageBound struct {
 	xPoints, yPoints       []float64
 	minX, maxX, minY, maxY float64
+	width, height          int
 
-	width, height int
+	speeds []float64
+
+	maxSpeed float64
+	avgSpeed float64
 }
 
 // 解析 GPX 文件
-func parseGPX(filePath string) ([]Point, error) {
+func parseGPX(filePath string) (*Session, error) {
 	gpxFile, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -41,17 +53,24 @@ func parseGPX(filePath string) ([]Point, error) {
 	var points []Point
 	for _, track := range gpxData.Tracks {
 		for _, segment := range track.Segments {
-			for _, p := range segment.Points {
+			for index, p := range segment.Points {
 				points = append(points, Point{
 					Latitude:  p.Latitude,
 					Longitude: p.Longitude,
 					Timestamp: p.Timestamp,
 					Elevation: p.Elevation.Value(),
+					Speed:     segment.Speed(index),
 				})
 			}
 		}
 	}
-	return points, nil
+
+	movingData := gpxData.MovingData()
+	return &Session{
+		avgSpeed: movingData.MovingDistance / movingData.MovingTime,
+		maxSpeed: movingData.MaxSpeed,
+		points:   points,
+	}, nil
 }
 
 // 经纬度转换为直角坐标系（墨卡托投影）
@@ -61,12 +80,17 @@ func mercatorProjection(lat, lon float64) (float64, float64) {
 	return x, y
 }
 
-func genImageBound(points []Point) *ImageBound {
-	var xPoints, yPoints []float64
+func genImageBound(session *Session) *ImageBound {
+	points := session.points
+	var (
+		xPoints, yPoints, speeds []float64
+	)
 	for _, point := range points {
 		x, y := mercatorProjection(point.Latitude, point.Longitude)
 		xPoints = append(xPoints, x)
 		yPoints = append(yPoints, y)
+
+		speeds = append(speeds, point.Speed)
 	}
 
 	// 计算坐标范围
@@ -88,11 +112,14 @@ func genImageBound(points []Point) *ImageBound {
 	}
 
 	return &ImageBound{
-		xPoints: xPoints,
-		yPoints: yPoints,
-		minX:    minX,
-		maxX:    maxX,
-		minY:    minY,
-		maxY:    maxY,
+		xPoints:  xPoints,
+		yPoints:  yPoints,
+		minX:     minX,
+		maxX:     maxX,
+		minY:     minY,
+		maxY:     maxY,
+		speeds:   speeds,
+		maxSpeed: session.maxSpeed,
+		avgSpeed: session.avgSpeed,
 	}
 }

@@ -36,13 +36,14 @@ func (s *RouteVideo) Run() error {
 	s.log.Infof("gpx2video gpx file is %s", s.gpxFile)
 
 	//get all points
-	points, err := parseGPX(s.gpxFile)
+	session, err := parseGPX(s.gpxFile)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	points := session.points
 	s.log.Infof("all points size %d", len(points))
 
-	imgBound := genImageBound(points)
+	imgBound := genImageBound(session)
 
 	prePoint := points[0]
 	err = s.genImage(0, points, imgBound)

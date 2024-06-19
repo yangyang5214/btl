@@ -79,24 +79,29 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 	avgSpeed := imgBound.avgSpeed
 
 	size := len(xPoints)
-	for i := 1; i < size; i++ {
-		speed := speeds[i-1]
+
+	step := 1
+	for i := step; i < size; i += step {
+		speed := speeds[i-step]
+		var r, g, b float64
 		if speed < avgSpeed {
+			// 绿色到黄色
 			normalizedSpeed := speed / avgSpeed
-			r := normalizedSpeed
-			g := 1.0
-			b := 0.0
-			dc.SetRGB(r, g, b) // 绿色到黄色的渐变
+			r = normalizedSpeed
+			g = 1.0
+			b = 0.0
 		} else {
+			// 黄色到红色¬
 			normalizedSpeed := (speed - avgSpeed) / (maxSpeed - avgSpeed)
-			r := 1.0
-			g := 1.0 - normalizedSpeed
-			b := 0.0
-			dc.SetRGB(r, g, b) // 黄色到红色的渐变
+			r = 1.0
+			g = 1.0 - normalizedSpeed
+			b = 0.0
 		}
 
-		x1 := (xPoints[i-1]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
-		y1 := (float64(height) - (yPoints[i-1]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
+		dc.SetRGB(r, g, b)
+
+		x1 := (xPoints[i-step]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
+		y1 := (float64(height) - (yPoints[i-step]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
 
 		x2 := (xPoints[i]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
 		y2 := (float64(height) - (yPoints[i]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
@@ -121,8 +126,8 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 	dc.DrawStringAnchored("起", startX, startY, 0.5, 0.5)
 
 	// 标记终点
-	endX := (xPoints[size-1]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
-	endY := (float64(height) - (yPoints[size-1]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
+	endX := (xPoints[size-step]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
+	endY := (float64(height) - (yPoints[size-step]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
 	dc.SetRGB(1, 0, 0)
 	dc.DrawCircle(endX, endY, circleSize)
 	dc.Fill()

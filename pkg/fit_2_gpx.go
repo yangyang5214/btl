@@ -44,6 +44,8 @@ func (s *Fit2Gpx) SetResultPath(resultPath string) {
 
 type Session struct {
 	points []*Record
+
+	sportType string
 }
 
 type Record struct {
@@ -79,6 +81,10 @@ func (s *Fit2Gpx) parserCsv(csvPath string) (*Session, error) {
 		}
 		if err != nil {
 			return nil, errors.WithStack(err)
+		}
+
+		if record[2] == "sport" && record[0] == "Data" {
+			session.sportType = record[4]
 		}
 
 		if record[2] == "record" {
@@ -162,11 +168,13 @@ func (s *Fit2Gpx) process() (*Session, error) {
 	}()
 	err := s.fit2Csv(csvPath)
 	if err != nil {
+		s.log.Errorf("FitCSVTool.jar cmd run err %+v", err)
 		return nil, err
 	}
 
 	session, err := s.parserCsv(csvPath)
 	if err != nil {
+		s.log.Errorf("parser csv err: %+v", err)
 		return nil, err
 	}
 	return session, nil
@@ -201,6 +209,8 @@ func (s *Fit2Gpx) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	s.log.Infof("sport type is <%s>", session.sportType)
+	gpxData.Tracks[0].Type = session.sportType
 	var gpxPoints []gpx.GPXPoint
 	for _, p := range points {
 		item := gpx.GPXPoint{
@@ -232,7 +242,12 @@ func (s *Fit2Gpx) Run() error {
 		return errors.WithStack(err)
 	}
 	defer f.Close()
-	_, _ = f.Write(newXml)
+	_, err = f.Write(newXml)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	s.log.Infof("fit2gpx success %s", s.resultGpx)
 	return nil
 }
 

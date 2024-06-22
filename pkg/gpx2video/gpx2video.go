@@ -94,13 +94,15 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 	logrHelper.Infof("run cmd: <%s>", gpx2fitCmd)
 	err = cmd.Run()
 	if err != nil {
+		logrHelper.Errorf("run merge-fit err: %s", logBuffer.String())
 		return nil, errors.WithStack(err)
 	}
-	logrHelper.Infof("fit stat: %s", logBuffer.String())
+	logrHelper.Infof("parser fit point: %s", logBuffer.String())
 
 	sessionFile := path.Join(tempDir, "record.json")
 	dates, err := os.ReadFile(sessionFile)
 	if err != nil {
+		logrHelper.Errorf("read file <%s> err", sessionFile)
 		return nil, err
 	}
 
@@ -122,14 +124,19 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 			continue
 		}
 
-		ps = append(ps, Point{
+		p := Point{
 			Latitude:  float64(lat.(int64)) / 10_000_000,
 			Longitude: float64(m["position_long"].(int64)) / 10_000_000,
-			Elevation: 0,
-			Speed:     float64(m["enhanced_speed"].(int64)) / 1_000,
-		})
-	}
+		}
 
+		speed, ok := m["enhanced_speed"]
+		if ok {
+			p.Speed = float64(speed.(int64)) / 1_000
+		}
+
+		ps = append(ps, p)
+	}
+	logrHelper.Infof("all point size %d", len(ps))
 	return &Session{
 		points: ps,
 	}, nil

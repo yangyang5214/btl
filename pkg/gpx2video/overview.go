@@ -5,41 +5,42 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
-	"github.com/tkrajina/gpxgo/gpx"
 	"math"
 	"os"
 	"path"
 )
 
 type ImgOverview struct {
-	log     *log.Helper
-	gpxData *gpx.GPX
-	width   int
-	height  int
+	log       *log.Helper
+	width     int
+	height    int
+	session   *Session
+	resultPng string
 }
 
-func NewImgOverview(gpxData *gpx.GPX, logger log.Logger) *ImgOverview {
+func NewImgOverview(session *Session, logger log.Logger) *ImgOverview {
 	return &ImgOverview{
-		log:     log.NewHelper(logger),
-		gpxData: gpxData,
-		width:   800,
-		height:  600,
+		log:       log.NewHelper(logger),
+		session:   session,
+		width:     1440,
+		height:    900,
+		resultPng: "result.png",
 	}
+}
+
+func (s *ImgOverview) SetImgPath(resultPng string) {
+	s.resultPng = resultPng
 }
 
 func (s *ImgOverview) Run() error {
-	session, err := parseGPX(s.gpxData)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	s.log.Infof("all points size %d", len(session.points))
-	imgBound := genImageBound(session)
+	s.log.Infof("all points size %d", len(s.session.points))
+	imgBound := genImageBound(s.session)
 	s.log.Infof("max/avg speed is %f,%f", imgBound.maxSpeed, imgBound.avgSpeed)
 
 	imgBound.width = s.width
 	imgBound.height = s.height
 
-	err = plotImage(imgBound, "result.png")
+	err := plotImage(imgBound, s.resultPng)
 	if err != nil {
 		return errors.WithStack(err)
 	}

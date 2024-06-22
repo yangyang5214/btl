@@ -36,3 +36,14 @@ func TestGenVideo(t *testing.T) {
 		panic(err)
 	}
 }
+
+func TestFitStat(t *testing.T) {
+	session, err := ParseFit("/Users/beer/beer/merge-fit/fits/1.fit", log.NewHelper(log.DefaultLogger))
+	if err != nil {
+		panic(err)
+	}
+	t.Log(session)
+}
+
+func TestImgFit(t *testing.T) {
+}

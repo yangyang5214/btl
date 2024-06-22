@@ -34,7 +34,7 @@ func NewRouteVideo(gpxData *gpx.GPX, logger log.Logger, workDir string) *RouteVi
 }
 
 func (s *RouteVideo) Run() error {
-	session, err := parseGPX(s.gpxData)
+	session, err := ParseGPX(s.gpxData)
 	if err != nil {
 		return errors.WithStack(err)
 	}

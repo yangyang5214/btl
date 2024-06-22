@@ -6,6 +6,7 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/gpx2video"
 	"os"
+	"strings"
 )
 
 // gpx2videoCmd represents the gpx2video command
@@ -43,11 +44,25 @@ var imgCmd = &cobra.Command{
 	Use:   "img",
 	Short: "img overview",
 	Run: func(cmd *cobra.Command, args []string) {
-		gpxData, err := gpx.ParseFile(filePath)
-		if err != nil {
-			panic(err)
+		var (
+			session *gpx2video.Session
+			err     error
+			logger  = log.DefaultLogger
+		)
+
+		if strings.HasSuffix(filePath, ".gpx") {
+			gpxData, err := gpx.ParseFile(filePath)
+			if err != nil {
+				panic(err)
+			}
+			session, err = gpx2video.ParseGPX(gpxData)
+		} else if strings.HasSuffix(filePath, ".fit") {
+			session, err = gpx2video.ParseFit(filePath, log.NewHelper(logger))
+		} else {
+			panic("不支持的文件类型")
 		}
-		s := gpx2video.NewImgOverview(gpxData, log.DefaultLogger)
+
+		s := gpx2video.NewImgOverview(session, logger)
 		err = s.Run()
 		if err != nil {
 			panic(err)

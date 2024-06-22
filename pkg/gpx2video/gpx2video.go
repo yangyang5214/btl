@@ -1,9 +1,18 @@
 package gpx2video
 
 import (
+	"bytes"
 	_ "embed"
+	"fmt"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 	"github.com/tkrajina/gpxgo/gpx"
 	"math"
+	"os"
+	"os/exec"
+	"path"
+	"runtime"
 	"time"
 )
 
@@ -36,8 +45,7 @@ type ImageBound struct {
 	avgSpeed float64
 }
 
-// 解析 GPX 文件
-func parseGPX(gpxData *gpx.GPX) (*Session, error) {
+func ParseGPX(gpxData *gpx.GPX) (*Session, error) {
 	var points []Point
 	for _, track := range gpxData.Tracks {
 		for _, segment := range track.Segments {
@@ -58,6 +66,72 @@ func parseGPX(gpxData *gpx.GPX) (*Session, error) {
 		avgSpeed: movingData.MovingDistance / movingData.MovingTime,
 		maxSpeed: movingData.MaxSpeed,
 		points:   points,
+	}, nil
+}
+
+func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
+	jarEnv := "/data/bin/merge-fit.jar"
+	if runtime.GOOS == "darwin" {
+		jarEnv = "/Users/beer/merge-fit.jar"
+	}
+
+	tempDir, err := os.MkdirTemp("", "")
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = os.RemoveAll(tempDir)
+	}()
+
+	gpx2fitCmd := fmt.Sprintf("/usr/bin/java -jar %s -p %s", jarEnv, fitFile)
+	cmd := exec.Command("/bin/bash", "-c", gpx2fitCmd)
+	cmd.Dir = tempDir
+
+	var logBuffer bytes.Buffer
+	cmd.Stdout = &logBuffer
+	cmd.Stderr = &logBuffer
+
+	logrHelper.Infof("run cmd: <%s>", gpx2fitCmd)
+	err = cmd.Run()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	logrHelper.Infof("fit stat: %s", logBuffer.String())
+
+	sessionFile := path.Join(tempDir, "record.json")
+	dates, err := os.ReadFile(sessionFile)
+	if err != nil {
+		return nil, err
+	}
+
+	result := gjson.ParseBytes(dates)
+
+	var ps []Point
+
+	points := result.Array()
+	for _, point := range points {
+		fields := point.Get("fields").Array()
+
+		m := make(map[string]any)
+		for _, field := range fields {
+			m[field.Get("name").Str] = field.Get("values").Array()[0].Int()
+		}
+
+		lat, ok := m["position_lat"]
+		if !ok {
+			continue
+		}
+
+		ps = append(ps, Point{
+			Latitude:  float64(lat.(int64)) / 10_000_000,
+			Longitude: float64(m["position_long"].(int64)) / 10_000_000,
+			Elevation: 0,
+			Speed:     float64(m["enhanced_speed"].(int64)) / 1_000,
+		})
+	}
+
+	return &Session{
+		points: ps,
 	}, nil
 }
 

@@ -140,8 +140,8 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 		}
 
 		p := Point{
-			Latitude:  float64(lat.(int64)) / 10_000_000,
-			Longitude: float64(m["position_long"].(int64)) / 10_000_000,
+			Latitude:  float64(lat.(int64)) / 11930465,
+			Longitude: float64(m["position_long"].(int64)) / 11930465,
 		}
 
 		speed, ok := m["speed"]

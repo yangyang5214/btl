@@ -45,5 +45,16 @@ func TestFitStat(t *testing.T) {
 	t.Log(session)
 }
 
+func TestFitImg(t *testing.T) {
+	session, err := ParseFit("/Users/beer/beer/merge-fit/fits/1.fit", log.NewHelper(log.DefaultLogger))
+	if err != nil {
+		panic(err)
+	}
+	err = NewImgOverview(session, log.DefaultLogger).Run()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func TestImgFit(t *testing.T) {
 }

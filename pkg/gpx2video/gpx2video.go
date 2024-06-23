@@ -110,6 +110,9 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 
 	var ps []Point
 
+	var maxSpeed float64
+	var speedFlag float64
+
 	points := result.Array()
 	for _, point := range points {
 		fields := point.Get("fields").Array()
@@ -129,16 +132,23 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 			Longitude: float64(m["position_long"].(int64)) / 10_000_000,
 		}
 
-		speed, ok := m["enhanced_speed"]
+		speed, ok := m["speed"]
 		if ok {
-			p.Speed = float64(speed.(int64)) / 1_000
+			speedVal := float64(speed.(int64)) / 1_000
+			p.Speed = speedVal
+			if speedVal > maxSpeed {
+				maxSpeed = speedVal
+			}
+			speedFlag = speedFlag + speedVal
 		}
 
 		ps = append(ps, p)
 	}
 	logrHelper.Infof("all point size %d", len(ps))
 	return &Session{
-		points: ps,
+		maxSpeed: maxSpeed,
+		avgSpeed: speedFlag / float64(len(ps)),
+		points:   ps,
 	}, nil
 }
 

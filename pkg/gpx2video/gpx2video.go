@@ -29,7 +29,7 @@ type Point struct {
 }
 
 type Session struct {
-	points   []Point
+	Points   []Point
 	maxSpeed float64
 	avgSpeed float64
 }
@@ -65,8 +65,20 @@ func ParseGPX(gpxData *gpx.GPX) (*Session, error) {
 	return &Session{
 		avgSpeed: movingData.MovingDistance / movingData.MovingTime,
 		maxSpeed: movingData.MaxSpeed,
-		points:   points,
+		Points:   points,
 	}, nil
+}
+
+func ParseFitBytes(byteData []byte, logrHelper *log.Helper) (*Session, error) {
+	p := path.Join(os.TempDir(), fmt.Sprintf("%d.fit", time.Now().Unix()))
+	defer func() {
+		_ = os.Remove(p)
+	}()
+	err := os.WriteFile(p, byteData, 0755)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFit(p, logrHelper)
 }
 
 func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
@@ -148,7 +160,7 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 	return &Session{
 		maxSpeed: maxSpeed,
 		avgSpeed: speedFlag / float64(len(ps)),
-		points:   ps,
+		Points:   ps,
 	}, nil
 }
 
@@ -160,7 +172,7 @@ func mercatorProjection(lat, lon float64) (float64, float64) {
 }
 
 func genImageBound(session *Session) *ImageBound {
-	points := session.points
+	points := session.Points
 	var (
 		xPoints, yPoints, speeds []float64
 	)

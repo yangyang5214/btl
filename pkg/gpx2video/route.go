@@ -38,8 +38,8 @@ func (s *RouteVideo) Run() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	points := session.points
-	s.log.Infof("all points size %d", len(points))
+	points := session.Points
+	s.log.Infof("all Points size %d", len(points))
 
 	imgBound := genImageBound(session)
 

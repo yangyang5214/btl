@@ -33,7 +33,7 @@ func (s *ImgOverview) SetImgPath(resultPng string) {
 }
 
 func (s *ImgOverview) Run() error {
-	s.log.Infof("all points size %d", len(s.session.points))
+	s.log.Infof("all Points size %d", len(s.session.Points))
 	imgBound := genImageBound(s.session)
 	s.log.Infof("max/avg speed is %f,%f", imgBound.maxSpeed, imgBound.avgSpeed)
 

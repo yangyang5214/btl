@@ -94,6 +94,32 @@ func FindGpxFiles(dirPath string) []string {
 	return r
 }
 
+func FindFitFiles(dirPath string) []string {
+	if strings.HasSuffix(dirPath, ".fit") {
+		return []string{dirPath}
+	}
+	absPath, err := filepath.Abs(dirPath)
+	if err != nil {
+		return nil
+	}
+	d, err := os.ReadDir(absPath)
+	if err != nil {
+		return nil
+	}
+	var r []string
+	for _, item := range d {
+		name := item.Name()
+		p := path.Join(absPath, name)
+		if item.IsDir() {
+			r = append(r, FindGpxFiles(p)...)
+		}
+		if strings.HasSuffix(name, ".fit") {
+			r = append(r, p)
+		}
+	}
+	return r
+}
+
 func GetColor(index int, colors []Color) Color {
 	return colors[index%len(colors)]
 }

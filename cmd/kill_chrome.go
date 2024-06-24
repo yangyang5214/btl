@@ -38,5 +38,6 @@ func isChromeProcess(process *process.Process) bool {
 	if name == "" {
 		return false
 	}
-	return strings.HasPrefix(strings.ToLower(name), "chromium")
+	lowerName := strings.ToLower(name)
+	return strings.Contains(lowerName, "chromium") || strings.Contains(lowerName, "chrome")
 }

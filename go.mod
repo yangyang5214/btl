@@ -12,6 +12,7 @@ require (
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-kratos/kratos/v2 v2.7.2
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217
+	github.com/google/uuid v1.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/qichengzx/coordtransform v0.0.0-20220708113031-010878418826
 	github.com/shirou/gopsutil/v3 v3.23.6

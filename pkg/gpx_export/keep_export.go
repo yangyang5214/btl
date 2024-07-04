@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"os/exec"
-	"path"
 	"strings"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -67,21 +65,6 @@ func (k *KeepExporter) Run() error {
 		return err
 	}
 	result := string(runtimeLog)
-	result = strings.Trim(result, "")
-	k.log.Infof("run keep result:\n %s", result)
-
-	cyclingDir := path.Join(k.exportDir, "cycling")
-	_ = os.MkdirAll(cyclingDir, 0755)
-	cmdStr = fmt.Sprintf("python3 %s/keep_export_cycling.py %s %s --out %s", k.gitDir, k.username, k.password, cyclingDir)
-	cmd = exec.Command("/bin/bash", "-c", cmdStr)
-	k.log.Infof("start run cmd: %s", cmdStr)
-
-	runtimeLog, err = cmd.Output()
-	if err != nil {
-		k.log.Infof("run cmd: %s", err)
-		return err
-	}
-	result = string(runtimeLog)
 	result = strings.Trim(result, "")
 	k.log.Infof("run keep result:\n %s", result)
 	return nil

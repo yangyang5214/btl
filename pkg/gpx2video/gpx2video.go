@@ -62,8 +62,13 @@ func ParseGPX(gpxData *gpx.GPX) (*Session, error) {
 	}
 
 	movingData := gpxData.MovingData()
+	var avgSpeed float64
+	if movingData.MovingTime != 0 {
+		avgSpeed = movingData.MovingDistance / movingData.MovingTime
+	}
+
 	return &Session{
-		avgSpeed: movingData.MovingDistance / movingData.MovingTime,
+		avgSpeed: avgSpeed,
 		maxSpeed: movingData.MaxSpeed,
 		Points:   points,
 	}, nil

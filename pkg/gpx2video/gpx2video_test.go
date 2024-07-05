@@ -46,7 +46,13 @@ func TestFitStat(t *testing.T) {
 }
 
 func TestFitImg(t *testing.T) {
-	session, err := ParseFit("/Users/beer/beer/merge-fit/fits/1.fit", log.NewHelper(log.DefaultLogger))
+	//session, err := ParseFit("/Users/beer/beer/merge-fit/fits/1.fit", log.NewHelper(log.DefaultLogger))
+
+	gpxData, err := gpx.ParseFile("/Users/beer/Downloads/84712d7f25ad6d1fb2793f202ac82708.gpx")
+	if err != nil {
+		panic(err)
+	}
+	session, err := ParseGPX(gpxData)
 	if err != nil {
 		panic(err)
 	}

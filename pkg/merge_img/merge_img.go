@@ -63,11 +63,12 @@ func (s *MergeImg) process() (*image.RGBA, error) {
 
 	// Get the bounds of the background image
 	bgBounds := s.bgImg.Bounds()
-	newWidth := bgBounds.Dx() / 2
+	newWidth := int(float64(bgBounds.Dx()) / 5 * 3)
 
-	ratio := newWidth / s.fgImg.Bounds().Dx()
+	ratio := float64(newWidth) / float64(s.fgImg.Bounds().Dx())
+	s.log.Infof("ratio is %f", ratio)
 
-	newHeight := ratio * s.fgImg.Bounds().Dy()
+	newHeight := int(ratio * float64(s.fgImg.Bounds().Dy()))
 
 	// Create a new image with the same size as the resized foreground image
 	resizedFgImg := image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))

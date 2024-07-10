@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/fogleman/gg"
 	"image/color"
 	"io"
 	"net/http"
@@ -196,4 +197,22 @@ func FileExists(fp string) bool {
 		return false
 	}
 	return true
+}
+
+func LoadFontFace(dc *gg.Context, points float64) error {
+	p := ttfPath()
+	_, err := os.Stat(p)
+	if err != nil {
+		return fmt.Errorf("ttf path %s not exist", p)
+	}
+	err = dc.LoadFontFace(p, points)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+func ttfPath() string {
+	homeDir, _ := os.UserHomeDir()
+	return path.Join(homeDir, ".ttf", "chinese.ttf")
 }

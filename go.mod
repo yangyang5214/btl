@@ -22,7 +22,7 @@ require (
 	github.com/tidwall/gjson v1.17.0
 	github.com/tkrajina/gpxgo v1.3.1
 	github.com/twpayne/go-kml v1.5.2
-	golang.org/x/image v0.13.0
+	golang.org/x/image v0.18.0
 )
 
 require (
@@ -51,7 +51,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

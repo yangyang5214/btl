@@ -29,6 +29,10 @@ func initInfos() (infos []*pkg.StatInfo) {
 		Label: "时间",
 		Value: "1h 10m",
 	})
+	infos = append(infos, &pkg.StatInfo{
+		Label: "最大速度",
+		Value: "30 km/h",
+	})
 	return
 }
 

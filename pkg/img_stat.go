@@ -3,14 +3,17 @@ package pkg
 import (
 	"github.com/fogleman/gg"
 	"github.com/go-kratos/kratos/v2/log"
+	"golang.org/x/image/colornames"
 	"image"
 	"image/color"
 	"os"
+	"strings"
 )
 
 type ImgStat struct {
 	imgPath string
 	log     *log.Helper
+	result  string
 }
 
 type StatInfo struct {
@@ -39,9 +42,13 @@ func NewImgStat(imgPath string, logger log.Logger) *ImgStat {
 	return &ImgStat{
 		imgPath: imgPath,
 		log:     log.NewHelper(logger),
+		result:  "result.png",
 	}
 }
 
+func (s *ImgStat) SetResult(result string) {
+	s.result = result
+}
 func (s *ImgStat) Run(infos []*StatInfo) error {
 	s.log.Infof("use stat info %v", infos)
 
@@ -51,19 +58,33 @@ func (s *ImgStat) Run(infos []*StatInfo) error {
 	}
 	dc := gg.NewContextForImage(img)
 
-	const fontSize = 20
-	const lineSpacing = fontSize + fontSize
-	x := 50.0
-	y := 80.0
+	height := float64(dc.Height())
+	width := float64(dc.Width())
+
+	fontSize := height / 50
+	s.log.Infof("fontSize use %v", fontSize)
+	lineSpacing := fontSize + fontSize*1.5
+	x := fontSize * 2
+	y := fontSize * 3
 
 	for _, info := range infos {
 		drawStr(dc, fontSize, info.Label, x, y)
 		y += lineSpacing
-		drawStr(dc, fontSize+10, info.Value, x, y)
+		drawStr(dc, fontSize*2, strings.ToUpper(info.Value), x, y)
 		y += lineSpacing
 	}
 	dc.Stroke()
-	return dc.SavePNG("result.png")
+
+	//add gpxt
+	dc.SetColor(color.Black)
+
+	textX := width - width/fontSize*3
+	textY := height - height/fontSize*3
+	dc.SetColor(colornames.Yellow)
+	_ = LoadFontFace(dc, fontSize)
+	dc.DrawStringAnchored("gpxt 小程序", textX, textY, 0.5, 0.5)
+
+	return dc.SavePNG(s.result)
 }
 
 func drawStr(dc *gg.Context, fontSize float64, label string, x, y float64) {

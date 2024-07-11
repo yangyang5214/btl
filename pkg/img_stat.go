@@ -76,11 +76,9 @@ func (s *ImgStat) Run(infos []*StatInfo) error {
 	dc.Stroke()
 
 	//add gpxt
-	dc.SetColor(color.Black)
-
-	textX := width - width/fontSize*3
-	textY := height - height/fontSize*3
-	dc.SetColor(colornames.Yellow)
+	textX := width - width/fontSize
+	textY := height - height/fontSize
+	dc.SetColor(colornames.Red)
 	_ = LoadFontFace(dc, fontSize)
 	dc.DrawStringAnchored("gpxt 小程序", textX, textY, 0.5, 0.5)
 

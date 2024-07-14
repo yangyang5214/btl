@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"runtime"
 	"time"
 )
 
@@ -74,7 +73,7 @@ func ParseGPX(gpxData *gpx.GPX) (*Session, error) {
 	}, nil
 }
 
-func ParseFitBytes(byteData []byte, logrHelper *log.Helper) (*Session, error) {
+func ParseFitBytes(mergeFitCmd string, byteData []byte, logrHelper *log.Helper) (*Session, error) {
 	p := path.Join(os.TempDir(), fmt.Sprintf("%d.fit", time.Now().Unix()))
 	defer func() {
 		_ = os.Remove(p)
@@ -83,15 +82,10 @@ func ParseFitBytes(byteData []byte, logrHelper *log.Helper) (*Session, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ParseFit(p, logrHelper)
+	return ParseFit(mergeFitCmd, p, logrHelper)
 }
 
-func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
-	jarEnv := "/data/bin/merge-fit.jar"
-	if runtime.GOOS == "darwin" {
-		jarEnv = "/Users/beer/merge-fit.jar"
-	}
-
+func ParseFit(mergeFitCmd, fitFile string, logrHelper *log.Helper) (*Session, error) {
 	tempDir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return nil, err
@@ -100,7 +94,7 @@ func ParseFit(fitFile string, logrHelper *log.Helper) (*Session, error) {
 		_ = os.RemoveAll(tempDir)
 	}()
 
-	gpx2fitCmd := fmt.Sprintf("/usr/bin/java -jar %s -p %s", jarEnv, fitFile)
+	gpx2fitCmd := fmt.Sprintf("%s -p %s", mergeFitCmd, fitFile)
 	cmd := exec.Command("/bin/bash", "-c", gpx2fitCmd)
 	cmd.Dir = tempDir
 

@@ -14,26 +14,27 @@ import (
 )
 
 type FitMerge struct {
-	log *log.Helper
+	log    *log.Helper
+	cmdStr string
 }
 
-func NewFitMerge() *FitMerge {
+func NewFitMerge(cmdStr string) *FitMerge {
 	return &FitMerge{
-		log: log.NewHelper(log.DefaultLogger),
+		log:    log.NewHelper(log.DefaultLogger),
+		cmdStr: cmdStr,
 	}
 }
 
 func (s *FitMerge) Run() error {
 	fitFiles := utils.FindFitFiles(".")
-	resultData, err := MergeFit(fitFiles, s.log)
+	resultData, err := MergeFit(s.cmdStr, fitFiles, s.log)
 	if err != nil {
 		return err
 	}
 	return os.WriteFile("result.fit", resultData, 0755)
 }
 
-func MergeFit(fitFiles []string, logHelper *log.Helper) ([]byte, error) {
-	jarEnv := MergeFitJarPath()
+func MergeFit(cmdStr string, fitFiles []string, logHelper *log.Helper) ([]byte, error) {
 	workDir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return nil, err
@@ -45,7 +46,7 @@ func MergeFit(fitFiles []string, logHelper *log.Helper) ([]byte, error) {
 	defer func() {
 		_ = os.Remove(resultFit)
 	}()
-	gitMergeCmd := fmt.Sprintf("/usr/bin/java -jar %s -m %s %s", jarEnv, resultFit, strings.Join(fitFiles, " "))
+	gitMergeCmd := fmt.Sprintf("%s -m %s %s", cmdStr, resultFit, strings.Join(fitFiles, " "))
 	cmd := exec.Command("/bin/bash", "-c", gitMergeCmd)
 
 	logHelper.Infof("run cmd: %s", gitMergeCmd)
@@ -62,9 +63,4 @@ func MergeFit(fitFiles []string, logHelper *log.Helper) ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 	return os.ReadFile(resultFit)
-}
-
-func MergeFitJarPath() string {
-	homeDir, _ := os.UserHomeDir()
-	return path.Join(homeDir, "merge-fit.jar")
 }

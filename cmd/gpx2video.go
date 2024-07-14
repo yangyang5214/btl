@@ -6,6 +6,7 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg/gpx2video"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -57,7 +58,13 @@ var imgCmd = &cobra.Command{
 			}
 			session, err = gpx2video.ParseGPX(gpxData)
 		} else if strings.HasSuffix(filePath, ".fit") {
-			session, err = gpx2video.ParseFit(filePath, log.NewHelper(logger))
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				panic(err)
+			}
+
+			p := path.Join(homeDir, "merge-fit.jar")
+			session, err = gpx2video.ParseFit(p, filePath, log.NewHelper(logger))
 		} else {
 			panic("不支持的文件类型")
 		}

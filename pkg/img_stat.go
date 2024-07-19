@@ -58,7 +58,6 @@ func (s *ImgStat) Run(infos []*StatInfo) error {
 	dc := gg.NewContextForImage(img)
 
 	height := float64(dc.Height())
-	width := float64(dc.Width())
 
 	fontSize := height / 50
 	s.log.Infof("fontSize use %v", fontSize)

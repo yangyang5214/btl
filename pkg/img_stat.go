@@ -3,7 +3,6 @@ package pkg
 import (
 	"github.com/fogleman/gg"
 	"github.com/go-kratos/kratos/v2/log"
-	"golang.org/x/image/colornames"
 	"image"
 	"image/color"
 	"os"
@@ -76,11 +75,11 @@ func (s *ImgStat) Run(infos []*StatInfo) error {
 	dc.Stroke()
 
 	//add gpxt
-	textX := width - (width/fontSize)*1.5
-	textY := height - height/fontSize
-	dc.SetColor(colornames.Red)
-	_ = LoadFontFace(dc, fontSize*2)
-	dc.DrawStringAnchored("gpxt", textX, textY, 0.5, 0.5)
+	//textX := width - (width/fontSize)*1.5
+	//textY := height - height/fontSize
+	//dc.SetColor(colornames.Red)
+	//_ = LoadFontFace(dc, fontSize*2)
+	//dc.DrawStringAnchored("gpxt", textX, textY, 0.5, 0.5)
 
 	return dc.SavePNG(s.result)
 }

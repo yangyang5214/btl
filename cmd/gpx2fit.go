@@ -6,6 +6,8 @@ import (
 	"github.com/yangyang5214/btl/pkg/utils"
 	"os"
 	"os/exec"
+	"path"
+	"time"
 )
 
 var gpx2fitCmd = &cobra.Command{
@@ -15,22 +17,35 @@ var gpx2fitCmd = &cobra.Command{
 
 		gpxFiles := utils.FindGpxFiles(".")
 
-		err := os.Mkdir("gpx2fit", 0755)
-		if err != nil {
-			panic(err)
-		}
-		for index, gpxFile := range gpxFiles {
-			resultFile := fmt.Sprintf("%d.fit", index)
-			cmdStr := fmt.Sprintf("java -jar ~/gpx2fit.jar %s %s", gpxFile, resultFile)
-			out, err := exec.Command("/bin/bash", "-c", cmdStr).CombinedOutput()
+		var err error
+		_ = os.Mkdir("gpx2fit", 0755)
+		for _, item := range gpxFiles {
+			fitFile := path.Join("gpx2fit", fmt.Sprintf("%d.fit", time.Now().Unix()))
+			err = gpx2fit(item, fitFile)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(string(out))
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(gpx2fitCmd)
+}
+
+func gpx2fit(gpxFile string, fitFile string) error {
+	input := path.Join("/tmp", fmt.Sprintf("%d.gpx", time.Now().Unix()))
+	defer os.Remove(input)
+	err := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp '%s' %s", gpxFile, input)).Run()
+	if err != nil {
+		return err
+	}
+	cmdStr := fmt.Sprintf("java -jar ~/gpx2fit.jar %s %s", input, fitFile)
+	fmt.Println(cmdStr)
+	out, err := exec.Command("/bin/bash", "-c", cmdStr).CombinedOutput()
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(out))
+	return nil
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"os"
@@ -16,14 +17,18 @@ var gpx2fitCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		gpxFiles := utils.FindGpxFiles(".")
-
+		log.Infof("gpxFiles size %d", len(gpxFiles))
 		var err error
 		_ = os.Mkdir("gpx2fit", 0755)
-		for _, item := range gpxFiles {
-			fitFile := path.Join("gpx2fit", fmt.Sprintf("%d.fit", time.Now().Unix()))
+
+		for index, item := range gpxFiles {
+			item := item
+			fname := fmt.Sprintf("%d.fit", index+1)
+
+			fitFile := path.Join("gpx2fit", fname)
 			err = gpx2fit(item, fitFile)
 			if err != nil {
-				panic(err)
+				log.Errorf("gpx2fit failed. file is %s", item)
 			}
 		}
 	},
@@ -41,11 +46,11 @@ func gpx2fit(gpxFile string, fitFile string) error {
 		return err
 	}
 	cmdStr := fmt.Sprintf("java -jar ~/gpx2fit.jar %s %s", input, fitFile)
-	fmt.Println(cmdStr)
+	log.Infof("cmdStr is <%s>", cmdStr)
 	out, err := exec.Command("/bin/bash", "-c", cmdStr).CombinedOutput()
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(out))
+	log.Info(string(out))
 	return nil
 }

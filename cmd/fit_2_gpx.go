@@ -12,7 +12,7 @@ var fitToGpxCmd = &cobra.Command{
 	Short: "fit to gpx file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fit := pkg.NewFit2Gpx(filePath, log.DefaultLogger)
+		fit := pkg.NewFit2Gpx(inputPath, log.DefaultLogger)
 		err := fit.Run()
 		if err != nil {
 			panic(err)

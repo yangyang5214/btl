@@ -13,7 +13,7 @@ var gpx2kmlCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		opts := pkg.WithSpeed(speed)
-		err := pkg.NewGpx2Kml(filePath, log.DefaultLogger, opts).Run()
+		err := pkg.NewGpx2Kml(inputPath, log.DefaultLogger, opts).Run()
 		if err != nil {
 			panic(err)
 		}

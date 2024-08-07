@@ -13,7 +13,7 @@ var garminUploadCmd = &cobra.Command{
 	Short: "garmin_upload",
 	Long:  `upload gpx/fit file to Garmin.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := gpx_export.NewGarminUpload(username, password, filePath, isCn, log.DefaultLogger).Run()
+		err := gpx_export.NewGarminUpload(username, password, inputPath, isCn, log.DefaultLogger).Run()
 		if err != nil {
 			panic(err)
 		}

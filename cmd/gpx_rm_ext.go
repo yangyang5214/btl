@@ -27,7 +27,7 @@ func init() {
 }
 
 func Main() error {
-	newGpxData, err := gpx.ParseFile(filePath)
+	newGpxData, err := gpx.ParseFile(inputPath)
 	if err != nil {
 		return err
 	}

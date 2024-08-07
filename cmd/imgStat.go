@@ -11,7 +11,7 @@ var imgStatCmd = &cobra.Command{
 	Use:   "img_stat",
 	Short: "Gen stat in image",
 	Run: func(cmd *cobra.Command, args []string) {
-		imgStat := pkg.NewImgStat(filePath, log.DefaultLogger)
+		imgStat := pkg.NewImgStat(inputPath, log.DefaultLogger)
 
 		err := imgStat.Run(initInfos())
 		if err != nil {

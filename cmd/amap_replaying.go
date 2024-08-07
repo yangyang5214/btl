@@ -13,7 +13,7 @@ var amapReplayingCmd = &cobra.Command{
 	Short: "amap replay",
 	Long:  `https://lbs.amap.com/demo/javascript-api-v2/example/marker/replaying-historical-running-data`,
 	Run: func(cmd *cobra.Command, args []string) {
-		gpxData, err := gpx.ParseFile(filePath)
+		gpxData, err := gpx.ParseFile(inputPath)
 		if err != nil {
 			panic(err)
 		}

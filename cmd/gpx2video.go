@@ -29,7 +29,7 @@ var routeCmd = &cobra.Command{
 		defer func() {
 			_ = os.Remove(tmpDir)
 		}()
-		gpxData, err := gpx.ParseFile(filePath)
+		gpxData, err := gpx.ParseFile(inputPath)
 		if err != nil {
 			panic(err)
 		}
@@ -51,20 +51,20 @@ var imgCmd = &cobra.Command{
 			logger  = log.DefaultLogger
 		)
 
-		if strings.HasSuffix(filePath, ".gpx") {
-			gpxData, err := gpx.ParseFile(filePath)
+		if strings.HasSuffix(inputPath, ".gpx") {
+			gpxData, err := gpx.ParseFile(inputPath)
 			if err != nil {
 				panic(err)
 			}
 			session, err = gpx2video.ParseGPX(gpxData)
-		} else if strings.HasSuffix(filePath, ".fit") {
+		} else if strings.HasSuffix(inputPath, ".fit") {
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
 				panic(err)
 			}
 
 			p := path.Join(homeDir, "merge-fit.jar")
-			session, err = gpx2video.ParseFit(p, filePath, log.NewHelper(logger))
+			session, err = gpx2video.ParseFit(p, inputPath, log.NewHelper(logger))
 		} else {
 			panic("不支持的文件类型")
 		}

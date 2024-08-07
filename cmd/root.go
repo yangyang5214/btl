@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -22,14 +19,16 @@ func Execute() {
 }
 
 var (
-	username string
-	password string
-	filePath string
+	username   string
+	password   string
+	inputPath  string
+	outputPath string
 )
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.PersistentFlags().StringVarP(&username, "user", "u", "", "username. email")
 	rootCmd.PersistentFlags().StringVarP(&password, "pwd", "p", "", "password")
-	rootCmd.PersistentFlags().StringVarP(&filePath, "file", "f", "", "input file")
+	rootCmd.PersistentFlags().StringVarP(&inputPath, "input", "f", "", "input file")
+	rootCmd.PersistentFlags().StringVarP(&outputPath, "output", "o", "", "output file")
 }

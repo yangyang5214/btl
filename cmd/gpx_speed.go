@@ -13,7 +13,7 @@ var gpxSpeedCmd = &cobra.Command{
 	Short: "customize gpx speed",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := pkg.NewGpxSpeed(filePath, speed, log.DefaultLogger).Run()
+		err := pkg.NewGpxSpeed(inputPath, speed, log.DefaultLogger).Run()
 		if err != nil {
 			panic(err)
 		}

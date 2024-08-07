@@ -15,7 +15,18 @@ var gpx2fitCmd = &cobra.Command{
 	Use:   "gpx2fit",
 	Short: "gpx 2 fit",
 	Run: func(cmd *cobra.Command, args []string) {
-
+		if inputPath != "" {
+			//single
+			out := "result.fit"
+			if outputPath != "" {
+				out = outputPath
+			}
+			err := gpx2fit(inputPath, out)
+			if err != nil {
+				panic(err)
+			}
+			return
+		}
 		gpxFiles := utils.FindGpxFiles(".")
 		log.Infof("gpxFiles size %d", len(gpxFiles))
 		var err error

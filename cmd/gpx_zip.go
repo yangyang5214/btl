@@ -15,7 +15,7 @@ var gpxSplitCmd = &cobra.Command{
 	Short: "zip gpx file to limited size.(remove some points)",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		gs := pkg.NewGpxZip(filePath, step)
+		gs := pkg.NewGpxZip(inputPath, step)
 		err := gs.Run()
 		if err != nil {
 			panic(err)

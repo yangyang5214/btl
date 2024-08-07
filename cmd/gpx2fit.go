@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
+	"github.com/tkrajina/gpxgo/gpx"
+	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"os"
-	"os/exec"
 	"path"
-	"time"
 )
 
 var gpx2fitCmd = &cobra.Command{
@@ -35,7 +35,6 @@ var gpx2fitCmd = &cobra.Command{
 		for index, item := range gpxFiles {
 			item := item
 			fname := fmt.Sprintf("%d.fit", index+1)
-
 			fitFile := path.Join("gpx2fit", fname)
 			err = gpx2fit(item, fitFile)
 			if err != nil {
@@ -50,18 +49,15 @@ func init() {
 }
 
 func gpx2fit(gpxFile string, fitFile string) error {
-	input := path.Join("/tmp", fmt.Sprintf("%d.gpx", time.Now().Unix()))
-	defer os.Remove(input)
-	err := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp '%s' %s", gpxFile, input)).Run()
+	gpxData, err := gpx.ParseFile(gpxFile)
 	if err != nil {
 		return err
 	}
-	cmdStr := fmt.Sprintf("java -jar ~/gpx2fit.jar %s %s", input, fitFile)
-	log.Infof("cmdStr is <%s>", cmdStr)
-	out, err := exec.Command("/bin/bash", "-c", cmdStr).CombinedOutput()
+	newXml, err := gpxData.ToXml(gpx.ToXmlParams{
+		Indent: true,
+	})
 	if err != nil {
 		return err
 	}
-	log.Info(string(out))
-	return nil
+	return pkg.GenFitFile("java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), newXml, fitFile)
 }

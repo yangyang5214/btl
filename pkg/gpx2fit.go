@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 func addSpeedExt(speed float64, nodes []gpx.ExtensionNode, trackExtSpace string) []gpx.ExtensionNode {
@@ -73,17 +72,6 @@ func GenFitFile(gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFi
 	gpxData, err := gpx.ParseBytes(gpxBytes)
 	if err != nil {
 		return errors.WithStack(err)
-	}
-
-	//垃圾行者
-	if strings.Contains(gpxData.Description, "行者") {
-		for _, track := range gpxData.Tracks {
-			for _, segment := range track.Segments {
-				for _, point := range segment.Points {
-					point.Timestamp = point.Timestamp.Add(time.Minute * 60 * 8)
-				}
-			}
-		}
 	}
 
 	gpxBytes, err = appendGpxSpeed(gpxData)

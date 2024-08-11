@@ -83,6 +83,7 @@ func GenFitFile(gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFi
 		logHelper.Errorf("create temp gpx err %+v", err)
 		return err
 	}
+	log.Infof("Temp gpx File %s", gpxFile.Name())
 	defer func() {
 		_ = os.Remove(gpxFile.Name())
 	}()

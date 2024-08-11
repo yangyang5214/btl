@@ -1,7 +1,3 @@
 go 1.21
 
-toolchain go1.21.6
-
 use .
-
-replace github.com/tkrajina/gpxgo => ./../gpxgo

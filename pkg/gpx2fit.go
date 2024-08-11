@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 func addSpeedExt(speed float64, nodes []gpx.ExtensionNode, trackExtSpace string) []gpx.ExtensionNode {
@@ -68,10 +69,22 @@ func appendGpxSpeed(gpxData *gpx.GPX) ([]byte, error) {
 	})
 }
 
-func GenFitFile(gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
+func GenFitFile(debug bool, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
 	gpxData, err := gpx.ParseBytes(gpxBytes)
 	if err != nil {
 		return errors.WithStack(err)
+	}
+
+	//这里统一转为 UTC 时间
+	if strings.Contains(gpxData.Description, "行者") {
+		for _, track := range gpxData.Tracks {
+			for _, segment := range track.Segments {
+				for index := range segment.Points {
+					p := &segment.Points[index] //注意这里
+					p.Timestamp = p.Timestamp.Add(time.Minute * 60 * 8)
+				}
+			}
+		}
 	}
 
 	gpxBytes, err = appendGpxSpeed(gpxData)
@@ -83,9 +96,11 @@ func GenFitFile(gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFi
 		logHelper.Errorf("create temp gpx err %+v", err)
 		return err
 	}
-	log.Infof("Temp gpx File %s", gpxFile.Name())
+	log.Infof("Temp gpx File %s, debug: %v", gpxFile.Name(), debug)
 	defer func() {
-		_ = os.Remove(gpxFile.Name())
+		if !debug {
+			_ = os.Remove(gpxFile.Name())
+		}
 	}()
 	_, err = gpxFile.Write(gpxBytes)
 	if err != nil {

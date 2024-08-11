@@ -23,6 +23,7 @@ var (
 	password   string
 	inputPath  string
 	outputPath string
+	debug      bool
 )
 
 func init() {
@@ -30,5 +31,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&username, "user", "u", "", "username. email")
 	rootCmd.PersistentFlags().StringVarP(&password, "pwd", "p", "", "password")
 	rootCmd.PersistentFlags().StringVarP(&inputPath, "input", "f", "", "input file")
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "default not debug")
 	rootCmd.PersistentFlags().StringVarP(&outputPath, "output", "o", "", "output file")
 }

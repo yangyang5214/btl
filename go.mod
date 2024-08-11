@@ -2,8 +2,6 @@ module github.com/yangyang5214/btl
 
 go 1.21
 
-toolchain go1.21.6
-
 require (
 	github.com/antchfx/htmlquery v1.3.0
 	github.com/chromedp/cdproto v0.0.0-20231011050154-1d073bb38998
@@ -20,7 +18,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
-	github.com/tkrajina/gpxgo v1.3.1
+	github.com/tkrajina/gpxgo v1.4.0
 	github.com/twpayne/go-kml v1.5.2
 	golang.org/x/image v0.18.0
 )

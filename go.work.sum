@@ -41,6 +41,8 @@ github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe h1:iruDEfMl2E6f
 github.com/paulmach/protoscan v0.2.1 h1:rM0FpcTjUMvPUNk2BhPJrreDKetq43ChnL+x1sRg8O8=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/stretchr/objx v0.5.0 h1:1zr/of2m5FGMsad5YfcqgdqdWrIhu+EBEJRhR1U7z/c=
+github.com/tkrajina/gpxgo v1.4.0 h1:cSD5uSwy3VZuNFieTEZLyRnuIwhonQEkGPkPGW4XNag=
+github.com/tkrajina/gpxgo v1.4.0/go.mod h1:BXSMfUAvKiEhMEXAFM2NvNsbjsSvp394mOvdcNjettg=
 github.com/twpayne/go-polyline v1.0.0 h1:EA8HPg0MNS62R5D2E8B6zyz2TMkmkXVlQaVBVgY3F5A=
 github.com/twpayne/go-waypoint v0.0.0-20200706203930-b263a7f6e4e8 h1:0DvmyIQBIEYpXJt7Wm242Wn6ePH84FR5wv2Jh/yRgUw=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=

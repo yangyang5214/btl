@@ -81,7 +81,7 @@ func GenFitFile(debug bool, gpx2FitCmd string, logHelper *log.Helper, gpxBytes [
 			for _, segment := range track.Segments {
 				for index := range segment.Points {
 					p := &segment.Points[index] //注意这里
-					p.Timestamp = p.Timestamp.Add(time.Minute * 60 * 8)
+					p.Timestamp = p.Timestamp.Add(-time.Minute * 60 * 8)
 				}
 			}
 		}

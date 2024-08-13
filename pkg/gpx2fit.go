@@ -69,7 +69,7 @@ func appendGpxSpeed(gpxData *gpx.GPX) ([]byte, error) {
 	})
 }
 
-func GenFitFile(debug bool, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
+func GenFitFile(activityType string, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
 	gpxData, err := gpx.ParseBytes(gpxBytes)
 	if err != nil {
 		return errors.WithStack(err)
@@ -96,11 +96,9 @@ func GenFitFile(debug bool, gpx2FitCmd string, logHelper *log.Helper, gpxBytes [
 		logHelper.Errorf("create temp gpx err %+v", err)
 		return err
 	}
-	log.Infof("Temp gpx File %s, debug: %v", gpxFile.Name(), debug)
+	log.Infof("Temp gpx File %s", gpxFile.Name())
 	defer func() {
-		if !debug {
-			_ = os.Remove(gpxFile.Name())
-		}
+		_ = os.Remove(gpxFile.Name())
 	}()
 	_, err = gpxFile.Write(gpxBytes)
 	if err != nil {
@@ -108,7 +106,7 @@ func GenFitFile(debug bool, gpx2FitCmd string, logHelper *log.Helper, gpxBytes [
 		return err
 	}
 
-	gpx2fitCmd := fmt.Sprintf("%s %s %s", gpx2FitCmd, gpxFile.Name(), fitFile)
+	gpx2fitCmd := fmt.Sprintf("%s %s %s %s", gpx2FitCmd, gpxFile.Name(), fitFile, activityType)
 	logHelper.Infof("run gpx2fit cmd %s", gpx2fitCmd)
 	cmd := exec.Command("/bin/bash", "-c", gpx2fitCmd)
 

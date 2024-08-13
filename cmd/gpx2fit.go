@@ -21,7 +21,7 @@ var gpx2fitCmd = &cobra.Command{
 			if outputPath != "" {
 				out = outputPath
 			}
-			err := gpx2fit(inputPath, out, debug)
+			err := gpx2fit(inputPath, out)
 			if err != nil {
 				panic(err)
 			}
@@ -36,7 +36,7 @@ var gpx2fitCmd = &cobra.Command{
 			item := item
 			fname := fmt.Sprintf("%d.fit", index+1)
 			fitFile := path.Join("gpx2fit", fname)
-			err = gpx2fit(item, fitFile, debug)
+			err = gpx2fit(item, fitFile)
 			if err != nil {
 				log.Errorf("gpx2fit failed. file is %s", item)
 			}
@@ -48,7 +48,7 @@ func init() {
 	rootCmd.AddCommand(gpx2fitCmd)
 }
 
-func gpx2fit(gpxFile string, fitFile string, debug bool) error {
+func gpx2fit(gpxFile string, fitFile string) error {
 	gpxData, err := gpx.ParseFile(gpxFile)
 	if err != nil {
 		return err
@@ -59,5 +59,5 @@ func gpx2fit(gpxFile string, fitFile string, debug bool) error {
 	if err != nil {
 		return err
 	}
-	return pkg.GenFitFile(debug, "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), newXml, fitFile)
+	return pkg.GenFitFile("", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), newXml, fitFile)
 }

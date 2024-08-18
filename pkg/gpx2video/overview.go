@@ -65,34 +65,13 @@ func plotImage(imgBound *ImageBound, outputImagePath string) error {
 
 	minX, maxX, minY, maxY := imgBound.minX, imgBound.maxX, imgBound.minY, imgBound.maxY
 
-	dc.SetLineWidth(8)
-
-	speeds := imgBound.speeds
-	maxSpeed := imgBound.maxSpeed
-	avgSpeed := imgBound.avgSpeed
+	dc.SetLineWidth(12)
 
 	size := len(xPoints)
 
 	step := 1
 	for i := step; i < size; i += step {
-		speed := speeds[i-step]
-		var r, g, b float64
-		if speed < avgSpeed {
-			// 绿色到黄色
-			normalizedSpeed := speed / avgSpeed
-			r = normalizedSpeed
-			g = 1.0
-			b = 0.0
-		} else {
-			// 黄色到红色¬
-			normalizedSpeed := (speed - avgSpeed) / (maxSpeed - avgSpeed)
-			r = 1.0
-			g = 1.0 - normalizedSpeed
-			b = 0.0
-		}
-
-		dc.SetRGB(r, g, b)
-
+		dc.SetRGB(1, 0, 0)
 		x1 := (xPoints[i-step]-minX)*scale + (float64(width)-(maxX-minX)*scale)/2
 		y1 := (float64(height) - (yPoints[i-step]-minY)*scale) - (float64(height)-(maxY-minY)*scale)/2
 

@@ -60,7 +60,7 @@ type Record struct {
 }
 
 func (s *Fit2Gpx) fit2Csv(csvPath string) error {
-	cmd := fmt.Sprintf("java -jar %s -b %s %s", s.fitCSVTool, s.fitFile, csvPath)
+	cmd := fmt.Sprintf("java -jar -Xmx2g %s -b %s %s", s.fitCSVTool, s.fitFile, csvPath)
 	s.log.Infof("run cmd %s", cmd)
 	return exec.Command("/bin/bash", "-c", cmd).Run()
 }

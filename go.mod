@@ -1,6 +1,6 @@
 module github.com/yangyang5214/btl
 
-go 1.21
+go 1.23
 
 require (
 	github.com/antchfx/htmlquery v1.3.0

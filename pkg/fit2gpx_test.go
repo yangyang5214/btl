@@ -46,7 +46,7 @@ func TestParserCsv(t *testing.T) {
 }
 
 func TestNewFit2Gpx(t *testing.T) {
-	fp := NewFit2Gpx("/Users/beer/Downloads/361850974_ACTIVITY.fit", log.DefaultLogger)
+	fp := NewFit2Gpx("/Users/beer/Downloads/Night_Run.fit", log.DefaultLogger)
 	err := fp.Run()
 	if err != nil {
 		panic(err)

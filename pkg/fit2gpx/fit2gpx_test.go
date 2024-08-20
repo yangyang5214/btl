@@ -1,4 +1,4 @@
-package pkg
+package fit2gpx
 
 import (
 	"fmt"

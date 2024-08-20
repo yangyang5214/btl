@@ -1,4 +1,4 @@
-package pkg
+package fit2gpx
 
 import (
 	_ "embed"
@@ -84,7 +84,7 @@ func (s *Fit2Gpx) parserCsv(csvPath string) (*Session, error) {
 		}
 
 		if record[2] == "sport" && record[0] == "Data" {
-			session.sportType = record[4]
+			session.sportType = parseSport(record[13])
 		}
 
 		if record[2] == "record" {

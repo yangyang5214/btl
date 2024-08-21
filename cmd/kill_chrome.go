@@ -12,32 +12,40 @@ var killChromeCmd = &cobra.Command{
 	Short: "kill all chrome process(chromium)",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		KillChromeProcesses()
+		KillChromeProcesses(all)
 	},
 }
 
+var (
+	all bool
+)
+
 func init() {
 	rootCmd.AddCommand(killChromeCmd)
+	killChromeCmd.Flags().BoolVarP(&all, "all", "a", false, "all is contains chrome")
 }
 
-func KillChromeProcesses() {
+func KillChromeProcesses(all bool) {
 	processes, err := process.Processes()
 	if err != nil {
 		panic(err)
 	}
 	for _, p := range processes {
-		if isChromeProcess(p) {
+		if isChromeProcess(p, all) {
 			_ = p.Kill()
 		}
 	}
 }
 
 // isChromeProcess checks if a process is chrome/chromium
-func isChromeProcess(process *process.Process) bool {
+func isChromeProcess(process *process.Process, all bool) bool {
 	name, _ := process.Name()
 	if name == "" {
 		return false
 	}
 	lowerName := strings.ToLower(name)
-	return strings.Contains(lowerName, "chromium") || strings.Contains(lowerName, "chrome")
+	if all {
+		return strings.Contains(lowerName, "chromium") || strings.Contains(lowerName, "chrome")
+	}
+	return strings.Contains(lowerName, "chromium")
 }

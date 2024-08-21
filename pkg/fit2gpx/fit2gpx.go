@@ -84,7 +84,12 @@ func (s *Fit2Gpx) parserCsv(csvPath string) (*Session, error) {
 		}
 
 		if record[2] == "sport" && record[0] == "Data" {
-			session.sportType = parseSport(record[13])
+			for i := 3; i < len(record); i += 3 {
+				if record[i] == "sport" {
+					session.sportType = parseSport(record[i+1])
+					break
+				}
+			}
 		}
 
 		if record[2] == "record" {

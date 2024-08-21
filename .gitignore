@@ -11,3 +11,5 @@ marker_point*
 index.html
 pkg/*kml
 pkg/script/result.json
+**/*result.gpx
+**/*result.fit

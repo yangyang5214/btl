@@ -7,6 +7,7 @@ import (
 	log2 "github.com/go-kratos/kratos/v2/log"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/gpx_amap"
 	"github.com/yangyang5214/btl/pkg/utils"
 )
@@ -24,9 +25,13 @@ var gpxAmapCmd = &cobra.Command{
 		if len(files) == 0 {
 			files = utils.FindGpxFiles(".")
 		}
-		gamap := gpx_amap.NewGpxAmap(amapStyle, log2.DefaultLogger)
+
+		llog := log2.DefaultLogger
+		chrome, cancel := pkg.NewChromePool(llog)
+		defer cancel()
+		gamap := gpx_amap.NewGpxAmap(amapStyle, llog, chrome)
 		gamap.SetFiles(files)
-		gamap.Screenshot()
+		gamap.Screenshot("result.png")
 		err := gamap.Run()
 		if err != nil {
 			log.Errorf("run gamap failed: %v", err)

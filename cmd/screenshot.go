@@ -15,8 +15,9 @@ var screenshotCmd = &cobra.Command{
 	Short: "screenshot for input html",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ss := pkg.NewScreenshot("result.png", htmlPath, log.DefaultLogger)
-		err := ss.Run()
+		chrome, cancel := pkg.NewChromePool(log.DefaultLogger)
+		defer cancel()
+		err := chrome.ScreenShot("result.png", htmlPath)
 		if err != nil {
 			panic(err)
 		}

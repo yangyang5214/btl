@@ -73,7 +73,7 @@ var sportMap = map[string]string{
 	"255": "invalid",
 }
 
-func parseSport(sportType string) string {
+func ParseSport(sportType string) string {
 	sport, ok := sportMap[sportType]
 	if ok {
 		return sport

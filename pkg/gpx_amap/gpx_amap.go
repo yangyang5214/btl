@@ -38,6 +38,7 @@ type GpxAmap struct {
 	logger log.Logger
 
 	htmlPath string
+	chrome   *pkg.ChromePool
 }
 
 type TemplateAmap struct {
@@ -45,7 +46,7 @@ type TemplateAmap struct {
 	Center utils.LatLng
 }
 
-func NewGpxAmap(style string, logger log.Logger) *GpxAmap {
+func NewGpxAmap(style string, logger log.Logger, chrome *pkg.ChromePool) *GpxAmap {
 	return &GpxAmap{
 		defaultColors: []color.Color{
 			colornames.Red,
@@ -64,6 +65,7 @@ func NewGpxAmap(style string, logger log.Logger) *GpxAmap {
 		waitSeconds:    5,
 		log:            log.NewHelper(logger),
 		htmlPath:       "index.html",
+		chrome:         chrome,
 	}
 }
 
@@ -91,11 +93,7 @@ func (g *GpxAmap) SetFiles(files []string) {
 	g.files = files
 }
 
-func (g *GpxAmap) Screenshot() {
-	g.screenshot = true
-}
-
-func (g *GpxAmap) SetImgPath(imgPath string) {
+func (g *GpxAmap) Screenshot(imgPath string) {
 	g.screenshot = true
 	g.imgPath = imgPath
 }
@@ -147,13 +145,7 @@ func (g *GpxAmap) Run() error {
 			_ = os.Remove(g.htmlPath)
 		}()
 		g.log.Info("start screenshot")
-		shot := pkg.NewScreenshot(g.imgPath, "file://"+g.htmlPath, g.logger)
-		shot.SetWaitSeconds(g.waitSeconds)
-		err = shot.Run()
-		if err != nil {
-			return err
-		}
-		g.log.Infof("screenshot success")
+		return g.chrome.ScreenShot("file://"+g.htmlPath, g.imgPath)
 	}
 	return nil
 }

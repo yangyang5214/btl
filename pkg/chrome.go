@@ -25,7 +25,10 @@ type ChromePool struct {
 }
 
 func NewChromePool(logger log.Logger) (*ChromePool, func()) {
-	dataStore, _ := os.MkdirTemp("", "sensitive-*")
+	dataStore, err := os.MkdirTemp("", "btl-*")
+	if err != nil {
+		panic(err)
+	}
 	chromeLauncher := launcher.New().
 		NoSandbox(true).
 		Headless(true).

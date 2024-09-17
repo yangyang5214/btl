@@ -134,13 +134,18 @@ func ParseFit(mergeFitCmd, fitFile string, logrHelper *log.Helper) (*Session, er
 		}
 
 		lat, ok := m["position_lat"]
-		if !ok {
+		if !ok || lat.(int64) == 0 {
+			continue
+		}
+
+		lng, ok := m["position_long"]
+		if !ok || lng.(int64) == 0 {
 			continue
 		}
 
 		p := Point{
 			Latitude:  float64(lat.(int64)) / 11930465,
-			Longitude: float64(m["position_long"].(int64)) / 11930465,
+			Longitude: float64(lng.(int64)) / 11930465,
 		}
 
 		speed, ok := m["speed"]

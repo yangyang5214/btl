@@ -76,7 +76,7 @@ func GenFitFile(activityType string, gpx2FitCmd string, logHelper *log.Helper, g
 	}
 
 	//这里统一转为 UTC 时间
-	if strings.Contains(gpxData.Description, "行者") {
+	if strings.Contains(gpxData.Description, "行者") || gpxData.Description == "Export from Mi Fitness" {
 		for _, track := range gpxData.Tracks {
 			for _, segment := range track.Segments {
 				for index := range segment.Points {

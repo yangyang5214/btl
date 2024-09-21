@@ -44,8 +44,13 @@ var gpx2fitCmd = &cobra.Command{
 	},
 }
 
+var (
+	maxSpeed string
+)
+
 func init() {
 	rootCmd.AddCommand(gpx2fitCmd)
+	gpx2fitCmd.Flags().StringVarP(&maxSpeed, "maxSpeed", "", "", "set max speed")
 }
 
 func gpx2fit(gpxFile string, fitFile string) error {
@@ -59,5 +64,5 @@ func gpx2fit(gpxFile string, fitFile string) error {
 	if err != nil {
 		return err
 	}
-	return pkg.GenFitFile("", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), newXml, fitFile)
+	return pkg.GenFitFile(maxSpeed, "", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), newXml, fitFile)
 }

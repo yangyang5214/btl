@@ -8,6 +8,7 @@ import (
 	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -46,8 +47,24 @@ func addSpeedExt(speed float64, nodes []gpx.ExtensionNode, trackExtSpace string)
 	return nodes
 }
 
-func appendGpxSpeed(gpxData *gpx.GPX) ([]byte, error) {
+func getRatio(maxSpeedStr string, maxSpeed float64) float64 {
+	var ratio = 1.0
+	actualMaxSpeed := maxSpeed
+
+	msFloat, err := strconv.ParseFloat(maxSpeedStr, 64)
+	if err != nil {
+		return ratio
+	}
+	return msFloat / actualMaxSpeed
+}
+
+func appendGpxSpeed(log *log.Helper, gpxData *gpx.GPX, maxSpeed string) ([]byte, error) {
 	nsAttrs := gpxData.Attrs.GetNamespaceAttrs()
+
+	actualMaxSpeed := gpxData.MovingData().MaxSpeed * 3.6
+	ratio := getRatio(maxSpeed, actualMaxSpeed)
+
+	log.Infof("set maxSpeed <%s km/h>, actualMaxSpeed: <%f km/h>, use ratio %f", maxSpeed, actualMaxSpeed, ratio)
 
 	var trackExtSpace string
 	for _, attr := range nsAttrs {
@@ -59,7 +76,8 @@ func appendGpxSpeed(gpxData *gpx.GPX) ([]byte, error) {
 		for _, segment := range track.Segments {
 			for index := range segment.Points {
 				point := &segment.Points[index]
-				point.Extensions.Nodes = addSpeedExt(segment.Speed(index), point.Extensions.Nodes, trackExtSpace)
+				speed := segment.Speed(index)
+				point.Extensions.Nodes = addSpeedExt(speed*ratio, point.Extensions.Nodes, trackExtSpace)
 			}
 		}
 	}
@@ -69,7 +87,7 @@ func appendGpxSpeed(gpxData *gpx.GPX) ([]byte, error) {
 	})
 }
 
-func GenFitFile(activityType string, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
+func GenFitFile(maxSpeed, activityType string, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
 	gpxData, err := gpx.ParseBytes(gpxBytes)
 	if err != nil {
 		return errors.WithStack(err)
@@ -87,7 +105,7 @@ func GenFitFile(activityType string, gpx2FitCmd string, logHelper *log.Helper, g
 		}
 	}
 
-	gpxBytes, err = appendGpxSpeed(gpxData)
+	gpxBytes, err = appendGpxSpeed(logHelper, gpxData, maxSpeed)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -96,7 +114,7 @@ func GenFitFile(activityType string, gpx2FitCmd string, logHelper *log.Helper, g
 		logHelper.Errorf("create temp gpx err %+v", err)
 		return err
 	}
-	log.Infof("Temp gpx File %s", gpxFile.Name())
+	logHelper.Infof("Temp gpx File %s", gpxFile.Name())
 	defer func() {
 		_ = os.Remove(gpxFile.Name())
 	}()

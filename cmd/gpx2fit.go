@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/tkrajina/gpxgo/gpx"
 	"github.com/yangyang5214/btl/pkg"
 	"github.com/yangyang5214/btl/pkg/utils"
 	"os"
@@ -54,15 +54,9 @@ func init() {
 }
 
 func gpx2fit(gpxFile string, fitFile string) error {
-	gpxData, err := gpx.ParseFile(gpxFile)
+	gpxBytes, err := os.ReadFile(gpxFile)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
-	newXml, err := gpxData.ToXml(gpx.ToXmlParams{
-		Indent: true,
-	})
-	if err != nil {
-		return err
-	}
-	return pkg.GenFitFile(maxSpeed, "", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), newXml, fitFile)
+	return pkg.GenFitFile(maxSpeed, "", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), gpxBytes, fitFile)
 }

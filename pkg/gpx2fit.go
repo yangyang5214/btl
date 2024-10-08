@@ -88,6 +88,10 @@ func appendGpxSpeed(log *log.Helper, gpxData *gpx.GPX, maxSpeed string) ([]byte,
 }
 
 func GenFitFile(maxSpeed, activityType string, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
+	//替换特殊字符
+	gpxContent := strings.ReplaceAll(string(gpxBytes), "&", "&amp;")
+	gpxBytes = []byte(gpxContent)
+
 	gpxData, err := gpx.ParseBytes(gpxBytes)
 	if err != nil {
 		return errors.WithStack(err)

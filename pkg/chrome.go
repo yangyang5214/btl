@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -25,10 +24,6 @@ type ChromePool struct {
 }
 
 func NewChromePool(logger log.Logger) (*ChromePool, func()) {
-	dataStore, err := os.MkdirTemp("", "btl-*")
-	if err != nil {
-		panic(err)
-	}
 	chromeLauncher := launcher.New().
 		NoSandbox(true).
 		Headless(true).
@@ -42,12 +37,9 @@ func NewChromePool(logger log.Logger) (*ChromePool, func()) {
 		Set("window-size", fmt.Sprintf("%d,%d", 1080, 1920)).
 		Set("mute-audio", "true").
 		Delete("use-mock-keychain").
-		Env(append(os.Environ(), "TZ=Asia/Shanghai")...).
-		UserDataDir(dataStore)
+		Env(append(os.Environ(), "TZ=Asia/Shanghai")...)
 
-	if runtime.GOOS == "darwin" {
-		chromeLauncher.Headless(false)
-	}
+	//chromeLauncher.Headless(false)
 
 	p, installed := launcher.LookPath()
 	if !installed {
@@ -64,7 +56,6 @@ func NewChromePool(logger log.Logger) (*ChromePool, func()) {
 
 	cancel := func() {
 		_ = browser.Close()
-		_ = os.RemoveAll(dataStore)
 	}
 
 	return &ChromePool{

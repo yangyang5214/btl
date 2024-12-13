@@ -43,6 +43,9 @@ func (e *GpxExport) SkipUpdate() {
 }
 
 func (e *GpxExport) Run() error {
+	if e.username == "" || e.password == "" {
+		return fmt.Errorf("user/pwd need")
+	}
 	if !pkg.FileExists(e.exportDir) {
 		return errors.New(fmt.Sprintf("exportDir: <%s> is not exists", e.exportDir))
 	}

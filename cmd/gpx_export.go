@@ -30,13 +30,15 @@ var gpxExportCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		if !pkg.FileExists(absPath) {
-			err = os.MkdirAll(absPath, 0755)
+
+		out := path.Join(absPath, app)
+		if !pkg.FileExists(out) {
+			err = os.MkdirAll(out, 0755)
 			if err != nil {
 				panic(err)
 			}
 		}
-		ge.SetExportDir(path.Join(absPath, app))
+		ge.SetExportDir(out)
 		err = ge.Run()
 		if err != nil {
 			panic(err)
@@ -47,7 +49,7 @@ var gpxExportCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(gpxExportCmd)
 	gpxExportCmd.Flags().StringVarP(&app, "app", "a", "", strings.Join(gpx_export.Apps, "\n"))
-	gpxExportCmd.Flags().StringVarP(&outDir, "out", "o", "garmin_export_out", "garmin_export_out dir")
+	gpxExportCmd.Flags().StringVarP(&outDir, "out", "", "gpx_export_out", "garmin_export_out_dir")
 
 	_ = gpxExportCmd.MarkFlagRequired("app")
 	_ = gpxExportCmd.MarkFlagRequired("user")

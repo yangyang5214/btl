@@ -15,7 +15,6 @@ type App = string
 
 var (
 	Apps = []App{
-		Strava,
 		GarminCN,
 		GarminCom,
 		Keep,
@@ -23,7 +22,6 @@ var (
 )
 
 const (
-	Strava    App = "strava"
 	GarminCN  App = "garmin_cn"
 	GarminCom App = "garmin"
 	Keep      App = "keep"

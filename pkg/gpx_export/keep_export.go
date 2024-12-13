@@ -54,7 +54,7 @@ func (k *KeepExporter) Init(gitDir, exportDir string, username, password string)
 	k.password = password
 }
 
-func (k *KeepExporter) Run() error {
+func (k *KeepExporter) Run(isAll bool) error {
 	cmdStr := fmt.Sprintf("python3 %s/keep_export.py %s %s --out %s", k.gitDir, k.username, k.password, k.exportDir)
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
 	k.log.Infof("start run cmd: %s", cmdStr)

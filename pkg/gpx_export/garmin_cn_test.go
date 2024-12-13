@@ -29,7 +29,7 @@ func init() {
 
 func TestRun(t *testing.T) {
 	g := NewGpxExport(log.DefaultLogger, GarminCN, username, password)
-	err := g.Run()
+	err := g.Run(false)
 	if err != nil {
 		t.Fatal(err)
 	}

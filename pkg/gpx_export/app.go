@@ -29,7 +29,7 @@ const (
 
 type AppExport interface {
 	Init(gitDir string, exportDir string, username, password string)
-	Run(isAll bool) error
+	Run(year, activityType string) error
 	Auth() bool
 }
 

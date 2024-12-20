@@ -47,11 +47,15 @@ func (g *Garmin) Auth() bool {
 	return strings.Contains(string(out), "success")
 }
 
-func (g *Garmin) Run(isAll bool) error {
+func (g *Garmin) Run(year, activityType string) error {
 	cmdStr := fmt.Sprintf("python3 %s/garmin_export.py -u '%s' -p '%s' --out %s", g.gitDir, g.username, g.password, g.exportDir)
-	if isAll {
-		cmdStr = cmdStr + " --all"
+	if year != "" {
+		cmdStr = cmdStr + " --year " + year
 	}
+	if activityType != "" {
+		cmdStr = cmdStr + " --activity_type " + activityType
+	}
+
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
 	g.log.Infof("start run cmd: %s", cmdStr)
 

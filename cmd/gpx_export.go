@@ -39,7 +39,7 @@ var gpxExportCmd = &cobra.Command{
 			}
 		}
 		ge.SetExportDir(out)
-		err = ge.Run(true)
+		err = ge.Run("", "")
 		if err != nil {
 			panic(err)
 		}

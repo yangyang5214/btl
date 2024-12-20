@@ -42,7 +42,7 @@ func (e *GpxExport) SkipUpdate() {
 	e.skipUpdate = true
 }
 
-func (e *GpxExport) Run(isAll bool) error {
+func (e *GpxExport) Run(year, activityType string) error {
 	if e.username == "" || e.password == "" {
 		return fmt.Errorf("user/pwd need")
 	}
@@ -76,7 +76,7 @@ func (e *GpxExport) Run(isAll bool) error {
 	}
 
 	e.log.Infof("auth success, start download gpx files... to %s", e.exportDir)
-	err := appExport.Run(isAll)
+	err := appExport.Run(year, activityType)
 	if err != nil {
 		return err
 	}

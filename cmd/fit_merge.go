@@ -17,7 +17,7 @@ var fitMergeCmd = &cobra.Command{
 		}
 
 		p := path.Join(homeDir, "merge-fit.jar")
-		err = pkg.NewFitMerge(p).Run()
+		err = pkg.NewFitMerge("java -jar " + p).Run()
 		if err != nil {
 			panic(err)
 		}

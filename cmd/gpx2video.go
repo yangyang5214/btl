@@ -64,7 +64,7 @@ var imgCmd = &cobra.Command{
 			}
 
 			p := path.Join(homeDir, "merge-fit.jar")
-			session, err = gpx2video.ParseFit(p, inputPath, log.NewHelper(logger))
+			session, err = gpx2video.ParseFit("java -jar "+p, inputPath, log.NewHelper(logger))
 		} else {
 			panic("不支持的文件类型")
 		}

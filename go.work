@@ -1,0 +1,10 @@
+go 1.23.0
+
+
+use (
+	.
+)
+
+replace (
+	github.com/yangyang5214/gpxgo v1.4.0 =>  ./../gpxgo
+)

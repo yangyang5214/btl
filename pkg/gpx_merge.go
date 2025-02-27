@@ -66,7 +66,7 @@ func (g *GpxMerge) loadGpxData() error {
 	return nil
 }
 
-func (g *GpxMerge) Run() error {
+func (g *GpxMerge) Run(removeFirstPoint bool) error {
 	if len(g.gpxDatas) == 0 {
 		err := g.loadGpxData()
 		if err != nil {
@@ -90,7 +90,10 @@ func (g *GpxMerge) Run() error {
 	for i := 1; i < len(g.gpxDatas); i++ {
 		points = append(points, g.gpxDatas[i].Tracks[0].Segments[0].Points...)
 	}
-	firstGpx.Tracks[0].Segments[0].Points = points[1:]
+
+	if removeFirstPoint {
+		firstGpx.Tracks[0].Segments[0].Points = points[1:]
+	}
 
 	date, err := firstGpx.ToXml(gpx.ToXmlParams{
 		Indent: true,

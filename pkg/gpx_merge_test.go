@@ -10,8 +10,8 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	g := NewGpxMerge("/tmp/test", log.DefaultLogger)
-	err := g.Run()
+	g := NewGpxMerge("/Users/beer/Downloads/11111", log.DefaultLogger)
+	err := g.Run(false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestSetGpxDatas(t *testing.T) {
 	}
 	g.SetGpxDatas([]*gpx.GPX{gpxData})
 	g.SetResultPath("/tmp/result.gpx")
-	err = g.Run()
+	err = g.Run(false)
 	if err != nil {
 		t.Fatal(err)
 	}

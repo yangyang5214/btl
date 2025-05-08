@@ -30,6 +30,7 @@ func NewGpxMerge(workDir string, logger log.Logger) *GpxMerge {
 }
 
 func (g *GpxMerge) SetResultPath(p string) {
+	g.log.Infof("Set result path to: %s", p)
 	g.resultPath = p
 }
 
@@ -87,13 +88,23 @@ func (g *GpxMerge) Run(removeFirstPoint bool) error {
 
 	firstGpx := g.gpxDatas[0]
 	points := firstGpx.Tracks[0].Segments[0].Points
+
+	//追加 points
 	for i := 1; i < len(g.gpxDatas); i++ {
-		points = append(points, g.gpxDatas[i].Tracks[0].Segments[0].Points...)
+		curPoints := g.gpxDatas[i].Tracks[0].Segments[0].Points
+
+		g.log.Infof("Append new points count %d, for file index %d", len(curPoints), i)
+
+		points = append(points, curPoints...)
 	}
 
+	g.log.Infof("All points count %d", len(points))
+
 	if removeFirstPoint {
-		firstGpx.Tracks[0].Segments[0].Points = points[1:]
+		points = points[1:]
 	}
+
+	firstGpx.Tracks[0].Segments[0].Points = points
 
 	date, err := firstGpx.ToXml(gpx.ToXmlParams{
 		Indent: true,

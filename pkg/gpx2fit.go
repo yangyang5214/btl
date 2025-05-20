@@ -87,7 +87,7 @@ func appendGpxSpeed(log *log.Helper, gpxData *gpx.GPX, maxSpeed string) ([]byte,
 	})
 }
 
-func GenFitFile(maxSpeed, activityType string, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
+func GenFitFile(maxSpeed, distance, activityType string, gpx2FitCmd string, logHelper *log.Helper, gpxBytes []byte, fitFile string) error {
 	//替换特殊字符
 	gpxContent := strings.ReplaceAll(string(gpxBytes), "&", "&amp;")
 	gpxBytes = []byte(gpxContent)
@@ -128,7 +128,7 @@ func GenFitFile(maxSpeed, activityType string, gpx2FitCmd string, logHelper *log
 		return err
 	}
 
-	gpx2fitCmd := fmt.Sprintf("%s %s %s %s", gpx2FitCmd, gpxFile.Name(), fitFile, activityType)
+	gpx2fitCmd := fmt.Sprintf("%s %s %s %s %s", gpx2FitCmd, gpxFile.Name(), fitFile, activityType, distance)
 	logHelper.Infof("run gpx2fit cmd %s", gpx2fitCmd)
 	cmd := exec.Command("/bin/bash", "-c", gpx2fitCmd)
 

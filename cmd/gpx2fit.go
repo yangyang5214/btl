@@ -58,5 +58,5 @@ func gpx2fit(gpxFile string, fitFile string) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return pkg.GenFitFile(maxSpeed, "", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), gpxBytes, fitFile)
+	return pkg.GenFitFile(maxSpeed, "", "", "java -jar ~/gpx2fit.jar", log.NewHelper(log.DefaultLogger), gpxBytes, fitFile)
 }

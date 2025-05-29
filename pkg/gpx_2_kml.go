@@ -49,7 +49,6 @@ type Gpx2Kml struct {
 	loggger log.Logger
 }
 
-// NewGpx2Kml
 // https://developers.google.com/kml/documentation/topicsinkml?hl=zh-cn
 // https://github.com/twpayne/go-kml
 func NewGpx2Kml(gpxFile string, logger log.Logger, opts ...Option) *Gpx2Kml {

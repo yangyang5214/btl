@@ -201,18 +201,29 @@ var gpxDemo = `
 `
 
 func (s *Fit2Gpx) Run() error {
+	var err error
+
+	gpxData, err := s.ParseToGpx()
+	if err != nil {
+		return err
+	}
+
+	return s.SaveGpx(gpxData, s.resultGpx)
+}
+
+func (s *Fit2Gpx) ParseToGpx() (*gpx.GPX, error) {
 	if len(s.fitFile) == 0 {
 		s.log.Infof("not fit file")
-		return nil
+		return nil, nil
 	}
 	session, err := s.process()
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	points := session.points
 	gpxData, err := gpx.ParseString(gpxDemo)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	s.log.Infof("sport type is <%s>", session.sportType)
 	gpxData.Tracks[0].Type = session.sportType
@@ -238,11 +249,14 @@ func (s *Fit2Gpx) Run() error {
 			Points: gpxPoints,
 		},
 	}
+	return gpxData, nil
+}
 
+func (s *Fit2Gpx) SaveGpx(gpxData *gpx.GPX, resultGpx string) error {
 	newXml, err := gpxData.ToXml(gpx.ToXmlParams{
 		Indent: true,
 	})
-	f, err := os.Create(s.resultGpx)
+	f, err := os.Create(resultGpx)
 	if err != nil {
 		return errors.WithStack(err)
 	}

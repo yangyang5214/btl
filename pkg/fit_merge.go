@@ -42,7 +42,7 @@ func MergeFit(cmdStr string, fitFiles []string, logHelper *log.Helper) ([]byte, 
 	defer func() {
 		_ = os.Remove(workDir)
 	}()
-	resultFit := path.Join(workDir, "rfp_"+uuid.New().String()+".fit")
+	resultFit := path.Join(workDir, "rfp"+uuid.New().String()+".fit")
 	defer func() {
 		_ = os.Remove(resultFit)
 	}()

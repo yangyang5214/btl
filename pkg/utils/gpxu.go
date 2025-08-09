@@ -114,7 +114,7 @@ func FindFitFiles(dirPath string) []string {
 			r = append(r, FindGpxFiles(p)...)
 		}
 		if strings.HasSuffix(name, ".fit") {
-			r = append(r, p)
+			r = append(r, fmt.Sprintf(`"%s"`, p))
 		}
 	}
 	return r

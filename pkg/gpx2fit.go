@@ -3,14 +3,15 @@ package pkg
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/pkg/errors"
-	"github.com/tkrajina/gpxgo/gpx"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
+	"github.com/tkrajina/gpxgo/gpx"
 )
 
 func addSpeedExt(speed float64, nodes []gpx.ExtensionNode, trackExtSpace string) []gpx.ExtensionNode {
@@ -98,7 +99,7 @@ func GenFitFile(maxSpeed, distance, activityType string, gpx2FitCmd string, logH
 	}
 
 	//这里统一转为 UTC 时间
-	if strings.Contains(gpxData.Description, "行者") || gpxData.Description == "Export from Mi Fitness" {
+	if strings.Contains(gpxData.Description, "行者") || gpxData.Description == "Export from Mi Fitness" || strings.Contains(gpxData.Creator, "https://github.com/labexp/osmtracker-android") {
 		for _, track := range gpxData.Tracks {
 			for _, segment := range track.Segments {
 				for index := range segment.Points {

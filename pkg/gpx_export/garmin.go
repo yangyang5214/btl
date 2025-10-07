@@ -34,7 +34,7 @@ func (g *Garmin) Init(gitDir string, exportDir string, username, password string
 }
 
 func (g *Garmin) Auth() bool {
-	cmdStr := fmt.Sprintf("python3 %s/garmin_secret.py -u '%s' -p '%s'", g.gitDir, g.username, g.password)
+	cmdStr := fmt.Sprintf("python3 %s/garmin_secret.py -u '%s' -p '%s'", g.gitDir, strings.TrimSpace(g.username), strings.TrimSpace(g.password))
 	cmd := exec.Command("/bin/bash", "-c", cmdStr)
 	g.log.Infof("start run cmd: %s", cmdStr)
 
